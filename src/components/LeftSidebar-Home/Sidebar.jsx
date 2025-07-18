@@ -81,8 +81,8 @@ export default function Sidebar() {
 
       <aside
         className={`
-          fixed top-0 left-0 h-full w-80 sm:w-64 bg-white dark:bg-fb-dark-primary 
-          shadow-lg lg:shadow-none overflow-y-auto p-4 z-50 transition-transform duration-300 ease-in-out
+          h-full w-72 sm:w-80 bg-white dark:bg-fb-dark-primary 
+          shadow-lg lg:shadow-none p-4 z-50 transition-transform duration-300 ease-in-out
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
           lg:translate-x-0 lg:top-14 lg:h-[calc(100vh-56px)] lg:z-30
         `}
