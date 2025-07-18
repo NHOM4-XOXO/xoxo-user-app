@@ -1,0 +1,60 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+import Image from "next/image";
+
+export default function MessageDropdown({ messages, onClose }) {
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        onClose();
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [onClose]);
+
+  return (
+    <div
+      ref={dropdownRef}
+      className="absolute right-1 top-16 w-96 bg-white dark:bg-fb-dark-secondary shadow-lg rounded-lg p-4 z-50"
+    >
+      <h3 className="text-lg font-semibold mb-2">Đoạn chat</h3>
+      <input
+        type="text"
+        placeholder="Tìm kiếm trên Messenger"
+        className="w-full px-3 py-1 mb-2 text-sm rounded-full bg-gray-100 dark:bg-gray-700 outline-none"
+      />
+      <div className="max-h-72 overflow-y-auto space-y-2">
+        {messages.map((msg) => (
+          <div
+            key={msg.id}
+            className={`flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer ${
+              msg.isRead ? "opacity-70" : "bg-blue-50 dark:bg-gray-700"
+            }`}
+          >
+            <Image
+              src={msg.avatar}
+              alt={msg.name}
+              width={50}
+              height={40}
+              className="rounded-full w-10 h-10 mr-3"
+            />
+            <div className="flex-1">
+              <p className="font-medium">{msg.name}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                {msg.preview}
+              </p>
+            </div>
+            <span className="text-xs text-gray-400 ml-2">{msg.time}</span>
+          </div>
+        ))}
+      </div>
+      <a href="#" className="block text-center text-blue-500 text-sm mt-2">
+        Xem tất cả trong Messenger
+      </a>
+    </div>
+  );
+}
