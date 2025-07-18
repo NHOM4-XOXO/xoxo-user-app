@@ -1,13 +1,13 @@
-import LoginForm from "@/components/LoginForm";
+"use client"
 
+import LoginForm from "@/components/LoginForm";
+import HomePage from "@/pages/HomePage/HomePage";
 
 
 export default function Home() {
   return (
     <main>
-      <LoginForm />
-
-   </main>
+      <HomePage />
+    </main>
   );
 }
-
