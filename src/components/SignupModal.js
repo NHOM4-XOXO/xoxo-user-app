@@ -1,61 +1,103 @@
 "use client";
-
 import { useState } from "react";
-import { HelpCircle, AlertCircle } from "lucide-react";
+import { useForm } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { AlertCircle, Eye, EyeOff } from "lucide-react";
+import userDataManager from "../utils/userDataManager";
+
+const sixYearsAgo = new Date();
+sixYearsAgo.setFullYear(sixYearsAgo.getFullYear() - 6);
+
+const schema = yup.object().shape({
+  firstName: yup.string().required("Vui lòng nhập tên."),
+  lastName: yup.string().required("Vui lòng nhập họ."),
+  email: yup
+    .string()
+    .required("Vui lòng nhập email hoặc số điện thoại.")
+    .test(
+      "emailOrPhone",
+      "Email hoặc số điện thoại không hợp lệ.",
+      (value) =>
+        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value || "") ||
+        /^(0|\+84)(3|5|7|8|9)\d{8}$/.test(value || "")
+    ),
+  password: yup
+    .string()
+    .required("Vui lòng nhập mật khẩu.")
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{6,}$/,
+      "Mật khẩu phải có ít nhất 6 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt."
+    ),
+  confirmPassword: yup
+    .string()
+    .oneOf([yup.ref("password")], "Mật khẩu không khớp.")
+    .required("Vui lòng xác nhận mật khẩu."),
+  birthday: yup
+    .date()
+    .typeError("Vui lòng chọn ngày sinh hợp lệ.")
+    .max(sixYearsAgo, "Bạn phải đủ ít nhất 6 tuổi để đăng ký.")
+    .required("Vui lòng chọn ngày sinh."),
+
+  gender: yup.string().required("Vui lòng chọn giới tính."),
+});
+
 export default function SignupModal({ isOpen, onClose }) {
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    birthday: "",
-    gender: "",
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({
+    resolver: yupResolver(schema),
+    mode: "onChange",
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
 
-  const [touched, setTouched] = useState({
-    firstName: false,
-    lastName: false,
-    email: false,
-    password: false,
-    confirmPassword: false,
-    birthday: false,
-  });
-  // Hàm xử lý khi người dùng rời khỏi trường nhập liệu
-  const handleBlur = (e) => {
-    const { name } = e.target;
-    setTouched((prev) => ({ ...prev, [name]: true }));
-  };
-  const isInvalid = (field) => touched[field] && !formData[field];
+  const onSubmit = async (data) => {
+    setIsSubmitting(true);
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-  // Trạng thái hiển thị gợi ý
-  const [showHint, setShowHint] = useState({
-    email: false,
-    password: false,
-  });
+    try {
+      
+      console.log("Đang lưu data đăng ký:", data);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      alert("Mật khẩu không khớp!");
-      return;
+      // Simulate network delay
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      // Lưu user data
+      const savedUser = userDataManager.saveUser(data);
+
+      console.log("Data đã được lưu thành công:", savedUser);
+      setSubmitSuccess(true);
+
+      
+      reset();
+
+      console.log("Tất cả users đã đăng ký:", userDataManager.getAllUsers());
+
+      setTimeout(() => {
+        setSubmitSuccess(false);
+        setIsSubmitting(false);
+        onClose();
+        alert(
+          "Đăng ký thành công!"
+        );
+      }, 2000);
+    } catch (error) {
+      console.error("Lỗi khi đăng ký:", error);
+      alert(error.message || "Có lỗi xảy ra khi đăng ký. Vui lòng thử lại!");
+      setIsSubmitting(false);
     }
-    // Xử lý đăng ký ở đây
-    console.log("Signup data:", formData);
-    onClose();
   };
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-white/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-screen overflow-visible">
+      <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-screen overflow-auto">
         <div className="p-6">
           <div className="flex justify-between items-center mb-4">
             <div>
@@ -70,233 +112,166 @@ export default function SignupModal({ isOpen, onClose }) {
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <div className="relative">
                 <input
                   type="text"
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  onFocus={() =>
-                    setTouched((prev) => ({ ...prev, lastName: false }))
-                  }
-                  placeholder="Tên"
-                  required
+                  {...register("lastName")}
+                  placeholder="Họ"
                   className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 ${
-                    isInvalid("lastName")
-                      ? "border-red-500"
-                      : "border-gray-300"
+                    errors.lastName ? "border-red-500" : "border-gray-300"
                   }`}
                 />
-                {isInvalid("lastName") && (
-                  <AlertCircle className="absolute right-2 top-2 text-red-500 w-5 h-5" />
+                {errors.lastName && (
+                  <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {errors.lastName.message}
+                  </p>
                 )}
               </div>
 
               <div className="relative">
                 <input
                   type="text"
-                  name="firstName"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  onFocus={() =>
-                    setTouched((prev) => ({ ...prev, firstName: false }))
-                  }
+                  {...register("firstName")}
                   placeholder="Tên"
-                  required
                   className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 ${
-                    isInvalid("firstName")
-                      ? "border-red-500"
-                      : "border-gray-300"
+                    errors.firstName ? "border-red-500" : "border-gray-300"
                   }`}
                 />
-
-                {isInvalid("firstName") && (
-                  <AlertCircle className="absolute right-2 top-2 text-red-500 w-5 h-5" />
+                {errors.firstName && (
+                  <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {errors.firstName.message}
+                  </p>
                 )}
               </div>
             </div>
 
             <div className="relative">
               <input
-                type="email"
-                name="email"
-                placeholder="Số di động hoặc email"
-                value={formData.email}
-                required
-                onChange={handleChange}
-                onFocus={() => {
-                  setShowHint((prev) => ({ ...prev, email: true }));
-                  setTouched((prev) => ({ ...prev, email: false }));
-                }}
-                onBlur={(e) => {
-                  setShowHint((prev) => ({ ...prev, email: false }));
-                  handleBlur(e);
-                }}
+                type="text"
+                {...register("email")}
+                placeholder="Email hoặc số điện thoại"
                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 ${
-                  isInvalid("email") ? "border-red-500" : "border-gray-300"
+                  errors.email ? "border-red-500" : "border-gray-300"
                 }`}
               />
-
-              {isInvalid("email") && (
-                <AlertCircle className="absolute right-2 top-2 text-red-500 w-5 h-5" />
-              )}
-
-              {showHint.email && (
-                <div className="absolute -left-[270px] top-1/2 -translate-y-1/2 w-[250px] bg-[#c84141] text-white text-sm px-4 py-2 rounded shadow-lg z-20 border border-[#8a2c2c]">
-                  <div className="absolute top-1/2 right-[-8px] -translate-y-1/2 w-0 h-0 border-t-[8px] border-b-[8px] border-l-[8px] border-t-transparent border-b-transparent border-l-[#c84141]"></div>
-                  Bạn sẽ sử dụng thông tin này khi đăng nhập và khi cần đặt lại
-                  mật khẩu.
-                </div>
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-4 h-4" />
+                  {errors.email.message}
+                </p>
               )}
             </div>
 
             <div className="relative">
               <input
-                type="password"
-                name="password"
-                value={formData.password}
+                type={showPassword ? "text" : "password"}
                 placeholder="Mật khẩu"
-                required
-                onChange={handleChange}
-                onFocus={() => {
-                  setShowHint((prev) => ({ ...prev, password: true }));
-                  setTouched((prev) => ({ ...prev, password: false }));
-                }}
-                onBlur={(e) => {
-                  setShowHint((prev) => ({ ...prev, password: false }));
-                  handleBlur(e);
-                }}
+                {...register("password")}
                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 ${
-                  isInvalid("password") ? "border-red-500" : "border-gray-300"
-                }`}
+                  errors.password ? "border-red-500" : "border-gray-300"
+                } pr-10`}
               />
-              {isInvalid("password") && (
-                <AlertCircle className="absolute right-2 top-2 text-red-500 w-5 h-5" />
-              )}
-
-              {showHint.password && (
-                <div className="absolute -left-[270px] top-1/2 -translate-y-1/2 w-[250px] bg-[#c84141] text-white text-sm px-4 py-2 rounded shadow-lg z-20 border border-[#8a2c2c]">
-                  <div className="absolute top-1/2 right-[-8px] -translate-y-1/2 w-0 h-0 border-t-[8px] border-b-[8px] border-l-[8px] border-t-transparent border-b-transparent border-l-[#c84141]"></div>
-                  Nhập mật khẩu có tối thiểu 6 ký tự, bao gồm chữ cái, số và ký
-                  tự đặc biệt.
-                </div>
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-2 top-2 text-gray-500"
+                tabIndex={-1}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-4 h-4" />
+                  {errors.password.message}
+                </p>
               )}
             </div>
 
             <div className="relative">
               <input
-                type="password"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                onFocus={() =>
-                  setTouched((prev) => ({ ...prev, confirmPassword: false }))
-                }
+                type={showConfirmPassword ? "text" : "password"}
                 placeholder="Nhập lại mật khẩu"
-                required
+                {...register("confirmPassword")}
                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 ${
-                  isInvalid("confirmPassword")
-                    ? "border-red-500"
-                    : "border-gray-300"
-                }`}
+                  errors.confirmPassword ? "border-red-500" : "border-gray-300"
+                } pr-10`}
               />
-              {isInvalid("confirmPassword") && (
-                <AlertCircle className="absolute right-2 top-2 text-red-500 w-5 h-5" />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword((prev) => !prev)}
+                className="absolute right-2 top-2 text-gray-500"
+                tabIndex={-1}
+              >
+                {showConfirmPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
+              {errors.confirmPassword && (
+                <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-4 h-4" />
+                  {errors.confirmPassword.message}
+                </p>
               )}
             </div>
+
             <div className="relative">
               <label className="block text-sm text-gray-600 mb-1">
                 Ngày sinh
-                <div className="relative inline-block group ml-1">
-                  <span>
-                    <HelpCircle
-                      className="w-4 h-4 text-black cursor-pointer"
-                      title="Chúng tôi dùng ngày sinh để xác định độ tuổi."
-                    />
-                  </span>
-                  <div className="absolute left-5 z-10 hidden group-hover:block w-56 bg-white text-sm text-gray-700 p-2 rounded shadow-lg border border-gray-200">
-                    Cung cấp sinh nhật của bạn giúp đảm bảo bạn có được trải
-                    nghiệm Facebook phù hợp với độ tuổi của mình. Nếu bạn muốn
-                    thay đổi người nhìn thấy thông tin này, hãy đi tới phần
-                    "Giới thiệu trên trang cá nhân" của bạn!
-                  </div>
-                </div>
               </label>
               <input
                 type="date"
-                name="birthday"
-                value={formData.birthday}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                onFocus={() =>
-                  setTouched((prev) => ({ ...prev, birthday: false }))
-                }
-                required
+                {...register("birthday")}
                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 ${
-                  isInvalid("birthday") ? "border-red-500" : "border-gray-300"
+                  errors.birthday ? "border-red-500" : "border-gray-300"
                 }`}
               />
-              {isInvalid("birthday") && (
-                <AlertCircle className="absolute right-2 top-2 text-red-500 w-5 h-5" />
+              {errors.birthday && (
+                <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-4 h-4" />
+                  {errors.birthday.message}
+                </p>
               )}
             </div>
 
             <div className="relative">
               <label className="block text-sm text-gray-600 mb-1">
                 Giới tính
-                <div className="relative inline-block group ml-1">
-                  <span>
-                    <HelpCircle
-                      className="w-4 h-4 text-black cursor-pointer"
-                      title="Chúng tôi dùng ngày sinh để xác định độ tuổi."
-                    />
-                  </span>
-                  <div className="absolute left-5 z-10 hidden group-hover:block w-56 bg-white text-sm text-gray-700 p-2 rounded shadow-lg border border-gray-200">
-                    Bạn có thể thay đổi người nhìn thấy giới tính của mình trên
-                    trang cá nhân vào lúc khác. Chọn Khác nếu bạn thuộc giới
-                    tính khác hoặc không muốn tiết lộ.
-                  </div>
-                </div>
               </label>
               <div className="grid grid-cols-3 gap-2">
-                <label className="flex items-center p-2 border border-gray-300 rounded-md">
-                  <input
-                    type="radio"
-                    name="gender"
-                    value="female"
-                    onChange={handleChange}
-                    className="mr-2"
-                  />
-                  Nữ
-                </label>
-                <label className="flex items-center p-2 border border-gray-300 rounded-md">
-                  <input
-                    type="radio"
-                    name="gender"
-                    value="male"
-                    onChange={handleChange}
-                    className="mr-2"
-                  />
-                  Nam
-                </label>
-                <label className="flex items-center p-2 border border-gray-300 rounded-md">
-                  <input
-                    type="radio"
-                    name="gender"
-                    value="other"
-                    onChange={handleChange}
-                    className="mr-2"
-                  />
-                  Khác
-                </label>
+                {["female", "male", "other"].map((value) => (
+                  <label
+                    key={value}
+                    className="flex items-center p-2 border border-gray-300 rounded-md"
+                  >
+                    <input
+                      type="radio"
+                      value={value}
+                      {...register("gender")}
+                      className="mr-2"
+                    />
+                    {value === "female"
+                      ? "Nữ"
+                      : value === "male"
+                      ? "Nam"
+                      : "Khác"}
+                  </label>
+                ))}
               </div>
-              {isInvalid("gender") && (
-                <AlertCircle className="absolute right-2 top-2 text-red-500 w-5 h-5" />
+              {errors.gender && (
+                <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-4 h-4" />
+                  {errors.gender.message}
+                </p>
               )}
             </div>
 
@@ -321,9 +296,57 @@ export default function SignupModal({ isOpen, onClose }) {
 
             <button
               type="submit"
-              className="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition duration-200 font-semibold"
+              disabled={isSubmitting}
+              className={`w-full py-2 px-4 rounded-md font-semibold transition duration-200 ${
+                isSubmitting
+                  ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                  : submitSuccess
+                  ? "bg-green-600 text-white"
+                  : "bg-green-500 text-white hover:bg-green-600"
+              }`}
             >
-              Đăng ký
+              {isSubmitting ? (
+                <span className="flex items-center justify-center">
+                  <svg
+                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Đang đăng ký...
+                </span>
+              ) : submitSuccess ? (
+                <span className="flex items-center justify-center">
+                  <svg
+                    className="w-5 h-5 mr-2"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  Đăng ký thành công!
+                </span>
+              ) : (
+                "Đăng ký"
+              )}
             </button>
           </form>
         </div>
