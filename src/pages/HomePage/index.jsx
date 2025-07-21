@@ -106,7 +106,7 @@ export default function HomePage() {
       </ScrollableContainer>
 
       {/* Chat Widget */}
-      <div>
+      <div className="hidden md:block">
         {activeChatContacts.map((contact, index) => (
           <ChatWidget
             key={contact.id}
