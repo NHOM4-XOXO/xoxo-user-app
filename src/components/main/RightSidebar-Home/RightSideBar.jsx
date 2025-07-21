@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { contactsData, groupChatsData } from "@/data/rightSidebarData";
 import { Search, MoreHorizontal, Plus } from "lucide-react";
-import SettingsDropdown from "@/components/RightSidebar-Home/SettingsDropdown";
 
-const RightSideBar = ({ isSettingsOpen, setIsSettingsOpen }) => {
+const RightSideBar = ({
+  isSettingsOpen,
+  setIsSettingsOpen,
+  onContactClick,
+}) => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const filteredContacts = contactsData.filter((contact) =>
@@ -38,6 +41,7 @@ const RightSideBar = ({ isSettingsOpen, setIsSettingsOpen }) => {
           <div
             key={contact.id}
             className="flex items-center p-2 hover:bg-fb-light-tertiary dark:hover:bg-fb-dark-tertiary rounded-lg cursor-pointer transition-colors group"
+            onClick={() => onContactClick(contact)}
           >
             <div className="relative">
               <img
