@@ -70,7 +70,7 @@ const SettingsDropdown = ({ isOpen, onClose }) => {
       <div className="fixed inset-0 z-50" onClick={onClose} />
 
       {/* Dropdown */}
-      <div className="absolute top-24 right-16 w-80 xl:w-96 max-h-11/12 overflow-y-auto bg-fb-light-primary dark:bg-fb-dark-secondary rounded-lg shadow-2xl z-50 border border-gray-300 dark:border-gray-700">
+      <div className="absolute hidden xl:block top-24 right-10 w-80 xl:w-96 max-h-3/4 overflow-y-auto bg-fb-light-primary dark:bg-fb-dark-secondary rounded-lg shadow-2xl z-50 border border-gray-300 dark:border-gray-700">
         {renderCurrentView()}
       </div>
     </>

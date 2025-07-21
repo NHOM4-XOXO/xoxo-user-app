@@ -1,7 +1,7 @@
 "use client"
 
-import LoginForm from "@/components/LoginForm";
-import HomePage from "@/pages/HomePage/HomePage";
+import LoginForm from "@/components/main/LoginForm";
+import HomePage from "@/pages/HomePage";
 
 
 export default function Home() {

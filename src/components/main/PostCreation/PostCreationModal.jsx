@@ -83,7 +83,9 @@ const PostCreationModal = ({
               className="w-10 h-10 rounded-full object-cover"
             />
             <div>
-              <h3 className="text-black dark:text-white font-medium">Minh Thắng</h3>
+              <h3 className="text-black dark:text-white font-medium">
+                Minh Thắng
+              </h3>
               <div className="relative">
                 <button
                   onClick={() => setShowPrivacyDropdown(!showPrivacyDropdown)}
