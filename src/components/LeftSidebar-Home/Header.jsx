@@ -114,7 +114,7 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="fixed top-0 left-0 right-0 bg-white dark:bg-fb-dark-secondary shadow z-50 px-2 sm:px-4 flex justify-between items-center">
+    <header className="fixed flex top-0 left-0 right-0 bg-white dark:bg-fb-dark-secondary shadow z-50 px-2 sm:px-4 flex justify-between items-center">
       <div className="flex items-center space-x-2">
         <button className="lg:hidden p-2 hover bg-gray-100 dark:hover:bg-gray-700 rounded-full">
           <FiMenu className="text-xl" />
@@ -138,21 +138,21 @@ export default function Header() {
         </button>
       </div>
 
-      <div className="hidden md:flex items-center text-2xl lg:text-3xl space-x-4 lg:space-6 text-gray-400 cursor-pointer">
+      <div className="hidden mr-35 md:flex items-center text-2xl lg:text-3xl space-x-4 lg:space-6 text-gray-400 cursor-pointer">
         <button className="p-2 lg:p-3 hover:bg-gray100 dark:hover:bg-gray-700 rounded-lg hover:text-blue-600 transition-colors cursor-pointer">
           <IoMdHome />
         </button>
         <button className="p-2 lg:p-3 hover:bg-gray100 dark:hover:bg-gray-700 rounded-lg hover:text-blue-600 transition-colors cursor-pointer">
-          <FaUserFriends />
+          <FaUserFriends className="ml-4" />
         </button>
         <button className="p-2 lg:p-3 hover:bg-gray100 dark:hover:bg-gray-700 rounded-lg hover:text-blue-600 transition-colors cursor-pointer">
-          <MdOndemandVideo />
+          <MdOndemandVideo className="ml-4" />
         </button>
         <button className="p-2 lg:p-3 hover:bg-gray100 dark:hover:bg-gray-700 rounded-lg hover:text-blue-600 transition-colors cursor-pointer">
-          <FaStore />
+          <FaStore className="ml-4" />
         </button>
         <button className="p-2 lg:p-3 hover:bg-gray100 dark:hover:bg-gray-700 rounded-lg hover:text-blue-600 transition-colors cursor-pointer">
-          <RiGroup2Line />
+          <RiGroup2Line className="ml-4" />
         </button>
       </div>
 
