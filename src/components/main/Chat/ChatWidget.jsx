@@ -180,7 +180,7 @@ export default function ChatWidget({
             >
               {msg.content || msg.file?.type === "other" ? (
                 <div
-                  className={`max-w-[75%] p-2 rounded-lg ${
+                  className={`max-w-[75%] p-2 rounded-lg break-all ${
                     msg.file
                       ? "bg-fb-light-tertiary dark:bg-fb-dark-tertiary dark:text-white"
                       : msg.sender === "me"
