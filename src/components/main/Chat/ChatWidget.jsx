@@ -170,17 +170,17 @@ export default function ChatWidget({
         </div>
 
         {/* Message Area */}
-        <ScrollableContainer className="flex-1 overflow-y-auto p-3 ">
-          <div className="space-y-3">
-            {messages.map((msg) => (
-              <div
-                key={msg.id}
-                className={`flex ${
-                  msg.sender === "me" ? "justify-end" : "justify-start"
-                }`}
-              >
+        <div className="flex-1 overflow-y-auto p-3 space-y-3 scrollbar-show">
+          {messages.map((msg) => (
+            <div
+              key={msg.id}
+              className={`flex ${
+                msg.sender === "me" ? "justify-end" : "justify-start"
+              }`}
+            >
+              {msg.content || msg.file?.type === "other" ? (
                 <div
-                  className={`max-w-[75%] p-2 rounded-lg break-all ${
+                  className={`max-w-[75%] p-2 rounded-lg ${
                     msg.file
                       ? "bg-fb-light-tertiary dark:bg-fb-dark-tertiary dark:text-white"
                       : msg.sender === "me"
@@ -198,53 +198,44 @@ export default function ChatWidget({
                       ))}
                     </p>
                   )}
+
                   {msg.file && (
-                    <div className="mt-1">
-                      {msg.file.type === "image" && (
-                        <img
-                          src={msg.file.url || "/placeholder.svg"}
-                          alt={msg.file.name}
-                          className="max-w-full h-auto rounded-md cursor-pointer"
-                          onClick={() => openImagePreview(msg.file.url)}
-                        />
-                      )}
-                      {msg.file.type === "video" && (
-                        <video
-                          src={msg.file.url}
-                          controls
-                          className="max-w-full h-auto rounded-md"
-                        />
-                      )}
-                      {msg.file.type === "audio" && (
-                        <audio
-                          src={msg.file.url}
-                          controls
-                          className="w-[200px]"
-                        />
-                      )}
-                      {msg.file.type === "other" && (
-                        <a
-                          href={msg.file.url}
-                          download={msg.file.name}
-                          className="flex items-center space-x-2 hover:underline"
-                        >
-                          <Download className="w-4 h-4" />
-                          <span className="text-sm font-bold">
-                            {msg.file.name}
-                          </span>
-                        </a>
-                      )}
-                    </div>
+                    <a
+                      href={msg.file.url}
+                      download={msg.file.name}
+                      className="flex items-center space-x-2 hover:underline"
+                    >
+                      <Download className="w-4 h-4" />
+                      <span className="text-sm font-bold">{msg.file.name}</span>
+                    </a>
                   )}
+
                   <span className="text-xs opacity-75 mt-1 block text-right">
                     {msg.timestamp}
                   </span>
                 </div>
-              </div>
-            ))}
-            <div ref={messagesEndRef} />
-          </div>
-        </ScrollableContainer>
+              ) : (
+                <div className="mt-1 max-w-[75%] rounded-lg">
+                  {msg.file.type === "image" && (
+                    <img
+                      src={msg.file.url || "/placeholder.svg"}
+                      alt={msg.file.name}
+                      className="rounded-md cursor-pointer"
+                      onClick={() => openImagePreview(msg.file.url)}
+                    />
+                  )}
+                  {msg.file.type === "video" && (
+                    <video src={msg.file.url} controls className="rounded-md" />
+                  )}
+                  {msg.file.type === "audio" && (
+                    <audio src={msg.file.url} controls className="w-[200px]" />
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+          <div ref={messagesEndRef} />
+        </div>
 
         {/* Input Area */}
         <div className="p-3 border-t border-gray-300 dark:border-gray-700 flex items-center space-x-2">
