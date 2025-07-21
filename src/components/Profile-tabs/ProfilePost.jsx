@@ -7,7 +7,8 @@ import {
     HeartIcon,
 } from "lucide-react";
 import Post from "../Post/PostItem";
-import PostCreation from "../PostCreation";
+import PostCreation from "../main/PostCreation";
+
 
 const posts = [
     {
