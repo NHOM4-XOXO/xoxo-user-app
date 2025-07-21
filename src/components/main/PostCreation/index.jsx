@@ -55,7 +55,7 @@ const PostCreation = () => {
           />
         </div>
 
-        <div className="border-t border-gray-700 pt-4 flex items-center justify-between space-x-1 md:space-x-0">
+        <div className="border-t border-gray-300 dark:border-gray-700 pt-4 flex items-center justify-between space-x-1 md:space-x-0">
           <button className="flex items-center space-x-1 md:space-x-2 px-2 md:px-1 py-2 hover:bg-fb-light-tertiary dark:hover:bg-fb-dark-quaternary rounded-lg transition-colors flex-1 justify-center cursor-pointer">
             <Video className="w-6 h-6 md:w-7 md:h-7 flex-shrink-0 text-red-500" />
             <span className="text-xs md:text-sm font-medium">
