@@ -48,10 +48,14 @@ export default function EmailVerification() {
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center">
-            <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center mr-4">
-              <span className="text-white font-bold text-xl">f</span>
+            <div className="w-14 h-14 bg-amber-50 rounded-full flex items-center justify-center mr-4">
+              <img
+                src="./logo_xoxo_500px-removebg-preview.png"
+                alt="Logo"
+                className="h-16 w-16 rounded-full"
+              />
             </div>
-            <h1 className="text-2xl font-bold text-blue-600">facebook</h1>
+            <h1 className="text-2xl font-bold text-blue-600">XOXO</h1>
           </div>
         </div>
       </header>
