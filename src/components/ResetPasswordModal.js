@@ -1,9 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { userDataManager } from "../utils/userDataManager";
+import userDataManager from "../utils/userDataManager";
 
-export default function ResetPasswordModal({ isOpen, onClose, user }) {
+export default function ResetPasswordModal({
+  isOpen,
+  onClose,
+  user,
+  onSuccess,
+}) {
   const [passwords, setPasswords] = useState({
     newPassword: "",
     confirmPassword: "",
@@ -32,20 +37,21 @@ export default function ResetPasswordModal({ isOpen, onClose, user }) {
   const validatePasswords = () => {
     const newErrors = {};
 
-    if (passwords.newPassword.length < 6) {
-      newErrors.newPassword = "Mật khẩu phải có ít nhất 6 ký tự";
-    }
-
-    if (passwords.newPassword !== passwords.confirmPassword) {
-      newErrors.confirmPassword = "Mật khẩu xác nhận không khớp";
-    }
+    // Kiểm tra mật khẩu có hợp lệ không (giống như signup)
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{6,}$/;
 
     if (!passwords.newPassword) {
       newErrors.newPassword = "Vui lòng nhập mật khẩu mới";
+    } else if (!passwordRegex.test(passwords.newPassword)) {
+      newErrors.newPassword =
+        "Mật khẩu phải có ít nhất 6 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt";
     }
 
     if (!passwords.confirmPassword) {
       newErrors.confirmPassword = "Vui lòng xác nhận mật khẩu";
+    } else if (passwords.newPassword !== passwords.confirmPassword) {
+      newErrors.confirmPassword = "Mật khẩu xác nhận không khớp";
     }
 
     setErrors(newErrors);
@@ -70,38 +76,41 @@ export default function ResetPasswordModal({ isOpen, onClose, user }) {
         throw new Error("User ID không hợp lệ!");
       }
 
-      // Cập nhật mật khẩu mới vào localStorage
-      const updatedUser = userDataManager.updatePassword(
-        user.id,
-        passwords.newPassword
-      );
+      // Sử dụng userDataManager trực tiếp thay vì UserContext
+      const updatedUser = userDataManager.updateUser(user.id, {
+        password: passwords.newPassword,
+      });
+
       console.log("Mật khẩu đã được cập nhật:", updatedUser);
 
-      // Kiểm tra lại user sau khi cập nhật để đảm bảo mật khẩu đã được lưu
-      const verifyUser = userDataManager.findUserByEmail(user.email);
-      console.log("Kiểm tra user sau khi cập nhật:", verifyUser);
+      // Simulate API call delay
+      setTimeout(() => {
+        setIsLoading(false);
 
-      if (verifyUser && verifyUser.password === passwords.newPassword) {
-        console.log("✅ Mật khẩu đã được cập nhật thành công!");
-
-        // Simulate API call delay
-        setTimeout(() => {
-          setIsLoading(false);
+        // Call success callback if provided
+        if (onSuccess) {
+          onSuccess();
           alert(
-            ` Mật khẩu đã được đặt lại thành công!\n\nEmail: ${user.email}\nMật khẩu mới: ${passwords.newPassword}\n\nVui lòng đăng nhập với mật khẩu mới.`
+            `Mật khẩu đã được đặt lại thành công!\n\nEmail: ${user.email}\nMật khẩu mới: ${passwords.newPassword}\n\nVui lòng đăng nhập với mật khẩu mới.`
+          );
+        } else {
+          alert(
+            `Mật khẩu đã được đặt lại thành công!\n\nEmail: ${user.email}\nMật khẩu mới: ${passwords.newPassword}\n\nVui lòng đăng nhập với mật khẩu mới.`
           );
           onClose();
-          // Reset form
-          setPasswords({
-            newPassword: "",
-            confirmPassword: "",
-          });
-          // Redirect to login page
+        }
+
+        // Reset form
+        setPasswords({
+          newPassword: "",
+          confirmPassword: "",
+        });
+
+        // Redirect to login page
+        setTimeout(() => {
           window.location.href = "/login";
-        }, 1500);
-      } else {
-        throw new Error("Có lỗi xảy ra khi lưu mật khẩu mới!");
-      }
+        }, 1000);
+      }, 1500);
     } catch (error) {
       setIsLoading(false);
       alert("Có lỗi xảy ra khi đặt lại mật khẩu. Vui lòng thử lại!");
@@ -112,7 +121,7 @@ export default function ResetPasswordModal({ isOpen, onClose, user }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-blue-300 bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
         <div className="p-6">
           <div className="flex justify-between items-center mb-4">
@@ -129,8 +138,8 @@ export default function ResetPasswordModal({ isOpen, onClose, user }) {
 
           <div className="mb-6">
             <p className="text-gray-600 mb-4">
-              Tạo mật khẩu mới có ít nhất 6 ký tự. Mật khẩu mạnh bao gồm chữ số,
-              chữ cái và dấu câu.
+              Tạo mật khẩu mới có ít nhất 6 ký tự. Mật khẩu mạnh phải bao gồm:
+              chữ hoa, chữ thường, số và ký tự đặc biệt (!@#$%^&*).
             </p>
 
             {/* User Info */}

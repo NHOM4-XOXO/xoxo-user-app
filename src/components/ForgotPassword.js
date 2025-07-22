@@ -2,29 +2,58 @@
 
 import { useState } from "react";
 import FindAccountModal from "./FindAccountModal";
+import { useUser } from "../contexts/UserContext";
 
 export default function ForgotPassword() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+
+  // Header login form states
+  const [headerLogin, setHeaderLogin] = useState({
+    email: "",
+    password: "",
+  });
+  const [headerLoading, setHeaderLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const { login } = useUser();
+
+  // Handle header login
+  const handleHeaderLogin = async (e) => {
+    e.preventDefault();
+    if (!headerLogin.email || !headerLogin.password) {
+      alert("Vui lòng nhập đầy đủ email và mật khẩu");
+      return;
+    }
+
+    setHeaderLoading(true);
+    try {
+      await login(headerLogin.email, headerLogin.password);
+      alert("Đăng nhập thành công!");
+      window.location.href = "/";
+    } catch (error) {
+      alert("Đăng nhập thất bại: " + error.message);
+    } finally {
+      setHeaderLoading(false);
+    }
+  };
 
   const handleSearch = () => {
     if (!searchQuery.trim()) {
-      setError("Vui lòng nhập email hoặc số điện thoại");
+      setError("Vui lòng nhập email");
       return;
     }
 
     // Basic validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const phoneRegex = /^[0-9]{10,11}$/;
 
-    if (!emailRegex.test(searchQuery) && !phoneRegex.test(searchQuery)) {
-      setError("Vui lòng nhập email hoặc số điện thoại hợp lệ");
+    if (!emailRegex.test(searchQuery)) {
+      setError("Vui lòng nhập email hợp lệ");
       return;
     }
 
     setError("");
-    setIsModalOpen(true);
+    setShowModal(true);
   };
 
   return (
@@ -42,47 +71,66 @@ export default function ForgotPassword() {
                     className="h-16 w-16 rounded-full"
                   />
                 </div>
-                <h1 className="text-2xl font-bold text-blue-600">XOXO</h1>
+                <div>
+                  <a href="/login" className="text-2xl font-bold text-blue-600">
+                    XOXO
+                  </a>
+                </div>
               </div>
-              <div className="ml-auto flex items-center space-x-4">
+              <form
+                onSubmit={handleHeaderLogin}
+                className="ml-auto flex items-center space-x-4"
+              >
                 <input
                   type="text"
-                  placeholder="Email hoặc điện thoại"
-                  className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+                  placeholder="Email "
+                  value={headerLogin.email}
+                  onChange={(e) =>
+                    setHeaderLogin({ ...headerLogin, email: e.target.value })
+                  }
+                  className="px-3 py-2 border border-gray-300 rounded-md text-sm placeholder-gray-600"
+                  disabled={headerLoading}
                 />
                 <input
                   type="password"
                   placeholder="Mật khẩu"
-                  className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+                  value={headerLogin.password}
+                  onChange={(e) =>
+                    setHeaderLogin({ ...headerLogin, password: e.target.value })
+                  }
+                  className="px-3 py-2 border border-gray-300 rounded-md text-sm placeholder-gray-600"
+                  disabled={headerLoading}
                 />
-                <button className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
-                  Đăng nhập
-                </button>
-                <a
-                  href="/login"
-                  className="text-blue-600 text-sm hover:underline"
+                <button
+                  type="submit"
+                  disabled={headerLoading}
+                  className={`px-4 py-2 rounded-md text-sm font-medium ${
+                    headerLoading
+                      ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+                      : "bg-blue-600 text-white hover:bg-blue-700"
+                  }`}
                 >
-                  Bạn quên tài khoản ư?
-                </a>
-              </div>
+                  {headerLoading ? "Đang đăng nhập..." : "Đăng nhập"}
+                </button>
+              </form>
             </div>
           </div>
         </header>
 
         {/* Main Content */}
-        <div className="flex items-center justify-center py-30 px-4">
+        <div className="flex items-center bg-blue-300 justify-center py-30 px-4">
           <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">
               Tìm tài khoản của bạn
             </h2>
             <p className="text-gray-600 mb-6">
-              Vui lòng nhập email hoặc số di động để tìm kiếm tài khoản của bạn.
+              Vui lòng nhập email để tìm kiếm tài khoản của bạn.
             </p>
 
             <div className="mb-6">
               <input
                 type="text"
-                placeholder="Email hoặc số di động"
+                placeholder="Email"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg placeholder-gray-600 ${
@@ -109,11 +157,12 @@ export default function ForgotPassword() {
             </div>
           </div>
         </div>
+        
       </div>
 
       <FindAccountModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
         searchQuery={searchQuery}
       />
     </>

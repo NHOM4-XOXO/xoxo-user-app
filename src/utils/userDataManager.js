@@ -151,6 +151,7 @@ export const userDataManager = {
 
       // Lưu thông tin user đang đăng nhập (lấy user sau khi đã update)
       localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+      console.log("✅ Đã lưu currentUser:", updatedUser);
 
       return updatedUser;
     } catch (error) {
