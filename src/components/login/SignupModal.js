@@ -14,13 +14,12 @@ const schema = yup.object().shape({
   lastName: yup.string().required("Vui lòng nhập họ."),
   email: yup
     .string()
-    .required("Vui lòng nhập email hoặc số điện thoại.")
+    .required("Vui lòng nhập email.")
     .test(
-      "emailOrPhone",
-      "Email hoặc số điện thoại không hợp lệ.",
+      "email",
+      "Email không hợp lệ.",
       (value) =>
-        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value || "") ||
-        /^(0|\+84)(3|5|7|8|9)\d{8}$/.test(value || "")
+        /^[a-zA-Z0-9._%+-]+@(?:gmail\.com|yahoo\.com|outlook\.com|example\.com)$/.test(value || "")
     ),
   password: yup
     .string()
@@ -154,7 +153,7 @@ export default function SignupModal({ isOpen, onClose }) {
               <input
                 type="text"
                 {...register("email")}
-                placeholder="Email hoặc số điện thoại"
+                placeholder="Email "
                 className={`w-full px-3 py-2 border rounded-md bg-white placeholder-gray-600 text-gray-900 focus:outline-none focus:ring-2 ${
                   errors.email ? "border-red-500" : "border-gray-300"
                 }`}
