@@ -21,7 +21,6 @@ export default function ResetPasswordModal({ isOpen, onClose, user }) {
       [name]: value,
     }));
 
-    // Clear errors when user types
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
@@ -160,7 +159,7 @@ export default function ResetPasswordModal({ isOpen, onClose, user }) {
                   placeholder="Mật khẩu mới"
                   value={passwords.newPassword}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg ${
+                  className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg placeholder:text-gray-700 placeholder:font-medium ${
                     errors.newPassword ? "border-red-500" : "border-gray-300"
                   }`}
                 />
@@ -178,7 +177,7 @@ export default function ResetPasswordModal({ isOpen, onClose, user }) {
                   placeholder="Nhập lại mật khẩu mới"
                   value={passwords.confirmPassword}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg ${
+                  className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg placeholder:text-gray-700 placeholder:font-medium ${
                     errors.confirmPassword
                       ? "border-red-500"
                       : "border-gray-300"

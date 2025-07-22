@@ -138,7 +138,6 @@ export default function VerificationModal({ isOpen, onClose, method, user }) {
               </div>
             </div>
 
-            {/* Test Code Helper (chỉ hiển thị sau khi gửi lại nhiều lần) */}
             {showTestCode && method === "email" && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
                 <div className="flex items-center">
@@ -155,7 +154,7 @@ export default function VerificationModal({ isOpen, onClose, method, user }) {
                   </svg>
                   <div className="text-sm text-blue-800">
                     <p className="font-medium">
-                       Mã test cho demo:{" "}
+                      Mã test cho demo:{" "}
                       <span className="font-mono bg-blue-100 px-2 py-1 rounded">
                         123456
                       </span>
@@ -179,11 +178,11 @@ export default function VerificationModal({ isOpen, onClose, method, user }) {
                     e.target.value.replace(/\D/g, "").slice(0, 6)
                   )
                 }
-                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg text-center tracking-widest font-mono"
+                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg text-center tracking-widest placeholder:text-gray-600 placeholder:font-medium"
                 maxLength={6}
               />
-              <p className="text-xs text-gray-500 mt-1 text-center">
-                Nhập 6 chữ số từ email hoặc tin nhắn
+              <p className="text-sm text-gray-700 mt-1 text-center font-normal">
+                Nhập 6 chữ số từ email
               </p>
             </div>
 
@@ -199,8 +198,6 @@ export default function VerificationModal({ isOpen, onClose, method, user }) {
                   Đã gửi lại {resendCount} lần
                 </p>
               )}
-
-              
 
               {/* Alternative options */}
               <div className="pt-2 border-t border-gray-200">
