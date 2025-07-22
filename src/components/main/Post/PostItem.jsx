@@ -1,3 +1,4 @@
+"use client";
 import { useState } from "react";
 import PostModal from "./PostModal";
 import {
@@ -24,6 +25,14 @@ const commentsMock = [
                 name: "Người dùng 2",
                 avatar: "https://randomuser.me/api/portraits/men/30.jpg",
                 text: "Đẹp quá anh ơi",
+                time: "2 tuần",
+            },
+
+            {
+                id: 12,
+                name: "Người dùng 3",
+                avatar: "https://randomuser.me/api/portraits/men/10.jpg",
+                text: "Ok tới",
                 time: "2 tuần",
             },
         ],

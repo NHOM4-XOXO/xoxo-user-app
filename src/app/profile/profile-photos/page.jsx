@@ -1,3 +1,4 @@
+"use client"
 import { useState } from "react";
 
 const ProfileImage = () => {
@@ -18,8 +19,8 @@ const ProfileImage = () => {
                         <button
                             onClick={() => setActiveTab(tab)}
                             className={`relative transition-colors duration-200 py-2 px-3 rounded-sm ${activeTab === tab
-                                    ? "text-blue-600 dark:text-blue-400 font-medium after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:border-b-2 after:border-blue-600 dark:after:border-blue-400"
-                                    : "hover:bg-gray-200 dark:hover:bg-fb-dark-tertiary"
+                                ? "text-blue-600 dark:text-blue-400 font-medium after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:border-b-2 after:border-blue-600 dark:after:border-blue-400"
+                                : "hover:bg-gray-200 dark:hover:bg-fb-dark-tertiary"
                                 }`}
                         >
                             {tab}
@@ -30,6 +31,10 @@ const ProfileImage = () => {
 
             {/* Image Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 px-4">
+                <label className="flex items-center justify-center border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-pointer hover:bg-gray-200 aspect-square w-full">
+                    <span className="text-3xl font-light">+</span>
+                    <input type="file" accept="image/*" className="hidden" />
+                </label>
                 {[...Array(20)].map((_, i) => (
                     <img
                         key={i}

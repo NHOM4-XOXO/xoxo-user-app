@@ -1,3 +1,5 @@
+import Post from "@/components/main/Post/PostItem";
+import PostCreation from "@/components/main/PostCreation";
 
 import {
     ImageIcon,
@@ -6,8 +8,7 @@ import {
     CalendarDaysIcon,
     HeartIcon,
 } from "lucide-react";
-import Post from "../Post/PostItem";
-import PostCreation from "../main/PostCreation";
+
 
 
 const posts = [

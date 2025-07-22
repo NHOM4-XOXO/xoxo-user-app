@@ -78,15 +78,15 @@ body {
 
 /* Tuỳ chỉnh modal khi dark mode */
 .custom-dark-modal .ant-modal-content {
-  background-color: #1C1C1D; /* var(--color-fb-dark-primary) */
-  color: #E4E6EB; /* text sáng */
+  background-color: #1C1C1D; 
+  color: #E4E6EB; 
   padding-left: 0;
   padding-right: 0;
 }
 
 .custom-dark-modal .ant-modal-header {
   background-color: #1C1C1D;
-  border-bottom: 1px solid #333333; /* var(--color-fb-dark-tertiary) */
+  border-bottom: 1px solid #333333; 
 }
 
 .custom-dark-modal .ant-modal-title {
@@ -98,7 +98,7 @@ body {
 }
 
 .custom-dark-modal .ant-input {
-  background-color: #3A3B3C !important; /* same as dark secondary */
+  background-color: #3A3B3C !important; 
   color: #E4E6EB;
 }
 .custom-dark-modal .ant-input::placeholder{
@@ -106,4 +106,28 @@ body {
 }
 
 
+
+
+
+/* Target ul.ant-dropdown-menu bên trong popup */
+.custom-dropdown .ant-dropdown-menu {
+  background-color: #3a3b3c !important;
+  color: #e4e6eb !important;
+  min-width: 150px;
+}
+
+.custom-dropdown .ant-dropdown-menu-item {
+  color: #e4e6eb !important;
+  font-size: 14px;
+  padding: 8px 12px;
+}
+
+.custom-dropdown .ant-dropdown-menu-item:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.custom-dropdown .ant-dropdown-arrow::before, 
+.custom-dropdown .ant-dropdown-arrow::after{
+    background-color: #3a3b3c !important;
+}
 
