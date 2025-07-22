@@ -119,10 +119,11 @@ export default function SignupModal({ isOpen, onClose }) {
                   type="text"
                   {...register("lastName")}
                   placeholder="Họ"
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 ${
+                  className={`w-full px-3 py-2 border rounded-md bg-white placeholder-gray-600 text-gray-900 focus:outline-none focus:ring-2 ${
                     errors.lastName ? "border-red-500" : "border-gray-300"
                   }`}
                 />
+
                 {errors.lastName && (
                   <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
                     <AlertCircle className="w-4 h-4" />
@@ -136,7 +137,7 @@ export default function SignupModal({ isOpen, onClose }) {
                   type="text"
                   {...register("firstName")}
                   placeholder="Tên"
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 ${
+                  className={`w-full px-3 py-2 border rounded-md bg-white placeholder-gray-600 text-gray-900 focus:outline-none focus:ring-2 ${
                     errors.firstName ? "border-red-500" : "border-gray-300"
                   }`}
                 />
@@ -154,7 +155,7 @@ export default function SignupModal({ isOpen, onClose }) {
                 type="text"
                 {...register("email")}
                 placeholder="Email hoặc số điện thoại"
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 ${
+                className={`w-full px-3 py-2 border rounded-md bg-white placeholder-gray-600 text-gray-900 focus:outline-none focus:ring-2 ${
                   errors.email ? "border-red-500" : "border-gray-300"
                 }`}
               />
@@ -171,7 +172,7 @@ export default function SignupModal({ isOpen, onClose }) {
                 type={showPassword ? "text" : "password"}
                 placeholder="Mật khẩu"
                 {...register("password")}
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 ${
+                className={`w-full px-3 py-2 border rounded-md bg-white placeholder-gray-600 text-gray-900 focus:outline-none focus:ring-2 ${
                   errors.password ? "border-red-500" : "border-gray-300"
                 } pr-10`}
               />
@@ -200,7 +201,7 @@ export default function SignupModal({ isOpen, onClose }) {
                 type={showConfirmPassword ? "text" : "password"}
                 placeholder="Nhập lại mật khẩu"
                 {...register("confirmPassword")}
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 ${
+                className={`w-full px-3 py-2 border rounded-md bg-white placeholder-gray-600 text-gray-900 focus:outline-none focus:ring-2 ${
                   errors.confirmPassword ? "border-red-500" : "border-gray-300"
                 } pr-10`}
               />
@@ -231,7 +232,7 @@ export default function SignupModal({ isOpen, onClose }) {
               <input
                 type="date"
                 {...register("birthday")}
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 ${
+                className={`w-full px-3 py-2 border rounded-md bg-white placeholder-gray-600 text-gray-900 focus:outline-none focus:ring-2 ${
                   errors.birthday ? "border-red-500" : "border-gray-300"
                 }`}
               />
@@ -251,19 +252,21 @@ export default function SignupModal({ isOpen, onClose }) {
                 {["female", "male", "other"].map((value) => (
                   <label
                     key={value}
-                    className="flex items-center p-2 border border-gray-300 rounded-md"
+                    className="flex items-center p-2 border border-gray-300 rounded-md text-gray-800"
                   >
                     <input
                       type="radio"
                       value={value}
                       {...register("gender")}
-                      className="mr-2"
+                      className="mr-2 w-5 h-5 text-blue-600 focus:ring-blue-500 accent-blue-600"
                     />
-                    {value === "female"
-                      ? "Nữ"
-                      : value === "male"
-                      ? "Nam"
-                      : "Khác"}
+                    <span>
+                      {value === "female"
+                        ? "Nữ"
+                        : value === "male"
+                        ? "Nam"
+                        : "Khác"}
+                    </span>
                   </label>
                 ))}
               </div>
