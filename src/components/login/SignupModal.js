@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { AlertCircle, Eye, EyeOff } from "lucide-react";
-import userDataManager from "../utils/userDataManager";
+import userDataManager from "@/utils/userDataManager";
 
 const sixYearsAgo = new Date();
 sixYearsAgo.setFullYear(sixYearsAgo.getFullYear() - 6);

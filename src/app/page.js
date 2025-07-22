@@ -1,10 +1,11 @@
-import LoginForm from "@/components/LoginForm";
-import React from "react";
+"use client";
+
+import HomePage from "@/pages/HomePage";
+
 export default function Home() {
   return (
     <main>
-      <LoginForm />
+      <HomePage />
     </main>
   );
 }
-

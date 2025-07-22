@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import SignupModal from "./SignupModal";
-import userDataManager from "../utils/userDataManager";
+import userDataManager from "@/utils/userDataManager";
 import { AlertCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
@@ -66,8 +66,11 @@ export default function LoginForm() {
                 />
               </div>
               <p className="text-2xl text-gray-600 max-w-md mx-auto lg:mx-0">
-                <span className="text-blue-600"><b>XOXO</b></span> giúp bạn kết nối và chia sẻ với mọi người
-                trong cuộc sống của bạn.
+                <span className="text-blue-600">
+                  <b>XOXO</b>
+                </span>{" "}
+                giúp bạn kết nối và chia sẻ với mọi người trong cuộc sống của
+                bạn.
               </p>
             </div>
 
