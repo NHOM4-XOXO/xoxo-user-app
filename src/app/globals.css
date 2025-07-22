@@ -10,7 +10,56 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  --color-fb-dark-primary: #1C1C1D;
+  --color-fb-dark-secondary: #252728;
+  --color-fb-dark-tertiary: #333333;
+  --color-fb-dark-quaternary: #484849;
+
+  --color-fb-light-primary: #FFFFFF;
+  --color-fb-light-secondary: #F2F4F7;
+  --color-fb-light-tertiary: #E6E8EA;
+  --color-fb-light-quaternary: #F1F2F6;
+  
 }
+
+@layer utilities {
+  /* Hide scrollbar by default */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Show scrollbar */
+  .scrollbar-show {
+    -ms-overflow-style: auto;
+    scrollbar-width: thin;
+  }
+
+  .scrollbar-show::-webkit-scrollbar {
+    display: block;
+    width: 6px;
+  }
+
+  .scrollbar-show::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+  }
+
+  .scrollbar-show::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+  }
+
+  .scrollbar-show::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+  }
+}
+
 
 @media (prefers-color-scheme: dark) {
   :root {
