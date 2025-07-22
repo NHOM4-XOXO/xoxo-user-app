@@ -12,7 +12,7 @@ import {
 
 const ProfileAbout = () => {
     const Box = ({ icon, label, value }) => (
-        <div className="flex items-center justify-between border rounded-lg px-4 py-3 bg-fb-light-primary dark:bg-fb-dark-secondary shadow-sm text-sm border-gray-200 dark:border-fb-dark-quaternary">
+        <div className="flex items-center justify-between  rounded-lg px-4 py-3 bg-fb-light-primary dark:bg-fb-dark-secondary shadow-sm text-sm border-gray-200 dark:border-fb-dark-quaternary">
             <div className="flex items-center">
                 <span className="text-gray-500 dark:text-gray-300 text-base mr-3">
                     {icon}
@@ -25,7 +25,7 @@ const ProfileAbout = () => {
     );
 
     return (
-        <div className="rounded-lg bg-fb-light-primary dark:bg-fb-dark-secondary flex flex-col p-4 space-y-2 shadow-sm border border-gray-200 dark:border-fb-dark-quaternary">
+        <div className="rounded-lg bg-fb-light-primary dark:bg-fb-dark-secondary flex flex-col p-4 space-y-2 shadow-sm  border-gray-200 dark:border-fb-dark-quaternary">
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                     Thông tin cá nhân
