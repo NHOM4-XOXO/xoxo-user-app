@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { FaFacebook, FaUserFriends, FaStore} from "react-icons/fa";
+import { FaFacebook, FaUserFriends, FaStore } from "react-icons/fa";
 import { FiSearch, FiMessageCircle, FiMenu } from "react-icons/fi";
 import { IoMdHome, IoMdNotifications } from "react-icons/io";
 import { MdOndemandVideo } from "react-icons/md";
@@ -9,6 +9,12 @@ import { IoClose } from "react-icons/io5";
 import Image from "next/image";
 import MessageDropdown from "./MessageDropdown";
 import NotificationDropdown from "./NotiDropDown";
+import SearchBar from "../../Search/SearchBar";
+import {
+  sampleMessages,
+  sampleNotifications,
+} from "../../../data/asideHeaderSampleData";
+import NavItem from "../../../components/Navbar/NavItem";
 
 export default function Header() {
   const [showMessages, setShowMessages] = useState(false);
@@ -16,70 +22,12 @@ export default function Header() {
   const [showSearch, setShowSearch] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const [searchTerm, setsearchTerm] = useState("");
+
+  const [results, setResults] = useState([]);
+
   const messageRef = useRef(null);
   const notiRef = useRef(null);
-
-  const sampleMessages = [
-    {
-      id: 1,
-      name: "Quang Anh",
-      avatar: "/images/group1.jpg",
-      preview: "Xin chào bạn nhé!",
-      time: "3 phút",
-      isRead: false,
-    },
-    {
-      id: 2,
-      name: "Thị B",
-      avatar: "/images/group2.jpg",
-      preview: "Tối nay đi chơi chứ?",
-      time: "1 giờ",
-      isRead: true,
-    },
-    {
-      id: 3,
-      name: "Văn C",
-      avatar: "/images/group1.jpg",
-      preview: "Đã nhận được file nha.",
-      time: "3 giờ",
-      isRead: true,
-    },
-    {
-      id: 4,
-      name: "Thị D",
-      avatar: "/images/group2.jpg",
-      preview: "Off thôi",
-      time: "6 giờ",
-      isRead: true,
-    },
-  ];
-
-  const sampleNotifications = [
-    {
-      id: 1,
-      type: "friend",
-      message: "Trang Nguyễn đã thích bài viết của bạn.",
-      avatar: "/image/group1.jpg",
-      time: "2 phút",
-      isRead: false,
-    },
-    {
-      id: 2,
-      type: "invite",
-      message: "Linh Trần đã gửi lời mời kết bạn.",
-      avatar: "/image/group2.jpg",
-      time: "15 phút",
-      isRead: true,
-    },
-    {
-      id: 3,
-      type: "group",
-      message: "DevGroup có bài viết mới.",
-      avatar: "/image/group1.jpg",
-      time: "1 giờ",
-      isRead: true,
-    },
-  ];
 
   const toggleMessageDropdown = () => {
     setShowMessages((prev) => !prev);
@@ -114,22 +62,25 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="fixed flex top-0 left-0 right-0 bg-white dark:bg-fb-dark-secondary shadow z-50 px-2 sm:px-4 flex justify-between items-center">
+    <header className="fixed top-0 left-0 right-0 bg-white dark:bg-fb-dark-secondary shadow z-50 px-2 sm:px-4 flex justify-between items-center">
       <div className="flex items-center space-x-2">
-        <button className="lg:hidden p-2 hover bg-gray-100 dark:hover:bg-gray-700 rounded-full">
+        {/* <button className="lg:hidden p-2 hover bg-gray-100 dark:hover:bg-gray-700 rounded-full">
           <FiMenu className="text-xl" />
-        </button>
+        </button> */}
 
-        <div className="flex items-center">
+        <li className="flex items-center">
           <FaFacebook className="text-blue-600 text-3xl sm:text-4xl" />
-        </div>
+        </li>
 
-        <div className="bg-gray-100 dark:bg-fb-dark-tertiary sm:flex items-center space-x-2 px-3 py-2 rounded-full min-w-[240px] hidden">
-          <FiSearch className="text-gray-500" />
-          <input
+        <div className="bg-gray-100 dark:bg-fb-dark-tertiary sm:flex px-3 py-1 items-center space-x-2 rounded-full min-w-[240px] hidden">
+          {/* <FiSearch className="text-gray-500" /> */}
+          {/* <input type="text" placeholder="Tìm kiếm" /> */}
+          <SearchBar
             type="text"
-            placeholder="Tìm kiếm"
-            className="bg-transparent outline-none text-sm flex-1"
+            placeholder=""
+            // className="bg-transparent outline-none text-sm flex-1"
+            value={searchTerm}
+            onChange={(e) => setsearchTerm(e.target.value)}
           />
         </div>
 
@@ -138,22 +89,26 @@ export default function Header() {
         </button>
       </div>
 
-      <div className="hidden mr-35 md:flex items-center text-2xl lg:text-3xl space-x-4 lg:space-6 text-gray-400 cursor-pointer">
-        <button className="p-2 lg:p-3 hover:bg-gray100 dark:hover:bg-gray-700 rounded-lg hover:text-blue-600 transition-colors cursor-pointer">
+      <div className="hidden md:flex mr-35 items-center text-2xl lg:text-3xl space-x-8 lg:space-6 text-gray-400 cursor-pointer">
+        <NavItem href="/" exact>
           <IoMdHome />
-        </button>
-        <button className="p-2 lg:p-3 hover:bg-gray100 dark:hover:bg-gray-700 rounded-lg hover:text-blue-600 transition-colors cursor-pointer">
-          <FaUserFriends className="ml-4" />
-        </button>
-        <button className="p-2 lg:p-3 hover:bg-gray100 dark:hover:bg-gray-700 rounded-lg hover:text-blue-600 transition-colors cursor-pointer">
-          <MdOndemandVideo className="ml-4" />
-        </button>
-        <button className="p-2 lg:p-3 hover:bg-gray100 dark:hover:bg-gray-700 rounded-lg hover:text-blue-600 transition-colors cursor-pointer">
-          <FaStore className="ml-4" />
-        </button>
-        <button className="p-2 lg:p-3 hover:bg-gray100 dark:hover:bg-gray-700 rounded-lg hover:text-blue-600 transition-colors cursor-pointer">
-          <RiGroup2Line className="ml-4" />
-        </button>
+        </NavItem>
+
+        <NavItem href="/friends">
+          <FaUserFriends />
+        </NavItem>
+
+        <NavItem href="/videos">
+          <MdOndemandVideo />
+        </NavItem>
+
+        <NavItem href="/store">
+          <FaStore />
+        </NavItem>
+
+        <NavItem href="/groups">
+          <RiGroup2Line />
+        </NavItem>
       </div>
 
       <div className="flex space-x-1 sm:space-x-2 items-center relative">
@@ -177,7 +132,7 @@ export default function Header() {
 
         <button className="flex items-center space-x-2 p-1 hover:bg-fb-dark-quaternary dark:hover:bg-gray-700 rounded-full cursor-pointer">
           <Image
-            src="/images/georgina.jpg"
+            src="/image/georgina.jpg"
             alt="Avatar"
             width={32}
             height={32}
@@ -191,10 +146,15 @@ export default function Header() {
           <div className="flex items-center space-x-2">
             <div className="flex-1 bg-gray-100 dark:bg-gray-fb-dark-tertiary px-3 py-2 rounded-full flex items-center space-x-2">
               <FiSearch className="text-gray-500" />
-              <input
+              {/* <input
                 type="text"
                 className="bg-transparent outline-none text-sm flex-1"
                 autoFocus
+              /> */}
+              <SearchBar
+                value={searchTerm}
+                onChange={(e) => setsearchTerm(e.target.value)}
+                className="flex-1"
               />
             </div>
             <button
