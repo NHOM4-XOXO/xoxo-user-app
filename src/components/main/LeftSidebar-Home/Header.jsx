@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { FaFacebook, FaUserFriends, FaStore } from "react-icons/fa";
+import { FaFacebook, FaUserFriends, FaStore} from "react-icons/fa";
 import { FiSearch, FiMessageCircle, FiMenu } from "react-icons/fi";
 import { IoMdHome, IoMdNotifications } from "react-icons/io";
 import { MdOndemandVideo } from "react-icons/md";
@@ -120,11 +120,11 @@ export default function Header() {
           <FiMenu className="text-xl" />
         </button>
 
-        <li className="flex items-center">
+        <div className="flex items-center">
           <FaFacebook className="text-blue-600 text-3xl sm:text-4xl" />
-        </li>
+        </div>
 
-        <div className="bg-gray-100 dark:bg-fb-dark-tertiary px-2 py-1 sm:flex px-3 py-2items-center space-x-2 rounded-full min-w-[240px] hidden">
+        <div className="bg-gray-100 dark:bg-fb-dark-tertiary sm:flex items-center space-x-2 px-3 py-2 rounded-full min-w-[240px] hidden">
           <FiSearch className="text-gray-500" />
           <input
             type="text"
@@ -177,7 +177,7 @@ export default function Header() {
 
         <button className="flex items-center space-x-2 p-1 hover:bg-fb-dark-quaternary dark:hover:bg-gray-700 rounded-full cursor-pointer">
           <Image
-            src="/image/georgina.jpg"
+            src="/images/georgina.jpg"
             alt="Avatar"
             width={32}
             height={32}
