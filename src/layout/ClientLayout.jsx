@@ -2,6 +2,7 @@
 
 import Header from "@/components/main/LeftSidebar-Home/Header";
 import MobileNavigation from "@/components/main/LeftSidebar-Home/MobileNavigation";
+import { UserProvider } from "@/contexts/UserContext";
 import { usePathname } from "next/navigation";
 import React from "react";
 
@@ -13,11 +14,11 @@ const ClientLayout = ({ children }) => {
   const shouldHideHeader = hideHeaderPaths.includes(pathname);
 
   return (
-    <>
+    <UserProvider>
       {!shouldHideHeader && <Header />}
       <div className={shouldHideHeader ? "" : "mt-14"}>{children}</div>
       {!shouldHideHeader && <MobileNavigation />}
-    </>
+    </UserProvider>
   );
 };
 
