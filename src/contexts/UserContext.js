@@ -22,7 +22,6 @@ export const UserProvider = ({ children }) => {
     const loadUser = () => {
       try {
         const user = userDataManager.getCurrentUser();
-        console.log("UserContext - Loaded user:", user);
         setCurrentUser(user);
       } catch (error) {
         console.error("Error loading user:", error);
@@ -37,7 +36,6 @@ export const UserProvider = ({ children }) => {
     // Listen for storage changes từ tabs khác
     const handleStorageChange = (e) => {
       if (e.key === "currentUser") {
-        console.log("UserContext - Storage changed, reloading user");
         loadUser();
       }
     };
@@ -49,7 +47,6 @@ export const UserProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const user = userDataManager.loginUser(email, password);
-      console.log("UserContext - Login successful:", user);
       setCurrentUser(user);
       return user;
     } catch (error) {
@@ -61,7 +58,6 @@ export const UserProvider = ({ children }) => {
   const logout = () => {
     userDataManager.logoutUser();
     setCurrentUser(null);
-    console.log("UserContext - User logged out");
   };
 
   const updateUserInfo = (updatedData) => {
@@ -72,7 +68,6 @@ export const UserProvider = ({ children }) => {
           updatedData
         );
         setCurrentUser(updatedUser);
-        console.log("UserContext - User updated:", updatedUser);
         return updatedUser;
       } catch (error) {
         console.error("UserContext - Update failed:", error);
@@ -83,7 +78,6 @@ export const UserProvider = ({ children }) => {
 
   const refreshUser = () => {
     const user = userDataManager.getCurrentUser();
-    console.log("UserContext - Refreshed user:", user);
     setCurrentUser(user);
     return user;
   };

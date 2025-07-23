@@ -43,11 +43,7 @@ export const userDataManager = {
   findUserByEmail: (email) => {
     try {
       const users = JSON.parse(localStorage.getItem("registeredUsers") || "[]");
-      console.log("Tìm user với email:", email);
-      console.log("Tất cả users:", users);
-      const foundUser = users.find((user) => user.email === email);
-      console.log("Tìm thấy user:", foundUser);
-      return foundUser;
+      return users.find((user) => user.email === email);
     } catch (error) {
       console.error("Error finding user:", error);
       return null;
@@ -57,12 +53,9 @@ export const userDataManager = {
   findUserByEmailOrPhone: (emailOrPhone) => {
     try {
       const users = JSON.parse(localStorage.getItem("registeredUsers") || "[]");
-      console.log("Tìm user với email/phone:", emailOrPhone);
-      const foundUser = users.find(
+      return users.find(
         (user) => user.email === emailOrPhone || user.phone === emailOrPhone
       );
-      console.log("Tìm thấy user:", foundUser);
-      return foundUser;
     } catch (error) {
       console.error("Error finding user:", error);
       return null;
@@ -72,21 +65,14 @@ export const userDataManager = {
   updateUser: (userId, updateData) => {
     try {
       const users = JSON.parse(localStorage.getItem("registeredUsers") || "[]");
-      console.log("Tất cả users trước khi update:", users);
-      console.log("Đang update user ID:", userId, "với data:", updateData);
-
       const userIndex = users.findIndex((user) => user.id === userId);
 
       if (userIndex === -1) {
-        console.error("Không tìm thấy user với ID:", userId);
         throw new Error("Không tìm thấy user!");
       }
 
       users[userIndex] = { ...users[userIndex], ...updateData };
       localStorage.setItem("registeredUsers", JSON.stringify(users));
-
-      console.log("User sau khi update:", users[userIndex]);
-      console.log("Tất cả users sau khi update:", users);
 
       return users[userIndex];
     } catch (error) {
@@ -118,40 +104,21 @@ export const userDataManager = {
   loginUser: (email, password) => {
     try {
       const users = JSON.parse(localStorage.getItem("registeredUsers") || "[]");
-      console.log("Tất cả users trong loginUser:", users);
-      console.log("Đăng nhập với email:", email, "và password:", password);
-
-      // Debug: hiển thị mật khẩu của user có email này
-      const userWithEmail = users.find((u) => u.email === email);
-      if (userWithEmail) {
-        console.log(
-          `💡 User với email ${email} có mật khẩu là: "${userWithEmail.password}"`
-        );
-        console.log(` Mật khẩu bạn nhập: "${password}"`);
-        console.log(` Khớp mật khẩu: ${userWithEmail.password === password}`);
-      } else {
-        console.log(` Không tìm thấy user với email: ${email}`);
-      }
-
       const user = users.find(
         (u) => u.email === email && u.password === password
       );
 
       if (!user) {
-        console.log("Không tìm thấy user với email/password này");
         throw new Error("Email hoặc mật khẩu không đúng!");
       }
-
-      console.log("Tìm thấy user:", user);
 
       // Cập nhật thời gian đăng nhập cuối
       const updatedUser = userDataManager.updateUser(user.id, {
         lastLogin: new Date().toISOString(),
       });
 
-      // Lưu thông tin user đang đăng nhập (lấy user sau khi đã update)
+      // Lưu thông tin user đang đăng nhập
       localStorage.setItem("currentUser", JSON.stringify(updatedUser));
-      console.log("✅ Đã lưu currentUser:", updatedUser);
 
       return updatedUser;
     } catch (error) {

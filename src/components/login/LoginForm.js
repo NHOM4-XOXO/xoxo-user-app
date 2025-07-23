@@ -1,11 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SignupModal from "./SignupModal";
 import { useUser } from "../../contexts/UserContext";
-import { AlertCircle } from "lucide-react";
-import { useForm } from "react-hook-form";
-import * as yup from "yup";
+import Footer from "../common/Footer";
+import { useSearchParams } from "next/navigation";
 
 export default function LoginForm() {
   const [formData, setFormData] = useState({
@@ -17,6 +16,13 @@ export default function LoginForm() {
   const [error, setError] = useState("");
 
   const { login } = useUser();
+    const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get("signup") === "true") {
+      setIsSignupModalOpen(true);
+    }
+  }, [searchParams]);
 
   const handleChange = (e) => {
     setFormData({
@@ -33,21 +39,14 @@ export default function LoginForm() {
     setError("");
 
     try {
-      console.log("🔐 Đang thử đăng nhập với:");
-      console.log("Email:", formData.email);
-      console.log("Password:", formData.password);
-
       // Sử dụng login function từ UserContext
       const user = await login(formData.email, formData.password);
-
-      console.log("✅ Đăng nhập thành công:", user);
 
       // Simulate loading time
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       window.location.href = "/";
     } catch (error) {
-      console.error("❌ Lỗi đăng nhập:", error);
       setError(error.message);
     } finally {
       setIsLoading(false);

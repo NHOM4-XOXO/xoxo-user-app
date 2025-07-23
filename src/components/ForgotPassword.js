@@ -3,6 +3,7 @@
 import { useState } from "react";
 import FindAccountModal from "./FindAccountModal";
 import { useUser } from "../contexts/UserContext";
+import Footer from "./common/Footer";
 
 export default function ForgotPassword() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -44,7 +45,6 @@ export default function ForgotPassword() {
       return;
     }
 
-    // Basic validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!emailRegex.test(searchQuery)) {
@@ -157,7 +157,8 @@ export default function ForgotPassword() {
             </div>
           </div>
         </div>
-        
+
+        <Footer />
       </div>
 
       <FindAccountModal

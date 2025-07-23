@@ -16,9 +16,6 @@ export default function ResetPasswordModal({
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
-  // Debug: log user object khi component render
-  console.log("ResetPasswordModal - User object:", user);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setPasswords((prev) => ({
@@ -68,10 +65,6 @@ export default function ResetPasswordModal({
     setIsLoading(true);
 
     try {
-      console.log("Đang reset password cho user:", user);
-      console.log("User ID:", user?.id);
-      console.log("New password:", passwords.newPassword);
-
       if (!user?.id) {
         throw new Error("User ID không hợp lệ!");
       }
@@ -80,8 +73,6 @@ export default function ResetPasswordModal({
       const updatedUser = userDataManager.updateUser(user.id, {
         password: passwords.newPassword,
       });
-
-      console.log("Mật khẩu đã được cập nhật:", updatedUser);
 
       // Simulate API call delay
       setTimeout(() => {

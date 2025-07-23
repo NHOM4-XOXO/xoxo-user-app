@@ -14,10 +14,8 @@ export default function FindAccountModal({ isOpen, onClose, searchQuery }) {
       // Tìm user thật từ localStorage
       const realUser = userDataManager.findUserByEmailOrPhone(searchQuery);
       if (realUser) {
-        console.log("Tìm thấy user thật:", realUser);
         setFoundUser(realUser);
       } else {
-        console.log("Không tìm thấy user với email/phone này");
         // Không tạo mock user nữa, thông báo không tìm thấy
         setFoundUser(null);
       }
@@ -26,7 +24,6 @@ export default function FindAccountModal({ isOpen, onClose, searchQuery }) {
 
   const handleSendCode = () => {
     if (selectedMethod && foundUser) {
-      console.log("Sending user to VerificationModal:", foundUser);
       setShowVerification(true);
     }
   };
@@ -80,7 +77,7 @@ export default function FindAccountModal({ isOpen, onClose, searchQuery }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-blue-300 bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
         <div className="p-6">
           <div className="flex justify-between items-center mb-4">
