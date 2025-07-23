@@ -8,10 +8,18 @@ export default function VerificationModal({ isOpen, onClose, method, user }) {
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [resendCount, setResendCount] = useState(0);
-  const [showTestCode, setShowTestCode] = useState(false);
-  const [showTroubleshoot, setShowTroubleshoot] = useState(false);
+  const [showSuccessNotification, setShowSuccessNotification] = useState(false);
+  const [passwordChangeSuccess, setPasswordChangeSuccess] = useState(false);
 
-  // Mã test để demo (trong thực tế sẽ được tạo random và gửi qua API)
+  // Callback để nhận thông báo từ ResetPasswordModal
+  const handlePasswordChangeSuccess = () => {
+    setPasswordChangeSuccess(true);
+    setTimeout(() => {
+      onClose(); // Đóng modal sau khi thành công
+    }, 3000);
+  };
+
+  // Mã test để demo
   const testVerificationCode = "123456";
 
   const handleVerifyCode = async () => {
@@ -26,15 +34,18 @@ export default function VerificationModal({ isOpen, onClose, method, user }) {
       setTimeout(() => {
         setIsLoading(false);
 
-        if (!isValidCode) {
-          alert("Mã xác thực không đúng! Vui lòng thử lại.");
-          return;
-        }
+        if (isValidCode) {
+          // Show success notification with animation
+          setShowSuccessNotification(true);
 
-        if (method === "email") {
-          window.location.href = "/email-verification";
+          // Hide notification after 2 seconds and proceed to reset password
+          setTimeout(() => {
+            setShowSuccessNotification(false);
+            setShowResetPassword(true);
+          }, 2000);
         } else {
-          setShowResetPassword(true);
+          alert("Mã xác thực không đúng!");
+          return;
         }
       }, 1500);
     }
@@ -43,37 +54,62 @@ export default function VerificationModal({ isOpen, onClose, method, user }) {
   const handleResendCode = () => {
     setResendCount((prev) => prev + 1);
 
-    // Hiển thị mã test sau lần thứ 2 gửi lại
-    if (resendCount >= 1) {
-      setShowTestCode(true);
-    }
-
-    // Simulate resending code
-    const message =
-      method === "email"
-        `Mã xác thực đã được gửi lại đến ${user.email}. Vui lòng kiểm tra cả thư mục.`
     alert(message);
-
 
   };
 
   if (!isOpen) return null;
 
   if (showResetPassword) {
-    return <ResetPasswordModal isOpen={true} onClose={onClose} user={user} />;
-  }
-
-  if (showTroubleshoot) {
     return (
-      <EmailTroubleshootModal
+      <ResetPasswordModal
         isOpen={true}
-        userEmail={user.email}
+        onClose={onClose}
+        user={user}
+        onSuccess={handlePasswordChangeSuccess}
       />
     );
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-blue-300 bg-opacity-50 flex items-center justify-center p-4 z-50">
+      {/* Success Notification for verification */}
+      {showSuccessNotification && (
+        <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-60 animate-bounce">
+          <div className="flex items-center space-x-2">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fillRule="evenodd"
+                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <span className="font-medium">Xác thực thành công!</span>
+          </div>
+        </div>
+      )}
+
+      {/* Password Change Success Notification */}
+      {passwordChangeSuccess && (
+        <div className="fixed top-4 right-4 bg-blue-500 text-white px-6 py-4 rounded-lg shadow-lg z-60">
+          <div className="flex items-center space-x-2">
+            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <div>
+              <p className="font-medium">Đổi mật khẩu thành công!</p>
+              <p className="text-sm opacity-90">
+                Đang chuyển về trang đăng nhập...
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
         <div className="p-6">
           <div className="flex justify-between items-center mb-4">
@@ -121,89 +157,55 @@ export default function VerificationModal({ isOpen, onClose, method, user }) {
               </div>
             )}
 
-            {/* User Info */}
-            <div className="bg-gray-50 rounded-lg p-4 mb-4">
-              <div className="flex items-center space-x-3">
-                <img
-                  src={user.avatar}
-                  alt={user.name}
-                  className="w-12 h-12 rounded-full object-cover"
-                />
-                <div>
-                  <h3 className="font-medium text-gray-900">{user.name}</h3>
-                  <p className="text-sm text-gray-600">
-                    Gửi đến: {method === "email" ? user.email : user.phone}
+            {/* Test code hint */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+              <div className="flex items-start">
+                <svg
+                  className="w-5 h-5 text-blue-600 mt-0.5 mr-2"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <div className="text-sm text-blue-800">
+                  <p className="font-medium">
+                    Mã test cho demo:{" "}
+                    <span className="font-mono bg-blue-100 px-2 py-1 rounded">
+                      123456
+                    </span>
+                  </p>
+                  <p className="text-xs mt-1">
+                    Sử dụng mã này nếu không nhận được email
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Test Code Helper (chỉ hiển thị sau khi gửi lại nhiều lần) */}
-            {showTestCode && method === "email" && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
-                <div className="flex items-center">
-                  <svg
-                    className="w-5 h-5 text-blue-600 mr-2"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <div className="text-sm text-blue-800">
-                    <p className="font-medium">
-                       Mã test cho demo:{" "}
-                      <span className="font-mono bg-blue-100 px-2 py-1 rounded">
-                        123456
-                      </span>
-                    </p>
-                    <p className="text-xs mt-1">
-                      Sử dụng mã này nếu không nhận được email
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
             {/* Verification Code Input */}
             <div className="mb-4">
               <input
                 type="text"
-                placeholder="Nhập mã gồm 6 chữ số"
+                maxLength="6"
+                placeholder="000000"
                 value={verificationCode}
-                onChange={(e) =>
-                  setVerificationCode(
-                    e.target.value.replace(/\D/g, "").slice(0, 6)
-                  )
-                }
-                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg text-center tracking-widest font-mono"
-                maxLength={6}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, "");
+                  setVerificationCode(value);
+                }}
+                className="w-full px-4 py-3 text-center text-2xl font-mono border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 tracking-widest"
               />
-              <p className="text-xs text-gray-500 mt-1 text-center">
-                Nhập 6 chữ số từ email hoặc tin nhắn
+              <p className="text-sm text-gray-500 mt-2 text-center">
+                Nhập 6 chữ số
               </p>
             </div>
-
             <div className="text-center space-y-2">
-              <button
-                onClick={handleResendCode}
-                className="text-blue-600 hover:underline text-sm font-medium"
-              >
-                Không nhận được mã? Gửi lại
-              </button>
-              {resendCount > 0 && (
-                <p className="text-xs text-gray-500">
-                  Đã gửi lại {resendCount} lần
-                </p>
-              )}
-
-              
 
               {/* Alternative options */}
-              <div className="pt-2 border-t border-gray-200">
+              <div className="pt-0 border-t border-gray-200">
                 <p className="text-xs text-gray-600 mb-2">
                   Hoặc thử các cách khác:
                 </p>
