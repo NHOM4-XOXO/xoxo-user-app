@@ -7,6 +7,8 @@ import ScrollableContainer from "@/components/common/ScrollableContainer";
 import ChatWidget from "@/components/main/Chat/ChatWidget";
 import useWindowWidth from "@/hooks/useWindowWidth";
 import useWindowHeight from "@/hooks/useWindowHeight";
+import { postData } from "@/data/postData";
+import Post from "@/components/main/Post/PostItem";
 
 export default function HomePage() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -75,16 +77,8 @@ export default function HomePage() {
 
             {/* Posts Feed */}
             <div className="space-y-4">
-              {Array.from({ length: 20 }, (_, index) => (
-                <div
-                  key={index}
-                  className="bg-gray-800 rounded-lg shadow-md p-4 md:p-6"
-                >
-                  <p className="text-gray-300">
-                    Đây là khu vực hiển thị các bài viết. Post creation
-                    component đã được thêm ở trên. Bài viết số {index + 1}
-                  </p>
-                </div>
+              {postData.map((item, index) => (
+                <Post key={index} data={item} />
               ))}
             </div>
           </div>
@@ -106,7 +100,7 @@ export default function HomePage() {
       </ScrollableContainer>
 
       {/* Chat Widget */}
-      <div>
+      <div className="hidden md:block">
         {activeChatContacts.map((contact, index) => (
           <ChatWidget
             key={contact.id}

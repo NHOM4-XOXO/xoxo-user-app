@@ -1,6 +1,7 @@
-import { Modal, Input, Avatar, Dropdown, Menu } from "antd";
+import { Modal, Input, Avatar, Dropdown, Tooltip } from "antd";
 import { DownOutlined } from "@ant-design/icons";
-import { useState } from "react";
+import EmojiPicker from "emoji-picker-react";
+import { useState, useRef } from "react";
 import {
     ThumbsUp,
     Heart,
@@ -10,6 +11,7 @@ import {
     Image,
     Send,
 } from "lucide-react";
+import PostComment from "./PostComment";
 
 const filterOptions = [
     {
@@ -18,7 +20,8 @@ const filterOptions = [
             <div>
                 <p className="font-semibold">Phù hợp nhất</p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Hiển thị bình luận của bạn bè và những bình luận có nhiều lượt tương tác nhất trước tiên.
+                    Hiển thị bình luận của bạn bè và những bình luận có nhiều lượt tương
+                    tác nhất trước tiên.
                 </p>
             </div>
         ),
@@ -29,7 +32,8 @@ const filterOptions = [
             <div>
                 <p className="font-semibold">Mới nhất</p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Hiển thị tất cả bình luận, theo thứ tự là các bình luận mới nhất trước tiên.
+                    Hiển thị tất cả bình luận, theo thứ tự là các bình luận mới nhất trước
+                    tiên.
                 </p>
             </div>
         ),
@@ -50,6 +54,13 @@ const filterOptions = [
 function PostModal({ post, comments, isModalOpen, setIsModalOpen }) {
     const [comment, setComment] = useState("");
     const [commentFilter, setCommentFilter] = useState("Phù hợp nhất");
+
+    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+    const emojiRef = useRef(null);
+
+    const handleEmojiClick = (emojiData) => {
+        setComment((prev) => prev + emojiData.emoji);
+    };
 
     const handleFilterChange = ({ key }) => {
         const selected = {
@@ -92,13 +103,19 @@ function PostModal({ post, comments, isModalOpen, setIsModalOpen }) {
                             className="w-10 h-10 rounded-full"
                         />
                         <div>
-                            <p className="font-semibold dark:text-fb-light-primary">{post.name}</p>
-                            <p className="text-xs text-gray-500 dark:text-fb-dark-quaternary">{post.time}</p>
+                            <p className="font-semibold dark:text-fb-light-primary">
+                                {post.name}
+                            </p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                                {post.time}
+                            </p>
                         </div>
                     </div>
 
                     {/* Caption + ảnh */}
-                    <p className="px-2 text-gray-600 dark:text-fb-light-quaternary">{post.caption}</p>
+                    <p className="px-2 text-gray-600 dark:text-fb-light-quaternary">
+                        {post.caption}
+                    </p>
                     <img
                         src={post.image}
                         alt="post"
@@ -106,18 +123,22 @@ function PostModal({ post, comments, isModalOpen, setIsModalOpen }) {
                     />
 
                     {/* Like + comment count */}
-                    <div className="flex justify-between items-center text-sm text-gray-600 dark:text-fb-light-quaternary">
+                    <div className="flex justify-between items-center text-sm text-gray-600 dark:text-gray-400 px-2">
                         <div className="flex items-center gap-1">
-                            <ThumbsUp className="w-4 h-4 text-blue-600" />
-                            <Heart className="w-4 h-4 text-red-600 fill-red-600" />
-                            <Laugh className="w-4 h-4 text-yellow-400" />
-                            <a href="#" className="text-sm hover:underline">
-                                {post.likes}
-                            </a>
+                            <div className=" flex items-center justify-center">
+                                <ThumbsUp size={18} className="text-blue-600" />
+                            </div>
+                            <div className="flex items-center justify-center">
+                                <Heart size={18} className="text-red-600" />
+                            </div>
+                            <div className=" flex items-center justify-center">
+                                <Smile size={18} className="text-yellow-500" />
+                            </div>
+                            <span className="text-sm hover:underline">{post.likes}</span>
                         </div>
-                        <a href="#" className="text-sm hover:underline">
-                            {`${post.comments} Bình luận`}
-                        </a>
+                        <span className="text-sm hover:underline">
+                            {`${post.comments.length} Bình luận`}
+                        </span>
                     </div>
 
                     <hr className="border-gray-300 dark:border-fb-dark-tertiary" />
@@ -142,44 +163,14 @@ function PostModal({ post, comments, isModalOpen, setIsModalOpen }) {
                         </Dropdown>
                         {comments.length > 0 ? (
                             comments.map((comment) => (
-                                <div key={comment.id} className="flex gap-3">
-                                    <Avatar src={comment.avatar} size={32} />
-                                    <div>
-                                        <div className="bg-fb-light-tertiary dark:bg-fb-dark-secondary px-3 py-2 rounded-xl max-w-[400px] text-sm text-gray-900 dark:text-fb-light-primary">
-                                            <span className="font-semibold">{comment.name}</span>
-                                            <p>{comment.text}</p>
-                                        </div>
-                                        <div className="text-xs text-gray-500 dark:text-fb-light-primary flex gap-3 ml-2 mt-1">
-                                            <span>{comment.time}</span>
-                                            <span className="cursor-pointer hover:underline">Thích</span>
-                                            <span className="cursor-pointer hover:underline">Trả lời</span>
-                                        </div>
-
-                                        {/* Trả lời bình luận */}
-                                        {comment.replies?.map((reply) => (
-                                            <div key={reply.id} className="flex gap-2 mt-3 ml-8">
-                                                <Avatar size={28} src={reply.avatar} />
-                                                <div>
-                                                    <div className="bg-fb-light-tertiary dark:bg-fb-dark-secondary px-3 py-2 rounded-xl max-w-[350px] text-sm text-gray-900 dark:text-fb-light-primary">
-                                                        <span className="font-semibold">{reply.name}</span>
-                                                        <p>{reply.text}</p>
-                                                    </div>
-                                                    <div className="text-xs text-gray-500 flex gap-3 ml-2 mt-1 dark:text-fb-light-primary">
-                                                        <span>{reply.time}</span>
-                                                        <span className="cursor-pointer hover:underline">Thích</span>
-                                                        <span className="cursor-pointer hover:underline">Trả lời</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
+                                <PostComment key={comment.id} comment={comment} />
                             ))
                         ) : (
-                            <p className="text-sm text-gray-500 dark:text-gray-400 italic">Chưa có bình luận nào.</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+                                Chưa có bình luận nào.
+                            </p>
                         )}
                     </div>
-
                 </div>
             </div>
 
@@ -192,11 +183,56 @@ function PostModal({ post, comments, isModalOpen, setIsModalOpen }) {
                         value={comment}
                         onChange={(e) => setComment(e.target.value)}
                     />
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2 flex gap-2 text-gray-500 dark:text-fb-light-quaternary">
-                        <Smile className="w-4 h-4 cursor-pointer" />
-                        <Camera className="w-4 h-4 cursor-pointer" />
-                        <Image className="w-4 h-4 cursor-pointer" />
-                        <Send className="w-4 h-4 cursor-pointer" />
+                    <div
+                        className="absolute right-3 top-1/2 -translate-y-1/2 flex gap-2 text-gray-500 dark:text-fb-light-quaternary "
+                        ref={emojiRef}
+                    >
+                        <Dropdown
+                            trigger={["click"]}
+                            placement="top"
+                            arrow
+                            overlayClassName="custom-dropdown"
+                            overlayStyle={{
+                                marginBottom: 16,
+                            }}
+                            popupRender={() => (
+                                <div className="custom-scrollbar ">
+                                    <EmojiPicker
+                                        theme="dark"
+                                        emojiStyle="apple"
+                                        lazyLoadEmojis={true}
+                                        searchDisabled={true}
+                                        skinTonesDisabled={false}
+                                        previewConfig={{ showPreview: false }}
+                                        suggestedEmojisMode="recent"
+                                        height={350}
+                                        width={350}
+                                        onEmojiClick={handleEmojiClick}
+                                    />
+                                </div>
+                            )}
+                        >
+                            <Tooltip title="Chọn biểu tượng cảm xúc" placement="top">
+                                <Smile className="w-4 h-4 cursor-pointer transition-all duration-150 hover:scale-110" />
+                            </Tooltip>
+                        </Dropdown>
+                        <Tooltip title="Đính kèm một ảnh hoặc video" placement="top">
+                            <label className="relative">
+                                <Camera className="w-4 h-4 hover:scale-110 transition-all duration-150 z-10 relative cursor-pointer" />
+                                <input
+                                    type="file"
+                                    accept="image/*,video/*"
+                                    className="absolute inset-0 w-full h-full opacity-0"
+                                    title=""
+                                />
+                            </label>
+                        </Tooltip>
+                        <Tooltip title="Bình luận" placement="top">
+                            <Send className={`w-4 h-4 transition-all duration-150 ${comment.trim()
+                                ? "cursor-pointer text-blue-500 hover:scale-110"
+                                : "cursor-not-allowed text-gray-400"
+                                }`} />
+                        </Tooltip>
                     </div>
                 </div>
             </div>
