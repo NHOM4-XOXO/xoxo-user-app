@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import SignupModal from "./SignupModal";
 import { useUser } from "../../contexts/UserContext";
-import Footer from "../common/Footer";
-import { useSearchParams } from "next/navigation";
+
+
 
 export default function LoginForm() {
   const [formData, setFormData] = useState({
@@ -16,13 +16,7 @@ export default function LoginForm() {
   const [error, setError] = useState("");
 
   const { login } = useUser();
-    const searchParams = useSearchParams();
 
-  useEffect(() => {
-    if (searchParams.get("signup") === "true") {
-      setIsSignupModalOpen(true);
-    }
-  }, [searchParams]);
 
   const handleChange = (e) => {
     setFormData({
