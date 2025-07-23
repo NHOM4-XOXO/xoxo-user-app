@@ -15,11 +15,10 @@ const schema = yup.object().shape({
   email: yup
     .string()
     .required("Vui lòng nhập email.")
-    .test(
-      "email",
-      "Email không hợp lệ.",
-      (value) =>
-        /^[a-zA-Z0-9._%+-]+@(?:gmail\.com|yahoo\.com|outlook\.com|example\.com)$/.test(value || "")
+    .test("email", "Email không hợp lệ.", (value) =>
+      /^[a-zA-Z0-9._%+-]+@(?:gmail\.com|yahoo\.com|outlook\.com|example\.com)$/.test(
+        value || ""
+      )
     ),
   password: yup
     .string()
@@ -60,30 +59,20 @@ export default function SignupModal({ isOpen, onClose }) {
     setIsSubmitting(true);
 
     try {
-      
-      console.log("Đang lưu data đăng ký:", data);
-
       // Simulate network delay
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
       // Lưu user data
       const savedUser = userDataManager.saveUser(data);
-
-      console.log("Data đã được lưu thành công:", savedUser);
       setSubmitSuccess(true);
 
-      
       reset();
-
-      console.log("Tất cả users đã đăng ký:", userDataManager.getAllUsers());
 
       setTimeout(() => {
         setSubmitSuccess(false);
         setIsSubmitting(false);
         onClose();
-        alert(
-          "Đăng ký thành công!"
-        );
+        alert("Đăng ký thành công!");
       }, 2000);
     } catch (error) {
       console.error("Lỗi khi đăng ký:", error);

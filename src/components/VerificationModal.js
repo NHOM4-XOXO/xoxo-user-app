@@ -54,20 +54,8 @@ export default function VerificationModal({ isOpen, onClose, method, user }) {
   const handleResendCode = () => {
     setResendCount((prev) => prev + 1);
 
-    // Simulate resending code
-    const message =
-      method === "email"
-        ? `Mã xác thực đã được gửi lại đến ${user.email}. Vui lòng kiểm tra cả thư mục spam.`
-        : `Mã xác thực đã được gửi lại đến số điện thoại ${user.phone}.`;
-
     alert(message);
 
-    // Simulate email sending delay
-    setTimeout(() => {
-      if (method === "email" && resendCount >= 1) {
-        alert("💡 Mẹo: Nếu vẫn không nhận được email, hãy thử mã test: 123456");
-      }
-    }, 1000);
   };
 
   if (!isOpen) return null;
@@ -210,26 +198,14 @@ export default function VerificationModal({ isOpen, onClose, method, user }) {
                 }}
                 className="w-full px-4 py-3 text-center text-2xl font-mono border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 tracking-widest"
               />
-              <p className="text-xs text-gray-500 mt-1 text-center">
+              <p className="text-sm text-gray-500 mt-2 text-center">
                 Nhập 6 chữ số
               </p>
             </div>
-
             <div className="text-center space-y-2">
-              <button
-                onClick={handleResendCode}
-                className="text-blue-600 hover:underline text-sm font-medium"
-              >
-                Không nhận được mã? Gửi lại
-              </button>
-              {resendCount > 0 && (
-                <p className="text-xs text-gray-500">
-                  Đã gửi lại {resendCount} lần
-                </p>
-              )}
 
               {/* Alternative options */}
-              <div className="pt-2 border-t border-gray-200">
+              <div className="pt-0 border-t border-gray-200">
                 <p className="text-xs text-gray-600 mb-2">
                   Hoặc thử các cách khác:
                 </p>
