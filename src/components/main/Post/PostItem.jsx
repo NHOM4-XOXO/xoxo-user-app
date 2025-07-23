@@ -1,6 +1,7 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import PostModal from "./PostModal";
+
 import {
     ThumbsUp,
     Heart,
@@ -10,49 +11,23 @@ import {
     Users,
     Smile,
 } from "lucide-react";
+import ReactionPopup from "./ReactionPopup";
 
-const commentsMock = [
-    {
-        id: 1,
-        postId: 1,
-        name: "Người dùng 1",
-        avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-        text: "Mê quá đi",
-        time: "2 tuần",
-        replies: [
-            {
-                id: 11,
-                name: "Người dùng 2",
-                avatar: "https://randomuser.me/api/portraits/men/30.jpg",
-                text: "Đẹp quá anh ơi",
-                time: "2 tuần",
-            },
 
-            {
-                id: 12,
-                name: "Người dùng 3",
-                avatar: "https://randomuser.me/api/portraits/men/10.jpg",
-                text: "Ok tới",
-                time: "2 tuần",
-            },
-        ],
-    },
-    {
-        id: 2,
-        postId: 2,
-        name: "Người dùng 3",
-        avatar: "https://randomuser.me/api/portraits/women/44.jpg",
-        text: "Ảnh như cứt",
-        time: "2 tuần",
-        replies: [],
-    },
-];
 
 const Post = ({ data }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [showFullCaption, setShowFullCaption] = useState(false);
     const toggleCaption = () => setShowFullCaption(!showFullCaption);
-    const comment = commentsMock.filter((c) => c.postId === data.id);
+    const comment = data.comments;
+    const [showPopup, setShowPopup] = useState(false);
+    const defaultReaction = {
+        icon: <ThumbsUp />,
+        name: "Thích",
+    }
+    const [selectedReaction, setSelectedReaction] = useState(defaultReaction);
+    const [isLiked, setIsLiked] = useState(false);
+
 
     return (
         <div className="rounded-lg bg-white dark:bg-fb-dark-secondary p-4 space-y-3 shadow-sm border border-gray-200 dark:border-fb-dark-quaternary">
@@ -109,7 +84,7 @@ const Post = ({ data }) => {
                     <span className="text-sm hover:underline">{data.likes}</span>
                 </div>
                 <span className="text-sm hover:underline">
-                    {`${data.comments} Bình luận`}
+                    {`${data.comments.length} Bình luận`}
                 </span>
             </div>
 
@@ -117,19 +92,56 @@ const Post = ({ data }) => {
 
             {/* Buttons */}
             <div className="flex justify-between text-sm text-gray-600 dark:text-gray-300">
-                <button className="w-1/3 hover:bg-gray-100 dark:hover:bg-fb-dark-tertiary flex items-center justify-center gap-2 py-2 rounded-md">
-                    <ThumbsUp size={18} /> Thích
-                </button>
+                {/* Button Thích có popup */}
+                <div
+                    className="w-1/3 relative flex justify-center"
+                    onMouseEnter={() => setShowPopup(true)}
+                    onMouseLeave={() => setShowPopup(false)}
+                >
+                    <button className="w-full hover:bg-gray-100 dark:hover:bg-fb-dark-tertiary flex items-center justify-center gap-2 rounded-md py-2 cursor-pointer" onClick={() => {
+                        if (isLiked) {
+                            setSelectedReaction(defaultReaction); // bỏ thích
+                            setIsLiked(false);
+                        } else {
+                            setSelectedReaction({
+                                ...defaultReaction,
+                                icon: <ThumbsUp className="text-blue-600" />
+                            }); // thích
+                            setIsLiked(true);
+                        }
+                    }}>
+                        {selectedReaction?.icon}
+                        {selectedReaction?.name}
+                    </button>
+
+                    <div
+                        className={`absolute -top-12 left-1/2 -translate-x-1/2 z-50 transition ease-in-out duration-500 
+                ${showPopup ? "flex opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"}`}
+                    >
+                        <ReactionPopup
+                            onSelect={(reaction) => {
+                                setSelectedReaction(reaction);
+                                setShowPopup(false); // ẩn popup sau khi chọn
+                                setIsLiked(true)
+                            }}
+                        />
+                    </div>
+                </div>
+
+                {/* Bình luận */}
                 <button
                     onClick={() => setIsModalOpen(true)}
                     className="w-1/3 hover:bg-gray-100 dark:hover:bg-fb-dark-tertiary flex items-center justify-center gap-2 py-2 rounded-md"
                 >
                     <MessageCircle size={18} /> Bình luận
                 </button>
+
+                {/* Chia sẻ */}
                 <button className="w-1/3 hover:bg-gray-100 dark:hover:bg-fb-dark-tertiary flex items-center justify-center gap-2 py-2 rounded-md">
                     <Share2 size={18} /> Chia sẻ
                 </button>
             </div>
+
 
             {/* Modal */}
             <PostModal
@@ -138,7 +150,7 @@ const Post = ({ data }) => {
                 isModalOpen={isModalOpen}
                 setIsModalOpen={setIsModalOpen}
             />
-        </div>
+        </div >
     );
 };
 
