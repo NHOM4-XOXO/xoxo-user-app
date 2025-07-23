@@ -9,20 +9,21 @@ import useWindowWidth from "@/hooks/useWindowWidth";
 import useWindowHeight from "@/hooks/useWindowHeight";
 import { postData } from "@/data/postData";
 import Post from "@/components/main/Post/PostItem";
+import { checkDeviceByWidth } from "@/utils/checkDeviceByWidth";
 
 export default function HomePage() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [activeChatContacts, setActiveChatContacts] = useState([]);
-  const { windowWidth, windowWidthType } = useWindowWidth();
+  const windowWidth = useWindowWidth();
   const windowHeight = useWindowHeight();
 
   // Determine max chat windows based on screen size
   const getMaxChatWindows = () => {
-    if (windowWidthType.desktop(windowWidth)) {
+    if (checkDeviceByWidth.desktop(windowWidth)) {
       return 3;
-    } else if (windowWidthType.tablet(windowWidth)) {
+    } else if (checkDeviceByWidth.tablet(windowWidth)) {
       return 2;
-    } else if (windowWidthType.mobile(windowWidth)) {
+    } else if (checkDeviceByWidth.mobile(windowWidth)) {
       return 1;
     }
     return 0;
