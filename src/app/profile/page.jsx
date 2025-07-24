@@ -2,49 +2,12 @@ import Post from "@/components/main/Post/PostItem";
 import PostCreation from "@/components/main/PostCreation";
 
 import {
-    ImageIcon,
-    VideoIcon,
-    FlagIcon,
     CalendarDaysIcon,
     HeartIcon,
 } from "lucide-react";
 
-
-
-const posts = [
-    {
-        id: 1,
-        name: "Nguyễn Thành Tài",
-        avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-        time: "07 tháng 7, 2025",
-        caption:
-            "Đây là buổi sáng tuyệt vời để bắt đầu hành trình mới. Cùng cố gắng nhé mọi người!...",
-        image: "https://picsum.photos/id/1015/800/400",
-        likes: 24,
-        comments: 5,
-    },
-    {
-        id: 2,
-        name: "Trần Thị Hạnh",
-        avatar: "https://randomuser.me/api/portraits/women/45.jpg",
-        time: "03 tháng 7, 2025",
-        caption: "Mỗi bức ảnh là một kỷ niệm. Du lịch Đà Lạt thật tuyệt vời!",
-        image: "https://picsum.photos/id/1035/800/400",
-        likes: 40,
-        comments: 12,
-    },
-    {
-        id: 3,
-        name: "Lê Minh Khôi",
-        avatar: "https://randomuser.me/api/portraits/men/75.jpg",
-        time: "01 tháng 7, 2025",
-        caption:
-            "Hôm nay trời đẹp quá, tranh thủ ra ngoài cafe làm việc một chút 😎",
-        image: "https://picsum.photos/id/1043/800/400",
-        likes: 18,
-        comments: 4,
-    },
-];
+import Link from "next/link";
+import { allPosts } from "@/data/posts";
 
 const ProfilePost = () => {
     return (
@@ -54,7 +17,7 @@ const ProfilePost = () => {
 
                 <PostCreation />
 
-                {posts.map((item, index) => (
+                {allPosts.map((item, index) => (
                     <Post key={index} data={item} />
                 ))}
             </div>
@@ -62,7 +25,7 @@ const ProfilePost = () => {
             {/* Right Column */}
             <div className="w-full md:w-[40%] space-y-3">
                 {/* About */}
-                <div className="rounded-lg bg-fb-light-primary dark:bg-fb-dark-secondary p-4 shadow-sm border border-gray-200 dark:border-fb-dark-quaternary text-sm text-gray-800 dark:text-white">
+                <div className="rounded-lg bg-fb-light-primary dark:bg-fb-dark-secondary p-4 shadow-sm  dark:border-fb-dark-quaternary text-sm text-gray-800 dark:text-white">
                     <h1 className="font-bold mb-2 text-gray-900 dark:text-white">
                         Giới thiệu
                     </h1>
@@ -87,14 +50,14 @@ const ProfilePost = () => {
                 </div>
 
                 {/* Photos */}
-                <div className="rounded-lg bg-fb-light-primary dark:bg-fb-dark-secondary p-4 space-y-4 shadow-sm border border-gray-200 dark:border-fb-dark-quaternary">
+                <div className="rounded-lg bg-fb-light-primary dark:bg-fb-dark-secondary p-4 space-y-4 shadow-sm  dark:border-fb-dark-quaternary">
                     <div className="flex justify-between items-center">
                         <h1 className="text-xl font-bold text-gray-900 dark:text-white">
                             Ảnh
                         </h1>
-                        <a href="#" className="text-sm text-blue-500 hover:underline">
+                        <Link href="/profile/profile-photos" className="text-sm text-blue-500 hover:underline">
                             Xem tất cả ảnh
-                        </a>
+                        </Link>
                     </div>
                     <div className="grid grid-cols-3 gap-2">
                         {[...Array(6)].map((_, i) => (
@@ -109,14 +72,14 @@ const ProfilePost = () => {
                 </div>
 
                 {/* Friends */}
-                <div className="rounded-lg bg-fb-light-primary dark:bg-fb-dark-secondary p-4 space-y-4 shadow-sm border border-gray-200 dark:border-fb-dark-quaternary">
+                <div className="rounded-lg bg-fb-light-primary dark:bg-fb-dark-secondary p-4 space-y-4 shadow-sm  dark:border-fb-dark-quaternary">
                     <div className="flex justify-between items-center">
                         <h1 className="text-xl font-bold text-gray-900 dark:text-white">
                             Bạn bè
                         </h1>
-                        <a href="#" className="text-sm text-blue-500 hover:underline">
+                        <Link href="/profile/profile-friends" className="text-sm text-blue-500 hover:underline">
                             Xem tất cả
-                        </a>
+                        </Link>
                     </div>
                     <div className="grid grid-cols-3 gap-2">
                         {[...Array(6)].map((_, i) => (
