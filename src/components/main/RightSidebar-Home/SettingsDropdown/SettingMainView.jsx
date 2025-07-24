@@ -9,7 +9,7 @@ import {
   Shield,
   Users,
 } from "lucide-react";
-import Divider from "../Divider";
+import Divider from "../../../common/Divider";
 
 const SettingMainView = ({ settings, toggleSetting, setCurrentView }) => (
   <>
