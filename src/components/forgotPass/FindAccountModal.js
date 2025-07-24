@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import VerificationModal from "./VerificationModal";
-import { userDataManager } from "../utils/userDataManager";
+import { userDataManager } from "../../utils/userDataManager";
 
 export default function FindAccountModal({ isOpen, onClose, searchQuery }) {
   const [selectedMethod, setSelectedMethod] = useState("");
@@ -11,12 +11,12 @@ export default function FindAccountModal({ isOpen, onClose, searchQuery }) {
 
   useEffect(() => {
     if (searchQuery) {
-      // Tìm user thật từ localStorage
+     
       const realUser = userDataManager.findUserByEmailOrPhone(searchQuery);
       if (realUser) {
         setFoundUser(realUser);
       } else {
-        // Không tạo mock user nữa, thông báo không tìm thấy
+      
         setFoundUser(null);
       }
     }
@@ -30,7 +30,6 @@ export default function FindAccountModal({ isOpen, onClose, searchQuery }) {
 
   if (!isOpen) return null;
 
-  // Nếu không tìm thấy user thật, hiển thị thông báo
   if (!foundUser) {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">

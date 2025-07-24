@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import FindAccountModal from "./FindAccountModal";
-import { useUser } from "../contexts/UserContext";
-import Footer from "./common/Footer";
+import { useUser } from "../../contexts/UserContext";
+import Footer from "../common/Footer";
 
 export default function ForgotPassword() {
   const [searchQuery, setSearchQuery] = useState("");
