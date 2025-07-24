@@ -16,6 +16,7 @@ import {
 } from "../../../data/asideHeaderSampleData";
 import NavItem from "../../../components/Navbar/NavItem";
 import ThemeToggle from "../../ThemeToggle";
+import ProfileDropdown from "../../../components/ProfileDropdown";
 
 export default function Header() {
   const [showMessages, setShowMessages] = useState(false);
@@ -133,15 +134,7 @@ export default function Header() {
           <span className="absolute top-1 -right-1 bg-red-500 text-white text-sx rounded-full w-3 h-3 flex items-center justify-center" />
         </button>
 
-        <button className="flex items-center space-x-2 p-1 hover:bg-fb-light-tertiary dark:hover:bg-gray-700 rounded-full cursor-pointer">
-          <Image
-            src="/image/georgina.jpg"
-            alt="Avatar"
-            width={32}
-            height={32}
-            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover"
-          />
-        </button>
+        <ProfileDropdown />
       </div>
 
       {showSearch && (
