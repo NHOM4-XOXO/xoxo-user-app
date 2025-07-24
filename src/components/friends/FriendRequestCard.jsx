@@ -21,7 +21,7 @@ const FriendRequestCard = ({ name, avatar }) => {
           <button className="bg-blue-600 hover:bg-blue-700 text-white py-1.5 rounded font-medium cursor-pointer">
             Xác nhận
           </button>
-          <button className="bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 text-white py-1.5 rounded font-medium cursor-pointer">
+          <button className="bg-gray-500 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 text-white py-1.5 rounded font-medium cursor-pointer">
             Xóa
           </button>
         </div>
