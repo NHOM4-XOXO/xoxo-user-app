@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import userDataManager from "../utils/userDataManager";
+import userDataManager from "../../utils/userDataManager";
 
 export default function UserList() {
   const [users, setUsers] = useState([]);

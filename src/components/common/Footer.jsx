@@ -12,7 +12,7 @@ export default function Footer() {
               />
               <span className="text-xl font-bold text-blue-600">XOXO</span>
             </div>
-            <p className="text-gray-600 text-xl">
+            <p className="text-gray-600 text-xm">
               Kết nối, chia sẻ và khám phá thế giới cùng bạn bè.
             </p>
           </div>
@@ -55,7 +55,7 @@ export default function Footer() {
           </div>
 
           {/* Support */}
-          <div className="space-y-4 ml-25">
+          <div className="space-y-4 ml-32">
             <h3 className="font-semibold text-gray-900">Hỗ trợ</h3>
             <ul className="space-y-2 text-sm text-gray-600">
               <li>
