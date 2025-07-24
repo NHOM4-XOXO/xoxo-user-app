@@ -1,5 +1,5 @@
 import { ArrowLeft } from "lucide-react";
-import Divider from "../Divider";
+import Divider from "../../../common/Divider";
 
 const SettingEncryptedChatsView = ({ goBack }) => (
   <>
