@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 
-export default function MessageDropdown({ messages, onClose }) {
+export default function MessageDropdown({ messages, onClose, onContactClick }) {
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -34,6 +34,17 @@ export default function MessageDropdown({ messages, onClose }) {
             className={`flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer ${
               msg.isRead ? "opacity-70" : "bg-blue-50 dark:bg-gray-700"
             }`}
+            onClick={() => {
+              if (onContactClick) {
+                onContactClick({
+                  id: msg.id,
+                  name: msg.name,
+                  avatar: msg.avatar,
+                  isOnline: Math.random() > 0.5, // Random online status for demo
+                })
+              }
+              onClose()
+            }}
           >
             <Image
               src={msg.avatar}

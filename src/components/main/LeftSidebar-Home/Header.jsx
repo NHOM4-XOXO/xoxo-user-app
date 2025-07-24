@@ -18,7 +18,7 @@ import NavItem from "../../../components/Navbar/NavItem";
 import ThemeToggle from "../../ThemeToggle";
 import ProfileDropdown from "../../../components/ProfileDropdown";
 
-export default function Header() {
+export default function Header({ onContactClick }) {
   const [showMessages, setShowMessages] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
@@ -168,6 +168,7 @@ export default function Header() {
           <MessageDropdown
             messages={sampleMessages}
             onClose={() => setShowMessages(false)}
+            onContactClick={onContactClick}
           />
         </div>
       )}
