@@ -9,11 +9,11 @@ import { usePathname } from "next/navigation";
 
 const items = [
   { href: "/friends", icon: <FaUserFriends />, label: "Trang chủ" },
-  {
-    href: "/friends/requests",
-    icon: <RiUserAddLine />,
-    label: "Lời mời kết bạn",
-  },
+  // {
+  //   href: "/friends/requests",
+  //   icon: <RiUserAddLine />,
+  //   label: "Lời mời kết bạn",
+  // },
   { href: "/friends/suggestions", icon: <MdOutlinePeople />, label: "Gợi ý" },
   { href: "/friends/all", icon: <FaUserFriends />, label: "Tất cả bạn bè" },
   { href: "/friends/birthdays", icon: <HiOutlineGift />, label: "Sinh nhật" },
@@ -28,8 +28,8 @@ export default function SidebarFriend() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-72 sm:w-80 bg-white dark:bg-fb-dark-primary p-4  overflow-y-auto hidden lg:block">
-      <div className="aside-children fixed">
+    <aside className="w-72 sm:w-80 bg-white dark:bg-fb-dark-primary p-4 overflow-y-auto hidden lg:block shadow-xl dark:border-r-0">
+      <div className="fixed">
         <h2 className="text-xl font-semibold mb-4 px-2 text-black dark:text-white">
           Bạn bè
         </h2>

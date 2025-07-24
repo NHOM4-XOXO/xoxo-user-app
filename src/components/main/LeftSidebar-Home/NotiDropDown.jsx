@@ -8,7 +8,7 @@ const NotificationDropdown = forwardRef((props, ref) => {
   return (
     <div
       ref={ref}
-      className="absolute top-9 right-14 w-[360px] max-h-[400px] overflow-y-auto bg-white dark:bg-fb-dark-secondary shadow-xl rounded-lg p-3 z-50"
+      className="absolute top-9 right-14 w-[360px] max-h-[400px] overflow-y-auto bg-white dark:bg-fb-dark-secondary shadow-xl rounded-lg p-3 z-50 cursor-pointer"
     >
       <div className="flex justify-between items-center mb-2">
         <h3 className="text-lg font-semibold">Thông báo</h3>
