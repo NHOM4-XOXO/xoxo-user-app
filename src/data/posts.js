@@ -28,7 +28,7 @@ export const allPosts = [
           avatar: "/default-avatar.jpg?height=32&width=32",
         },
         content:
-          "Haha, dễ thương quádwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww!",
+          "Haha, dễ thương quá!",
         timestamp: "1 giờ trước",
         replies: [
           {
@@ -38,10 +38,33 @@ export const allPosts = [
               avatar: "/default-avatar.jpg?height=32&width=32",
             },
             content:
-              "Đúng rồi, nhìn cưng ghê.quádwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww!",
+              "Đúng rồi, nhìn cưng ghê.quá!",
             timestamp: "30 phút trước",
-            replies: [],
+            replies: [
+              {
+                id: "reply-2-1",
+                author: {
+                  name: "Trần Thị C",
+                  avatar: "/default-avatar.jpg?height=32&width=32",
+                },
+                content:
+                  "em cảm ơn",
+                timestamp: "15 phút trước",
+                replies: [],
+              },
+            ],
           },
+          {
+            id: "reply-1-2",
+            author: {
+              name: "Trần Thị B",
+              avatar: "/default-avatar.jpg?height=32&width=32",
+            },
+            content:
+              "Đúng rồi, nhìn thấy ghê.quá",
+            timestamp: "30 phút trước",
+            replies: []
+          }
         ],
       },
       {

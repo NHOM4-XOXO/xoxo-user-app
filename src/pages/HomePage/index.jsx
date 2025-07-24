@@ -7,9 +7,9 @@ import ScrollableContainer from "@/components/common/ScrollableContainer";
 import ChatWidget from "@/components/main/Chat/ChatWidget";
 import useWindowWidth from "@/hooks/useWindowWidth";
 import useWindowHeight from "@/hooks/useWindowHeight";
-import { postData } from "@/data/postData";
 import Post from "@/components/main/Post/PostItem";
 import { checkDeviceByWidth } from "@/utils/checkDeviceByWidth";
+import { allPosts } from "@/data/posts";
 
 export default function HomePage() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -78,7 +78,7 @@ export default function HomePage() {
 
             {/* Posts Feed */}
             <div className="space-y-4">
-              {postData.map((item, index) => (
+              {allPosts.map((item, index) => (
                 <Post key={index} data={item} />
               ))}
             </div>

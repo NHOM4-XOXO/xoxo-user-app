@@ -1,59 +1,58 @@
-"use client"
-import { useState } from "react";
-import { Search, MoreHorizontal } from "lucide-react";
+"use client";
+import { useEffect, useState } from "react";
+import { Search, MoreHorizontal, UserX, User, SquareX } from "lucide-react";
+import { Dropdown, Menu } from "antd";
+import { friends } from "@/data/friendData";
+import { useTheme } from "next-themes";
 
-const friends = [
-    {
-        id: 1,
-        name: "Nguyễn Văn A",
-        avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-        mutualFriends: 5,
-    },
-    {
-        id: 2,
-        name: "Trần Thị B",
-        avatar: "https://randomuser.me/api/portraits/women/44.jpg",
-        mutualFriends: 3,
-    },
-    {
-        id: 3,
-        name: "Lê Văn C",
-        avatar: "https://randomuser.me/api/portraits/men/55.jpg",
-        mutualFriends: 8,
-    },
-    {
-        id: 4,
-        name: "Phạm Thị D",
-        avatar: "https://randomuser.me/api/portraits/women/36.jpg",
-        mutualFriends: 2,
-    },
-    {
-        id: 5,
-        name: "Hoàng Văn E",
-        avatar: "https://randomuser.me/api/portraits/men/66.jpg",
-        mutualFriends: 6,
-    },
-    {
-        id: 6,
-        name: "Đinh Thị F",
-        avatar: "https://randomuser.me/api/portraits/women/25.jpg",
-        mutualFriends: 4,
-    },
-];
+const menu = {
+    items: [
+        {
+            key: "view-profile",
+            icon: <User size={18} />,
+            label: <p className="font-semibold">Xem trang cá nhân</p>,
+        },
+        {
+            key: "unfollow",
+            icon: <SquareX size={18} />,
+            label: <p className="font-semibold">Bỏ theo dõi</p>,
+        },
+        {
+            key: "unfriend",
+            icon: <UserX size={18} />,
+            label: <p className="font-semibold">Hủy kết bạn</p>,
+        },
+    ],
+};
 
 const ProfileFriend = () => {
     const tabs = ["Tất cả bạn bè", "Đang theo dõi"];
     const [activeTab, setActiveTab] = useState(tabs[0]);
 
+    const [isDark, setIsDark] = useState(false);
+    const { theme, resolvedTheme } = useTheme();
+    useEffect(() => {
+        // resolvedTheme sẽ là "dark" hoặc "light"
+        setIsDark(resolvedTheme === "dark");
+    }, [resolvedTheme]);
+
+    const handleMenuClick = (e, friend) => {
+        if (e.key === "unfriend") {
+            console.log(`Hủy kết bạn với ${friend.name}`);
+        } else if (e.key === "hide") {
+            console.log(`Ẩn ${friend.name} khỏi trang cá nhân`);
+        }
+    };
+
     return (
-        <div className="rounded-lg bg-fb-light-primary dark:bg-fb-dark-primary text-gray-800 dark:text-white flex flex-col p-4 space-y-3 shadow-sm border border-gray-200 dark:border-fb-dark-tertiary">
+        <div className="rounded-lg bg-fb-light-primary dark:bg-fb-dark-secondary text-gray-800 dark:text-white flex flex-col p-4 space-y-3 shadow-sm dark:border-fb-dark-tertiary">
             {/* Header */}
             <div className="flex justify-between items-center">
                 <h2 className="text-lg font-semibold">Bạn bè</h2>
                 <div className="relative w-60">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
                     <input
-                        className="w-full bg-fb-light-tertiary dark:bg-fb-dark-secondary outline-none rounded-3xl pl-10 pr-3 py-2 text-sm text-gray-800 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400"
+                        className="w-full bg-fb-light-quaternary dark:bg-fb-dark-tertiary outline-none rounded-3xl pl-10 pr-3 py-2 text-sm text-gray-800 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400"
                         placeholder="Tìm kiếm"
                     />
                 </div>
@@ -78,27 +77,42 @@ const ProfileFriend = () => {
 
             {/* Friend List */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-4">
-                {friends.map((friend) => (
-                    <div
-                        key={friend.id}
-                        className="flex gap-3 items-center bg-fb-light-secondary dark:bg-fb-dark-secondary p-6 rounded-lg shadow-sm border border-gray-100 dark:border-fb-dark-tertiary"
-                    >
-                        <img
-                            src={friend.avatar}
-                            alt={friend.name}
-                            className="w-16 h-16 rounded-full object-cover"
-                        />
-                        <div>
-                            <h2 className="font-medium">{friend.name}</h2>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                                {friend.mutualFriends} Bạn chung
-                            </p>
+                {friends.map((friend) => {
+                    return (
+                        <div
+                            key={friend.id}
+                            className="flex gap-3 items-center bg-fb-light-primary dark:bg-fb-dark-tertiary p-6 rounded-lg shadow-sm border border-gray-100 dark:border-fb-dark-tertiary"
+                        >
+                            <img
+                                src={friend.avatar}
+                                alt={friend.name}
+                                className="w-16 h-16 rounded-full object-cover"
+                            />
+                            <div>
+                                <h2 className="font-medium">{friend.name}</h2>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">
+                                    {friend.mutualFriends} Bạn chung
+                                </p>
+                            </div>
+
+                            {activeTab === "Tất cả bạn bè" && (
+                                <div className="ml-auto ">
+                                    <Dropdown
+                                        menu={menu}
+                                        placement="bottomRight"
+                                        trigger={["click"]}
+                                        overlayClassName={isDark ? "custom-dropdown" : ""}
+                                        arrow={{ pointAtCenter: true }}
+                                    >
+                                        <button type="button">
+                                            <MoreHorizontal className="cursor-pointer text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-fb-dark-quaternary w-8 h-8 p-[0.4rem] rounded-full" />
+                                        </button>
+                                    </Dropdown>
+                                </div>
+                            )}
                         </div>
-                        {activeTab === "Tất cả bạn bè" && (
-                            <MoreHorizontal className="ml-auto text-gray-600 dark:text-gray-300 cursor-pointer hover:bg-gray-200 dark:hover:bg-fb-dark-tertiary p-2 rounded-full" />
-                        )}
-                    </div>
-                ))}
+                    );
+                })}
             </div>
         </div>
     );
