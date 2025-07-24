@@ -55,7 +55,6 @@ export default function VerificationModal({ isOpen, onClose, method, user }) {
     setResendCount((prev) => prev + 1);
 
     alert(message);
-
   };
 
   if (!isOpen) return null;
@@ -203,7 +202,6 @@ export default function VerificationModal({ isOpen, onClose, method, user }) {
               </p>
             </div>
             <div className="text-center space-y-2">
-
               {/* Alternative options */}
               <div className="pt-0 border-t border-gray-200">
                 <p className="text-xs text-gray-600 mb-2">
