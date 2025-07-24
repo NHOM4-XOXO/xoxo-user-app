@@ -15,6 +15,8 @@ import {
   sampleNotifications,
 } from "../../../data/asideHeaderSampleData";
 import NavItem from "../../../components/Navbar/NavItem";
+import ThemeToggle from "../../ThemeToggle";
+import ProfileDropdown from "../../../components/ProfileDropdown";
 
 export default function Header() {
   const [showMessages, setShowMessages] = useState(false);
@@ -112,9 +114,11 @@ export default function Header() {
       </div>
 
       <div className="flex space-x-1 sm:space-x-2 items-center relative">
+        {/* Theme Toggle */}
+        <ThemeToggle />
         <button
           ref={messageRef}
-          className="p-2 bg-gray-100 dark:bg-fb-dark-tertiary hover:bg-fb-dark-quaternary dar:hover:bg-gray-700 rounded-full relative cursor-pointer"
+          className="p-2 bg-gray-100 dark:bg-fb-dark-tertiary hover:bg-fb-light-tertiary dark:hover:bg-gray-700 rounded-full relative cursor-pointer"
           onClick={toggleMessageDropdown}
         >
           <FiMessageCircle className="text-2xl" />
@@ -123,22 +127,14 @@ export default function Header() {
 
         <button
           ref={notiRef}
-          className="p-2 bg-gray-100 dark:bg-fb-dark-tertiary hover:bg-fb-dark-quaternary dar:hover:bg-gray-700 rounded-full relative cursor-pointer"
+          className="p-2 bg-gray-100 dark:bg-fb-dark-tertiary hover:bg-fb-light-tertiary dark:hover:bg-gray-700 rounded-full relative cursor-pointer"
           onClick={toggleNotificationDropdown}
         >
           <IoMdNotifications className="text-2xl" />
           <span className="absolute top-1 -right-1 bg-red-500 text-white text-sx rounded-full w-3 h-3 flex items-center justify-center" />
         </button>
 
-        <button className="flex items-center space-x-2 p-1 hover:bg-fb-dark-quaternary dark:hover:bg-gray-700 rounded-full cursor-pointer">
-          <Image
-            src="/image/georgina.jpg"
-            alt="Avatar"
-            width={32}
-            height={32}
-            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover"
-          />
-        </button>
+        <ProfileDropdown />
       </div>
 
       {showSearch && (

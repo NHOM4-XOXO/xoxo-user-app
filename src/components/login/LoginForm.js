@@ -1,11 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SignupModal from "./SignupModal";
-import userDataManager from "@/utils/userDataManager";
-import { AlertCircle } from "lucide-react";
-import { useForm } from "react-hook-form";
-import * as yup from "yup";
+import { useUser } from "../../contexts/UserContext";
+
+
 
 export default function LoginForm() {
   const [formData, setFormData] = useState({
@@ -15,6 +14,10 @@ export default function LoginForm() {
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const { login } = useUser();
+
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -30,21 +33,14 @@ export default function LoginForm() {
     setError("");
 
     try {
-      console.log("Đang thử đăng nhập với:");
-      console.log("Email:", formData.email);
-      console.log("Password:", formData.password);
-
-      // Sử dụng userDataManager để đăng nhập
-      const user = userDataManager.loginUser(formData.email, formData.password);
-
-      console.log("Đăng nhập thành công:", user);
+      // Sử dụng login function từ UserContext
+      const user = await login(formData.email, formData.password);
 
       // Simulate loading time
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       window.location.href = "/";
     } catch (error) {
-      console.error("Lỗi đăng nhập:", error);
       setError(error.message);
     } finally {
       setIsLoading(false);
@@ -88,7 +84,7 @@ export default function LoginForm() {
                     <input
                       type="email"
                       name="email"
-                      placeholder="Email hoặc số điện thoại"
+                      placeholder="Email "
                       value={formData.email}
                       onChange={handleChange}
                       required
