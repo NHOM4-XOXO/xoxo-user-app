@@ -1,4 +1,4 @@
-"use client";
+
 
 import GroupDetailLayout from "@/components/groups/GroupDetailLayout";
 
