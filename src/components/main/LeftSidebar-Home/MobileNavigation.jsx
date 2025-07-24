@@ -26,7 +26,7 @@ export default function MobileNavigation() {
         </NavItem>
 
         <NavItem
-          href="/video"
+          href="/videos"
           className="flex flex-col items-center p-2 text-gray-500 hover:text-blue-600"
         >
           <MdOndemandVideo className="text-2xl" />
