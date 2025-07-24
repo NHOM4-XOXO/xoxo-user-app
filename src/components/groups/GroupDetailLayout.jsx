@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import GroupDetailHeader from "./GroupDetailHeader";
 import GroupDetailSidebar from "./GroupDetailSidebar";
 import GroupDetailContent from "./GroupDetailContent";
 
@@ -9,16 +8,16 @@ import GroupDetailContent from "./GroupDetailContent";
 const groupData = {
   id: 1,
   name: "TỰ HỌC GUITAR - PIANO VÀ UKULELE",
-  coverImage: "/image/group1.jpg",
+  coverImage: "https://picsum.photos/800/300?random=1",
   members: "501.2K thành viên",
   isPublic: true,
   description: "Nhóm Công khai • 501,2K thành viên",
   memberAvatars: [
-    "/default-avatar.jpg",
-    "/image/georgina.jpg",
-    "/default-avatar.jpg",
-    "/image/georgina.jpg",
-    "/default-avatar.jpg",
+    "https://picsum.photos/40/40?random=1",
+    "https://picsum.photos/40/40?random=2",
+    "https://picsum.photos/40/40?random=3",
+    "https://picsum.photos/40/40?random=4",
+    "https://picsum.photos/40/40?random=5",
   ],
 };
 
@@ -26,14 +25,11 @@ export default function GroupDetailLayout({ groupId }) {
   const [activeTab, setActiveTab] = useState("discussion");
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Group Header */}
-      <GroupDetailHeader group={groupData} />
-
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="flex gap-6">
+    <div className="min-h-screen bg-gray-700">
+      <div className="max-w-full -mx-5 px-5 py-6">
+        <div className="flex gap-12 ">
           {/* Left Sidebar */}
-          <div className="w-80 flex-shrink-0">
+          <div className="w-80 ">
             <GroupDetailSidebar group={groupData} />
           </div>
 
@@ -59,7 +55,7 @@ export default function GroupDetailLayout({ groupId }) {
                 <div className="flex items-center space-x-2 text-sm text-gray-600">
                   <span>🔒</span>
                   <div>
-                    <div className="font-medium text-gray-900">Công khai</div>
+                    <div className="font-medium text-gray-500">Công khai</div>
                     <div>
                       Bất kỳ ai cũng có thể nhìn thấy mọi người trong nhóm và
                       những gì họ đăng.
