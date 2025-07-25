@@ -21,11 +21,13 @@ export default function MessageDropdown({ messages, onClose, onContactClick }) {
       ref={dropdownRef}
       className="absolute -right-5 top-10 w-96 bg-white dark:bg-fb-dark-secondary shadow-lg rounded-lg p-4 z-50"
     >
-      <h3 className="text-lg font-semibold mb-2">Đoạn chat</h3>
+      <h3 className="text-lg font-semibold mb-2 text-black dark:text-white">
+        Đoạn chat
+      </h3>
       <input
         type="text"
         placeholder="Tìm kiếm trên Messenger"
-        className="w-full px-3 py-1 mb-2 text-sm rounded-full bg-gray-100 dark:bg-gray-700 outline-none"
+        className="w-full px-3 py-1 mb-2 text-sm rounded-full bg-gray-100 dark:bg-gray-700 text-black outline-none dark:placeholder:text-gray-400"
       />
       <div className="max-h-72 overflow-y-auto space-y-2">
         {messages.map((msg) => (
@@ -41,9 +43,9 @@ export default function MessageDropdown({ messages, onClose, onContactClick }) {
                   name: msg.name,
                   avatar: msg.avatar,
                   isOnline: Math.random() > 0.5, // Random online status for demo
-                })
+                });
               }
-              onClose()
+              onClose();
             }}
           >
             <Image
@@ -54,8 +56,10 @@ export default function MessageDropdown({ messages, onClose, onContactClick }) {
               className="rounded-full w-10 h-10 mr-3"
             />
             <div className="flex-1">
-              <p className="font-medium">{msg.name}</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+              <p className="font-medium text-black dark:text-white">
+                {msg.name}
+              </p>
+              <p className="text-sm text-gray-900 dark:text-gray-400 truncate">
                 {msg.preview}
               </p>
             </div>
@@ -63,7 +67,11 @@ export default function MessageDropdown({ messages, onClose, onContactClick }) {
           </div>
         ))}
       </div>
-      <a href="#" className="block text-center text-blue-500 text-sm mt-2">
+      <a
+        href="#"
+        className="block text-center text-blue-500 text-sm mt-2 dark:text-white"
+        s
+      >
         Xem tất cả trong Messenger
       </a>
     </div>
