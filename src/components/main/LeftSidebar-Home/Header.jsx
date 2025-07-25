@@ -30,7 +30,6 @@ export default function Header({ onContactClick }) {
 
   const [searchTerm, setsearchTerm] = useState("");
 
-  // 1
   useEffect(() => {
     if (searchTerm.trim() === "") {
       setResults([]);
@@ -125,9 +124,10 @@ export default function Header({ onContactClick }) {
             />
           </div>
 
-          <button className="sm:hidden p-2 hover:bg-gray-100 dar:hover:bg-gray-700 rounded-full">
+          {/* Hide search on mobile */}
+          {/* <button className="sm:hidden p-2 hover:bg-gray-100 dar:hover:bg-gray-700 rounded-full">
             <FiSearch className="text-xl" />
-          </button>
+          </button> */}
         </div>
 
         <div className="hidden md:flex mr-35 items-center text-2xl lg:text-3xl space-x-8 lg:space-6 text-gray-400 cursor-pointer">
