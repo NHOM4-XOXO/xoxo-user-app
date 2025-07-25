@@ -2,7 +2,7 @@
 import { IoMdHome, IoMdNotifications } from "react-icons/io";
 import { FaUserFriends, FaStore } from "react-icons/fa";
 import { MdOndemandVideo } from "react-icons/md";
-import { RiGroup2Line } from "react-icons/ri";
+// import { RiGroup2Line } from "react-icons/ri";
 import { BsMusicPlayerFill } from "react-icons/bs";
 
 import NavItem from "../../../components/Navbar/NavItem";
