@@ -1,4 +1,3 @@
-"use client";
 
 import GroupsLayout from "@/components/groups/GroupsLayout";
 
