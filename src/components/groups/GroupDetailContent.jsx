@@ -1,6 +1,10 @@
 "use client";
 
+import { allPosts } from "@/data/posts";
 import { useState } from "react";
+import Post from "../main/Post/PostItem";
+import PostCreation from "../main/PostCreation";
+import ScrollableContainer from "../common/ScrollableContainer";
 
 export default function GroupDetailContent({ groupId }) {
   const [activeTab, setActiveTab] = useState("discussion");
@@ -120,9 +124,11 @@ export default function GroupDetailContent({ groupId }) {
   ];
 
   return (
-    <div className="max-w-12xl mx-2">
+    <div
+      className="max-w-12xl mx-2" >
+      
       {/* Group Cover & Info */}
-      <div className="bg-white rounded-lg shadow-sm mb-4 overflow-hidden">
+      <div className="bg-white rounded-lg shadow-sm mb-4">
         <div
           className="h-60 bg-cover bg-center relative"
           style={{
@@ -165,18 +171,6 @@ export default function GroupDetailContent({ groupId }) {
               </button>
             </div>
           </div>
-          {/* Action Buttons */}
-          {/* <div className="flex space-x-3">
-            <button className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 font-medium">
-              ➕ Đã tham gia
-            </button>
-            <button className="bg-gray-200 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-300 font-medium">
-              💬 Mời bạn bè
-            </button>
-            <button className="bg-gray-200 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-300 font-medium">
-              🔔 Thông báo
-            </button>
-          </div> */}
         </div>
         <hr className="border-gray-300" />
         <nav className="flex">
@@ -236,93 +230,14 @@ export default function GroupDetailContent({ groupId }) {
       {/* Content based on active tab */}
       {activeTab === "discussion" && (
         <div className="flex gap-6">
-          {/* Posts Column - Nhỏ lại */}
           <div className="w-2/3 space-y-4">
             {/* Create Post */}
-            <div className="bg-white rounded-lg shadow-sm p-3">
-              <div className="flex space-x-2">
-                <img
-                  src="https://picsum.photos/800/300?random=1"
-                  alt="User"
-                  className="w-8 h-8 rounded-full"
-                />
-                <div className="flex-1">
-                  <textarea
-                    placeholder="Bạn đang nghĩ gì?"
-                    className="w-full px-4 py-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg text-gray-900 placeholder-gray-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-                    rows="2"
-                  />
-                  <div className="flex justify-between items-center mt-2">
-                    <div className="flex space-x-15">
-                      <button className="text-gray-600 hover:text-blue-600 text-md ">
-                        📷 Ảnh
-                      </button>
-                      <button className="text-gray-600 hover:text-blue-600 text-md">
-                        <span>
-                          <img
-                            src="https://static.xx.fbcdn.net/rsrc.php/v4/yd/r/Y4mYLVOhTwq.png"
-                            alt="Icon"
-                            className="inline-block w-5 h-5 mr-2 "
-                          />
-                          Cảm xúc
-                        </span>
-                      </button>
-                      <button className="text-gray-600 hover:text-blue-600 text-md">
-                        📊 Thăm dò
-                      </button>
-                    </div>
-                    <button className="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 text-md">
-                      Đăng
-                    </button>
-                  </div>
-                </div>
-              </div>
+            <div className="bg-fb-light-primary dark:bg-fb-dark-secondary rounded-lg mb-4 md:mb-6 border-gray-700">
+              <PostCreation />
             </div>
 
-            {/* Posts */}
-            {posts.map((post) => (
-              <div key={post.id} className="bg-white rounded-lg shadow-sm p-3">
-                <div className="flex items-center space-x-2 mb-3">
-                  <img
-                    src={post.avatar}
-                    alt={post.author}
-                    className="w-8 h-8 rounded-full"
-                  />
-                  <div>
-                    <h4 className="font-semibold text-gray-900 text-md">
-                      {post.author}
-                    </h4>
-                    <p className="text-xs text-gray-600">{post.time}</p>
-                  </div>
-                </div>
-
-                <p className="text-gray-800 mb-3 text-md">{post.content}</p>
-
-                {post.image && (
-                  <img
-                    src={`https://picsum.photos/800/300?random=${post.id}`}
-                    alt="Post content"
-                    className="w-full rounded-lg mb-3 max-h-72 object-cover"
-                  />
-                )}
-
-                <div className="flex items-center justify-between pt-2 border-t border-gray-200">
-                  <div className="flex space-x-3">
-                    <button className="flex items-center space-x-1 text-gray-600 hover:text-blue-600 text-md">
-                      <span>👍</span>
-                      <span>Thích ({post.likes})</span>
-                    </button>
-                    <button className="flex items-center space-x-1 text-gray-600 hover:text-blue-600 text-md">
-                      <span>💬</span>
-                      <span>Bình luận ({post.comments})</span>
-                    </button>
-                    <button className="flex items-center space-x-1 text-gray-600 hover:text-blue-600 text-md">
-                      <span>↗️</span>
-                      <span>Chia sẻ</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
+            {allPosts.map((item, index) => (
+              <Post key={index} data={item} />
             ))}
           </div>
 
@@ -483,6 +398,7 @@ export default function GroupDetailContent({ groupId }) {
           </div>
         </div>
       )}
+      <ScrollableContainer />
     </div>
   );
 }
