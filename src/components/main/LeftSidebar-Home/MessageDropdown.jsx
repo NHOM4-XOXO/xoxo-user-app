@@ -70,7 +70,6 @@ export default function MessageDropdown({ messages, onClose, onContactClick }) {
       <a
         href="#"
         className="block text-center text-blue-500 text-sm mt-2 dark:text-white"
-        s
       >
         Xem tất cả trong Messenger
       </a>
