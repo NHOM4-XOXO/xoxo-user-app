@@ -55,6 +55,9 @@ const filterOptions = [
 function PostModal({ post, comments, isModalOpen, setIsModalOpen }) {
     const [comment, setComment] = useState("");
     const [commentFilter, setCommentFilter] = useState("Phù hợp nhất");
+    const [selectedFiles, setSelectedFiles] = useState([]);
+
+
 
     const emojiPickerRef = useRef(null);
     const emojiButtonRef = useRef(null);
@@ -99,6 +102,13 @@ function PostModal({ post, comments, isModalOpen, setIsModalOpen }) {
             document.removeEventListener("mousedown", handleClickOutside, true);
         };
     }, []);
+
+    const removeFile = (indexToRemove) => {
+        setSelectedFiles((prev) => prev.filter((_, i) => i !== indexToRemove));
+    };
+
+
+
 
 
 
@@ -189,6 +199,17 @@ function PostModal({ post, comments, isModalOpen, setIsModalOpen }) {
                                     accept="image/*,video/*"
                                     className="absolute inset-0 w-full h-full opacity-0"
                                     title=""
+                                    multiple
+                                    onChange={(e) => {
+                                        const files = Array.from(e.target.files);
+                                        const newFiles = files.map((file) => ({
+                                            url: URL.createObjectURL(file),
+                                            type: file.type.startsWith("image") ? "image" : "video",
+                                        }));
+
+                                        setSelectedFiles((prev) => [...prev, ...newFiles]);
+                                    }}
+
                                 />
                             </label>
                         </Tooltip>
@@ -206,6 +227,41 @@ function PostModal({ post, comments, isModalOpen, setIsModalOpen }) {
 
                 </div>
             </div>
+            {selectedFiles.length > 0 && (
+                <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {selectedFiles.map((fileObj, index) => (
+                        <div
+                            key={index}
+                            className="relative group w-full aspect-square overflow-hidden rounded-lg border border-gray-200 dark:border-gray-600 bg-black/5"
+                        >
+                            {fileObj.type === "image" ? (
+                                <img
+                                    src={fileObj.url}
+                                    alt={`Selected ${index}`}
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : (
+                                <video
+                                    src={fileObj.url}
+                                    className="w-full h-full object-cover"
+                                    controls
+                                />
+                            )}
+
+                            <button
+                                onClick={() => removeFile(index)}
+                                className="absolute top-1.5 right-1.5 bg-black/60 hover:bg-black/80 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs transition-opacity opacity-0 group-hover:opacity-100"
+                                title="Xóa"
+                            >
+                                ✕
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+
+
         </Modal>
     );
 }

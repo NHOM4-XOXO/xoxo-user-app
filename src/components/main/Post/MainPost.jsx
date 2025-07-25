@@ -85,7 +85,7 @@ const MainPost = ({ data }) => {
             </div>
 
             {/* Media */}
-            {media && media.length > 0 && <PostMediaGrid media={media} />}
+            {media && media.length > 0 && <PostMediaGrid media={media} postId={data.id} />}
 
             {/* Reactions */}
             <div className="flex justify-between items-center text-sm text-gray-600 dark:text-gray-400 px-2">
