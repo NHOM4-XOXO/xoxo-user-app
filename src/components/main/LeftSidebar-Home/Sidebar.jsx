@@ -12,29 +12,34 @@ import {
 import { FaMeta, FaRegMessage } from "react-icons/fa6";
 import { IoTimer, IoClose } from "react-icons/io5";
 import { MdEvent } from "react-icons/md";
+import Link from "next/link";
 
 const items = [
-  { icon: <FaMeta />, label: "Meta AI" },
-  { icon: <FaUserFriends />, label: "Bạn bè" },
-  { icon: <FaUsers />, label: "Nhóm" },
-  { icon: <FaVideo />, label: "Video" },
-  { icon: <IoTimer />, label: "Kỷ niệm" },
-  { icon: <FaRegSave />, label: "Đã lưu" },
-  { icon: <FaPlaceOfWorship />, label: "Marketplace" },
-  { icon: <FaGamepad />, label: "Chơi game" },
-  { icon: <FaRegMessage />, label: "Message kid" },
-  { icon: <MdEvent />, label: "Sự kiện" },
+  { icon: <FaMeta />, label: "XoXo AI", href: "" },
+  { icon: <FaUserFriends />, label: "Bạn bè", href: "/friends" },
+  { icon: <FaUsers />, label: "Nhóm", href: "/groups" },
+  { icon: <FaVideo />, label: "Video", href: "/videos" },
+  { icon: <IoTimer />, label: "Kỷ niệm", href: "/" },
+  { icon: <FaRegSave />, label: "Đã lưu", href: "/saves" },
+  { icon: <FaPlaceOfWorship />, label: "Marketplace", href: "marketplaces" },
+  { icon: <FaGamepad />, label: "Chơi game", href: "/games" },
+  { icon: <FaRegMessage />, label: "Message kid", href: "/messages" },
+  { icon: <MdEvent />, label: "Sự kiện", href: "/events" },
 ];
 
 const shortcuts = [
-  { name: "Lập trình viên 2k5", image: "/image/group1.jpg" },
-  { name: "LikeLion 2025 k1", image: "/image/group2.jpg" },
-  { name: "Group 5", image: "/image/group1.jpg" },
-  { name: "Lập trình hay bug", image: "/image/group2.jpg" },
-  { name: "Group 7", image: "/image/group1.jpg" },
-  { name: "Lập trình viên trái nghành", image: "/image/group1.jpg" },
-  { name: "Group 6", image: "/image/group1.jpg" },
-  { name: "Group 1", image: "/image/group1.jpg" },
+  { name: "Lập trình viên 2k5", image: "/image/group1.jpg", href: "/groups" },
+  { name: "LikeLion 2025 k1", image: "/image/group2.jpg", href: "/groups" },
+  { name: "Group 5", image: "/image/group1.jpg", href: "/groups" },
+  { name: "Lập trình hay bug", image: "/image/group2.jpg", href: "/groups" },
+  { name: "Group 7", image: "/image/group1.jpg", href: "/groups" },
+  {
+    name: "Lập trình viên trái nghành",
+    image: "/image/group1.jpg",
+    href: "/groups",
+  },
+  { name: "Group 6", image: "/image/group1.jpg", href: "/groups" },
+  { name: "Group 1", image: "/image/group1.jpg", href: "/groups" },
 ];
 
 export default function Sidebar() {
@@ -114,15 +119,19 @@ export default function Sidebar() {
           <ul className="space-y-1">
             {visibleItems.map((item, index) => (
               <li key={index}>
-                <button className="w-full p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg cursor-pointer flex items-center space-x-3 text-left transition-colors">
+                <Link
+                  href={item.href || "/"}
+                  className="w-full p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg cursor-pointer flex items-center space-x-3 text-left transition-colors"
+                >
                   <span className="text-xl text-blue-600">{item.icon}</span>
                   <span className="font-medium">{item.label}</span>
-                </button>
+                </Link>
               </li>
             ))}
 
             <li>
               <button
+                // href={group.href}
                 className="w-full p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg cursor-pointer text-left font-medium transition-colors"
                 onClick={() => setShowAll(!showAll)}
               >
