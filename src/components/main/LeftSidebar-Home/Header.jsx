@@ -18,7 +18,9 @@ import sampleFriends from "../../../data/sampleFriends";
 import NavItem from "../../../components/Navbar/NavItem";
 import ThemeToggle from "../../ThemeToggle";
 import ProfileDropdown from "../../../components/ProfileDropdown";
-// import MarketplaceDropdown from "../../../components/marketplace";
+import { BsMusicPlayerFill } from "react-icons/bs";
+
+import Link from "next/link";
 
 export default function Header({ onContactClick }) {
   const [showMessages, setShowMessages] = useState(false);
@@ -89,9 +91,9 @@ export default function Header({ onContactClick }) {
     <>
       <header className="fixed top-0 left-0 right-0 bg-white dark:bg-fb-dark-secondary shadow z-50 px-2 sm:px-4 flex justify-between items-center">
         <div className="flex items-center space-x-2">
-          <li className="flex items-center">
+          <Link href="/" className="flex items-center">
             <FaFacebook className="text-blue-600 text-3xl sm:text-4xl" />
-          </li>
+          </Link>
 
           <div className="bg-gray-100 dark:bg-fb-dark-tertiary sm:flex px-3 py-1 items-center space-x-2 rounded-full min-w-[240px] hidden relative">
             {/* <FiSearch className="text-gray-500" /> */}
@@ -149,6 +151,10 @@ export default function Header({ onContactClick }) {
 
           <NavItem href="/groups">
             <RiGroup2Line />
+          </NavItem>
+
+          <NavItem href="/musics">
+            <BsMusicPlayerFill />
           </NavItem>
         </div>
 

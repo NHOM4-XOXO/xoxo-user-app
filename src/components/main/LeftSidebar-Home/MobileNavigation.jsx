@@ -44,7 +44,7 @@ export default function MobileNavigation() {
         </NavItem>
 
         <NavItem
-          href="/group"
+          href="/musics"
           className="flex flex-col items-center p-2 text-gray-500 hover:text-blue-600"
         >
           <BsMusicPlayerFill className="text-2xl" />
