@@ -12,13 +12,6 @@ const groupData = {
   members: "501.2K thành viên",
   isPublic: true,
   description: "Nhóm Công khai • 501,2K thành viên",
-  memberAvatars: [
-    "https://picsum.photos/40/40?random=1",
-    "https://picsum.photos/40/40?random=2",
-    "https://picsum.photos/40/40?random=3",
-    "https://picsum.photos/40/40?random=4",
-    "https://picsum.photos/40/40?random=5",
-  ],
 };
 
 export default function GroupDetailLayout({ groupId }) {
