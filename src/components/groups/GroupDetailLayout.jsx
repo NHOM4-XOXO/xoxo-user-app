@@ -3,6 +3,8 @@
 import { useState } from "react";
 import GroupDetailSidebar from "./GroupDetailSidebar";
 import GroupDetailContent from "./GroupDetailContent";
+import { HEADER_HEIGHT } from "@/constants";
+import ScrollableContainer from "../common/ScrollableContainer";
 
 // Mock data cho nhóm
 const groupData = {
@@ -12,38 +14,36 @@ const groupData = {
   members: "501.2K thành viên",
   isPublic: true,
   description: "Nhóm Công khai • 501,2K thành viên",
-  memberAvatars: [
-    "https://picsum.photos/40/40?random=1",
-    "https://picsum.photos/40/40?random=2",
-    "https://picsum.photos/40/40?random=3",
-    "https://picsum.photos/40/40?random=4",
-    "https://picsum.photos/40/40?random=5",
-  ],
 };
 
 export default function GroupDetailLayout({ groupId }) {
   const [activeTab, setActiveTab] = useState("discussion");
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="bg-gray-100">
       <div className="max-w-full mx-1 ">
         <div className="flex gap-12 ">
           {/* Left Sidebar */}
           <div className="w-80 ">
-            <GroupDetailSidebar group={groupData} />
+            <ScrollableContainer className=" overflow-y-auto">
+              <GroupDetailSidebar group={groupData} />
+            </ScrollableContainer>
           </div>
 
           {/* Main Content */}
-          <div className="flex-2">
-            <GroupDetailContent
-              group={groupData}
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-            />
-          </div>
+          <ScrollableContainer className=" overflow-y-auto flex-2">
+            <div
           
+              style={{ maxHeight: `calc(100vh - ${HEADER_HEIGHT}px)` }}
+            >
+              <GroupDetailContent
+                group={groupData}
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+              />
+            </div>
+          </ScrollableContainer>
         </div>
-        
       </div>
     </div>
   );
