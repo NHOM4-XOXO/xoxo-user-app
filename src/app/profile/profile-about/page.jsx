@@ -28,7 +28,6 @@ const initialInfoData = [
     { icon: <Heart className="w-4 h-4" />, label: "Tình trạng", value: "Độc thân" },
     { icon: <Briefcase className="w-4 h-4" />, label: "Chức vụ", value: "Lập trình viên" },
     { icon: <MapPin className="w-4 h-4" />, label: "Nơi ở", value: "Hồ Chí Minh" },
-    { icon: <CalendarCheck className="w-4 h-4" />, label: "Ngày tham gia", value: "2019-11-26" },
     { icon: <Mail className="w-4 h-4" />, label: "Email", value: "abc@xyz.com" },
 ];
 
