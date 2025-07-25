@@ -1,5 +1,7 @@
 "use client";
 
+import { HEADER_HEIGHT } from "@/constants";
+
 export default function GroupDetailSidebar({ group }) {
   const quickActions = [
     {
@@ -12,7 +14,10 @@ export default function GroupDetailSidebar({ group }) {
   ];
 
   return (
-    <div className="space-y-4">
+    <div
+      className="space-y-4"
+      style={{ maxHeight: `calc(100vh - ${HEADER_HEIGHT}px)` }}
+    >
       {/* Quick Actions */}
       <div className="bg-white rounded-lg shadow-sm p-4">
         <div className="space-y-4">
