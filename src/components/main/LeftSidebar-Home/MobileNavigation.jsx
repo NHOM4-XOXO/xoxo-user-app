@@ -3,6 +3,8 @@ import { IoMdHome, IoMdNotifications } from "react-icons/io";
 import { FaUserFriends, FaStore } from "react-icons/fa";
 import { MdOndemandVideo } from "react-icons/md";
 import { RiGroup2Line } from "react-icons/ri";
+import { BsMusicPlayerFill } from "react-icons/bs";
+
 import NavItem from "../../../components/Navbar/NavItem";
 
 export default function MobileNavigation() {
@@ -34,7 +36,7 @@ export default function MobileNavigation() {
         </NavItem>
 
         <NavItem
-          href="/store"
+          href="/marketplace"
           className="flex flex-col items-center p-2 text-gray-500 hover:text-blue-600"
         >
           <FaStore className="text-2xl" />
@@ -42,19 +44,11 @@ export default function MobileNavigation() {
         </NavItem>
 
         <NavItem
-          href="/noti"
-          className="flex flex-col items-center p-2 text-gray-500 hover:text-blue-600 relative"
-        >
-          <IoMdNotifications className="text-2xl" />
-          <span className="text-xs mt-1 whitespace-nowrap">Thông báo</span>
-        </NavItem>
-
-        <NavItem
           href="/group"
           className="flex flex-col items-center p-2 text-gray-500 hover:text-blue-600"
         >
-          <RiGroup2Line className="text-2xl" />
-          <span className="text-xs mt-1">Nhóm</span>
+          <BsMusicPlayerFill className="text-2xl" />
+          <span className="text-xs mt-1">Music</span>
         </NavItem>
       </div>
     </nav>

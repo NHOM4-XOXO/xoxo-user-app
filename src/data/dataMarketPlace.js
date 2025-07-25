@@ -1,0 +1,97 @@
+
+const marketPlaceData = [
+    {
+        id: 1,
+        title: "Áo hoodie local brand",
+        price: "350.000₫",
+        location: "Quận 1, TP. HCM",
+        // image: "/images/products/hoodie.jpg",
+        store: "LocalBrand Store",
+    },
+    {
+        id: 2,
+        title: "Xe đạp thể thao",
+        price: "2.500.000",
+        location: "Thủ Đức, TP. HCM",
+        store: "Xe Cũ Sài Gòn",
+    },
+    {
+        id: 3,
+        title: "MacBook Pro 2020",
+        price: "15.000.000",
+        location: "Gò Vấp, TP. HCM",
+        store: "Apple Secondhand",
+    },
+    {
+        id: 4,
+        title: "Ghế gaming",
+        price: "1.200.000",
+        location: "Cầu Giấy, Hà Nội",
+        store: "Gaming Hub",
+    },
+    {
+        id: 5,
+        title: "Ghế gaming",
+        price: "1.200.000",
+        location: "Cầu Giấy, Hà Nội",
+        store: "Gaming Hub",
+    },
+    {
+        id: 6,
+        title: "Ghế gaming",
+        price: "1.200.000",
+        location: "Cầu Giấy, Hà Nội",
+        store: "Gaming Hub",
+    },
+    {
+        id: 7,
+        title: "Ghế gaming",
+        price: "1.200.000",
+        location: "Cầu Giấy, Hà Nội",
+        store: "Gaming Hub",
+    },
+    {
+        id: 8,
+        title: "Ghế gaming",
+        price: "1.200.000",
+        location: "Cầu Giấy, Hà Nội",
+        store: "Gaming Hub",
+    },
+    {
+        id: 9,
+        title: "Ghế gaming",
+        price: "1.200.000",
+        location: "Cầu Giấy, Hà Nội",
+        store: "Gaming Hub",
+    },
+    {
+        id: 10,
+        title: "Ghế gaming",
+        price: "1.200.000",
+        location: "Cầu Giấy, Hà Nội",
+        store: "Gaming Hub",
+    },
+    {
+        id: 11,
+        title: "Ghế gaming",
+        price: "1.200.000",
+        location: "Cầu Giấy, Hà Nội",
+        store: "Gaming Hub",
+    },
+    {
+        id: 12,
+        title: "Ghế gaming",
+        price: "1.200.000",
+        location: "Cầu Giấy, Hà Nội",
+        store: "Gaming Hub",
+    },
+    {
+        id: 13,
+        title: "Ghế gaming",
+        price: "1.200.000",
+        location: "Cầu Giấy, Hà Nội",
+        store: "Gaming Hub",
+    },
+];
+
+export default marketPlaceData;
