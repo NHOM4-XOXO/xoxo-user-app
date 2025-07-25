@@ -95,13 +95,13 @@ function ProfileHeader() {
                     </p>
                 </div>
                 <div className="sm:ml-auto sm:mt-4 mt-2 text-end">
-                    <button
+                    {/* <button
                         className="bg-fb-light-tertiary dark:bg-fb-dark-tertiary px-3 py-2 rounded-lg text-sm hover:bg-gray-200 dark:hover:bg-fb-dark-quaternary transition-colors duration-200 flex items-center text-black dark:text-white"
                     // onClick={showModal}
                     >
                         <User className="w-4 h-4 mr-1" />
                         Chỉnh sửa trang cá nhân
-                    </button>
+                    </button> */}
                 </div>
             </div>
 
