@@ -8,13 +8,15 @@ const NotificationDropdown = forwardRef((props, ref) => {
   return (
     <div
       ref={ref}
-      className="absolute top-14 right-16 w-[360px] max-h-[400px] overflow-y-auto bg-white dark:bg-fb-dark-tertiary shadow-xl rounded-lg p-3 z-50"
+      className="absolute top-9 right-14 w-[360px] max-h-[400px] overflow-y-auto bg-white dark:bg-fb-dark-secondary shadow-xl rounded-lg p-3 z-50 cursor-pointer"
     >
       <div className="flex justify-between items-center mb-2">
-        <h3 className="text-lg font-semibold">Thông báo</h3>
+        <h3 className="text-lg font-semibold text-black dark:text-white">
+          Thông báo
+        </h3>
         <button
           onClick={onClose}
-          className="text-sm text-gray-500 hover:underline"
+          className="text-sm text-gray-500 hover:underline dark:text-white-300"
         >
           Đóng
         </button>
@@ -38,7 +40,7 @@ const NotificationDropdown = forwardRef((props, ref) => {
               <p className="text-sm text-gray-800 dark:text-white">
                 {item.message}
               </p>
-              <span className="text-xs text-gray-500">{item.time} trước</span>
+              <span className="text-xs text-gray-500 ">{item.time} trước</span>
             </div>
           </li>
         ))}

@@ -1,3 +1,4 @@
+"use client";
 import { useRef, useState } from "react";
 import { Video, ImageIcon, Smile } from "lucide-react";
 import PostCreationModal from "./PostCreationModal";

@@ -1,22 +1,24 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import clsx from "clsx";
 
-export default function NavItem({ href, exact = false, children }) {
+export default function NavItem({ href, children }) {
   const pathname = usePathname();
-  const isActive = exact ? pathname === href : pathname.startsWith(href);
-
-  const baseStyle = "p-2 lg:p-3 rounded-lg transition-colors cursor-pointer";
-  const activeStyle = "text-blue-600 bg-gray-200 dark:bg-gray-700";
-  const hoverStyle =
-    "hover:text-blue-600 hover:bg-gray-100 dark:hover:bg-gray-700";
-  const className = `${baseStyle} ${hoverStyle} ${
-    isActive ? activeStyle : "text-gray-400"
-  }`;
+  const isActive = pathname === href;
 
   return (
-    <Link href={href} className={className}>
-      {children}
+    <Link href={href}>
+      <div
+        className={clsx(
+          "flex flex-col items-center p-2 w-[60px] transition-colors",
+          isActive
+            ? "text-blue-600 px-9 bg-blue-100 dark:bg-blue-900 rounded-xl"
+            : "text-gray-500 hover:text-blue-600"
+        )}
+      >
+        {children}
+      </div>
     </Link>
   );
 }
