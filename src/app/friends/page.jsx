@@ -4,12 +4,14 @@ import sampleFriends from "@/data/sampleFriends";
 
 export default function FriendsPage() {
   return (
-    <div className="flex bg-black min-h-screen text-white">
+    <div className="flex bg-white min-h-screen dark:text-white dark:bg-black">
       <SidebarFriend />
 
       <main className="flex-1 p-6">
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold">Lời mời kết bạn</h1>
+          <h1 className="text-2xl font-bold dark:text-white">
+            Lời mời kết bạn
+          </h1>
           <a href="#" className="text-blue-500 hover:underline">
             Xem tất cả
           </a>

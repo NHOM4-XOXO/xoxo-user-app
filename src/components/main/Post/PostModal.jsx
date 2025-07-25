@@ -1,17 +1,18 @@
 import { Modal, Input, Avatar, Dropdown, Tooltip } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 import EmojiPicker from "emoji-picker-react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
     ThumbsUp,
     Heart,
-    Laugh,
     Smile,
     Camera,
-    Image,
     Send,
 } from "lucide-react";
 import PostComment from "./PostComment";
+import { useTheme } from "next-themes";
+import EmojiButtonPicker from "@/components/common/EmojiButtonPicker";
+import MainPost from "./MainPost";
 
 const filterOptions = [
     {
@@ -54,13 +55,23 @@ const filterOptions = [
 function PostModal({ post, comments, isModalOpen, setIsModalOpen }) {
     const [comment, setComment] = useState("");
     const [commentFilter, setCommentFilter] = useState("Phù hợp nhất");
+    const [selectedFiles, setSelectedFiles] = useState([]);
 
-    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-    const emojiRef = useRef(null);
 
-    const handleEmojiClick = (emojiData) => {
-        setComment((prev) => prev + emojiData.emoji);
+
+    const emojiPickerRef = useRef(null);
+    const emojiButtonRef = useRef(null);
+
+    const [isDark, setIsDark] = useState(false);
+    const { theme, resolvedTheme } = useTheme();
+    useEffect(() => {
+        // resolvedTheme sẽ là "dark" hoặc "light"
+        setIsDark(resolvedTheme === "dark");
+    }, [resolvedTheme]);
+    const handleEmojiClick = (emoji) => {
+        setComment((prev) => prev + emoji);
     };
+
 
     const handleFilterChange = ({ key }) => {
         const selected = {
@@ -71,10 +82,40 @@ function PostModal({ post, comments, isModalOpen, setIsModalOpen }) {
         setCommentFilter(selected);
     };
 
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            const emojiPicker = emojiPickerRef.current;
+            const emojiButton = emojiButtonRef.current;
+
+            if (
+                emojiPicker &&
+                !emojiPicker.contains(e.target) &&
+                emojiButton &&
+                !emojiButton.contains(e.target)
+            ) {
+                setShowEmojiPicker(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside, true); // ⚠️ capture = true
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside, true);
+        };
+    }, []);
+
+    const removeFile = (indexToRemove) => {
+        setSelectedFiles((prev) => prev.filter((_, i) => i !== indexToRemove));
+    };
+
+
+
+
+
+
     return (
         <Modal
             title={
-                <h2 className="text-xl font-bold text-center mb-3 text-fb-light-primary dark:text-white">
+                <h2 className="text-xl font-bold text-center mb-3 text-fb-dark-primary dark:text-white">
                     Bài viết của {post.name}
                 </h2>
             }
@@ -90,81 +131,43 @@ function PostModal({ post, comments, isModalOpen, setIsModalOpen }) {
                     maxHeight: "80vh",
                 },
             }}
-            className="custom-dark-modal"
+            className={isDark ? "custom-dark-modal" : ""}
         >
             {/* Nội dung có thể cuộn */}
             <div className="flex-1 overflow-y-auto  px-5 text-fb-dark-secondary dark:text-fb-light-primary">
                 <div className="space-y-3">
-                    {/* Header bài viết */}
-                    <div className="flex items-center gap-3">
-                        <img
-                            src={post.avatar}
-                            alt="avatar"
-                            className="w-10 h-10 rounded-full"
-                        />
-                        <div>
-                            <p className="font-semibold dark:text-fb-light-primary">
-                                {post.name}
-                            </p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                                {post.time}
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* Caption + ảnh */}
-                    <p className="px-2 text-gray-600 dark:text-fb-light-quaternary">
-                        {post.caption}
-                    </p>
-                    <img
-                        src={post.image}
-                        alt="post"
-                        className="w-full rounded-md object-cover"
-                    />
-
-                    {/* Like + comment count */}
-                    <div className="flex justify-between items-center text-sm text-gray-600 dark:text-gray-400 px-2">
-                        <div className="flex items-center gap-1">
-                            <div className=" flex items-center justify-center">
-                                <ThumbsUp size={18} className="text-blue-600" />
-                            </div>
-                            <div className="flex items-center justify-center">
-                                <Heart size={18} className="text-red-600" />
-                            </div>
-                            <div className=" flex items-center justify-center">
-                                <Smile size={18} className="text-yellow-500" />
-                            </div>
-                            <span className="text-sm hover:underline">{post.likes}</span>
-                        </div>
-                        <span className="text-sm hover:underline">
-                            {`${post.comments.length} Bình luận`}
-                        </span>
-                    </div>
+                    <MainPost data={post} />
 
                     <hr className="border-gray-300 dark:border-fb-dark-tertiary" />
 
                     {/* Comments */}
                     <div className="space-y-5">
                         {/* Bộ lọc bình luận */}
-                        <Dropdown
-                            menu={{
-                                items: filterOptions,
-                                onClick: handleFilterChange,
-                            }}
-                            trigger={["click"]}
-                            placement="bottomRight"
-                            arrow={{ pointAtCenter: true }}
-                            overlayStyle={{ maxWidth: 400 }}
-                            overlayClassName="custom-dropdown"
-                        >
-                            <button className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline flex items-center">
-                                {commentFilter} <DownOutlined className="ml-1 text-xs" />
-                            </button>
-                        </Dropdown>
+
                         {comments.length > 0 ? (
-                            comments.map((comment) => (
-                                <PostComment key={comment.id} comment={comment} />
-                            ))
+                            <>
+                                <Dropdown
+                                    menu={{
+                                        items: filterOptions,
+                                        onClick: handleFilterChange,
+                                    }}
+                                    trigger={["click"]}
+                                    placement="bottomRight"
+                                    arrow={{ pointAtCenter: true }}
+                                    overlayStyle={{ maxWidth: 400 }}
+                                    overlayClassName={isDark ? "custom-dropdown" : ""}
+                                >
+                                    <button className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline flex items-center">
+                                        {commentFilter} <DownOutlined className="ml-1 text-xs" />
+                                    </button>
+                                </Dropdown>
+                                {
+                                    comments.map((comment) => (
+                                        <PostComment key={comment.id} comment={comment} />
+                                    ))
+                                }
+                            </>
+
                         ) : (
                             <p className="text-sm text-gray-500 dark:text-gray-400 italic">
                                 Chưa có bình luận nào.
@@ -183,39 +186,11 @@ function PostModal({ post, comments, isModalOpen, setIsModalOpen }) {
                         value={comment}
                         onChange={(e) => setComment(e.target.value)}
                     />
-                    <div
-                        className="absolute right-3 top-1/2 -translate-y-1/2 flex gap-2 text-gray-500 dark:text-fb-light-quaternary "
-                        ref={emojiRef}
-                    >
-                        <Dropdown
-                            trigger={["click"]}
-                            placement="top"
-                            arrow
-                            overlayClassName="custom-dropdown"
-                            overlayStyle={{
-                                marginBottom: 16,
-                            }}
-                            popupRender={() => (
-                                <div className="custom-scrollbar ">
-                                    <EmojiPicker
-                                        theme="dark"
-                                        emojiStyle="apple"
-                                        lazyLoadEmojis={true}
-                                        searchDisabled={true}
-                                        skinTonesDisabled={false}
-                                        previewConfig={{ showPreview: false }}
-                                        suggestedEmojisMode="recent"
-                                        height={350}
-                                        width={350}
-                                        onEmojiClick={handleEmojiClick}
-                                    />
-                                </div>
-                            )}
-                        >
-                            <Tooltip title="Chọn biểu tượng cảm xúc" placement="top">
-                                <Smile className="w-4 h-4 cursor-pointer transition-all duration-150 hover:scale-110" />
-                            </Tooltip>
-                        </Dropdown>
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 flex gap-2 text-gray-500 dark:text-fb-light-quaternary">
+                        {/* Emoji Button */}
+                        <EmojiButtonPicker onSelect={handleEmojiClick} />
+
+                        {/* Upload Image */}
                         <Tooltip title="Đính kèm một ảnh hoặc video" placement="top">
                             <label className="relative">
                                 <Camera className="w-4 h-4 hover:scale-110 transition-all duration-150 z-10 relative cursor-pointer" />
@@ -224,18 +199,69 @@ function PostModal({ post, comments, isModalOpen, setIsModalOpen }) {
                                     accept="image/*,video/*"
                                     className="absolute inset-0 w-full h-full opacity-0"
                                     title=""
+                                    multiple
+                                    onChange={(e) => {
+                                        const files = Array.from(e.target.files);
+                                        const newFiles = files.map((file) => ({
+                                            url: URL.createObjectURL(file),
+                                            type: file.type.startsWith("image") ? "image" : "video",
+                                        }));
+
+                                        setSelectedFiles((prev) => [...prev, ...newFiles]);
+                                    }}
+
                                 />
                             </label>
                         </Tooltip>
+
+                        {/* Send */}
                         <Tooltip title="Bình luận" placement="top">
-                            <Send className={`w-4 h-4 transition-all duration-150 ${comment.trim()
-                                ? "cursor-pointer text-blue-500 hover:scale-110"
-                                : "cursor-not-allowed text-gray-400"
-                                }`} />
+                            <Send
+                                className={`w-4 h-4 transition-all duration-150 ${comment.trim()
+                                    ? "cursor-pointer text-blue-500 hover:scale-110"
+                                    : "cursor-not-allowed text-gray-400"
+                                    }`}
+                            />
                         </Tooltip>
                     </div>
+
                 </div>
             </div>
+            {selectedFiles.length > 0 && (
+                <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {selectedFiles.map((fileObj, index) => (
+                        <div
+                            key={index}
+                            className="relative group w-full aspect-square overflow-hidden rounded-lg border border-gray-200 dark:border-gray-600 bg-black/5"
+                        >
+                            {fileObj.type === "image" ? (
+                                <img
+                                    src={fileObj.url}
+                                    alt={`Selected ${index}`}
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : (
+                                <video
+                                    src={fileObj.url}
+                                    className="w-full h-full object-cover"
+                                    controls
+                                />
+                            )}
+
+                            <button
+                                onClick={() => removeFile(index)}
+                                className="absolute top-1.5 right-1.5 bg-black/60 hover:bg-black/80 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs transition-opacity opacity-0 group-hover:opacity-100"
+                                title="Xóa"
+                            >
+                                ✕
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+
+
         </Modal>
     );
 }

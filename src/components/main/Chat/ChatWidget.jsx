@@ -5,6 +5,7 @@ import ScrollableContainer from "../../common/ScrollableContainer";
 import { HEADER_HEIGHT } from "@/constants";
 import { BASE_HEIGHT } from "@/constants/ChatWidget";
 import ImagePreviewModal from "./ImagePreviewModal";
+import { ContentMultipleLines } from "@/utils/ContentMultipleLines";
 
 export default function ChatWidget({
   contact,
@@ -128,7 +129,7 @@ export default function ChatWidget({
   return (
     <>
       <div
-        className="fixed bottom-0 w-80 bg-white dark:bg-fb-dark-secondary shadow-lg rounded-lg border border-gray-300 dark:border-gray-700 flex flex-col z-50"
+        className="fixed bottom-0 z-50 flex flex-col bg-white border border-gray-300 rounded-lg shadow-lg w-80 dark:bg-fb-dark-secondary dark:border-gray-700"
         style={{
           right: `${rightPosition}px`,
           height: `${Math.min(BASE_HEIGHT, dynamicMaxHeight)}px`,
@@ -144,7 +145,7 @@ export default function ChatWidget({
                 alt={contact.name}
                 width={32}
                 height={32}
-                className="rounded-full object-cover"
+                className="object-cover rounded-full"
               />
               <div
                 className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 ${
@@ -152,17 +153,17 @@ export default function ChatWidget({
                 } border border-white dark:border-fb-dark-secondary rounded-full`}
               ></div>
             </div>
-            <span className="font-semibold text-sm text-black dark:text-white">
+            <span className="text-sm font-semibold text-black dark:text-white">
               {contact.name}
             </span>
           </div>
           <div className="flex items-center space-x-1">
-            <button className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors cursor-pointer">
+            <button className="p-1 transition-colors rounded-full cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700">
               <Minus className="w-4 h-4 text-gray-600 dark:text-gray-400" />
             </button>
             <button
               onClick={onClose}
-              className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors cursor-pointer"
+              className="p-1 transition-colors rounded-full cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
             >
               <X className="w-4 h-4 text-gray-600 dark:text-gray-400" />
             </button>
@@ -170,7 +171,7 @@ export default function ChatWidget({
         </div>
 
         {/* Message Area */}
-        <div className="flex-1 overflow-y-auto p-3 space-y-3 scrollbar-show">
+        <div className="flex-1 p-3 space-y-3 overflow-y-auto scrollbar-show">
           {messages.map((msg) => (
             <div
               key={msg.id}
@@ -190,12 +191,7 @@ export default function ChatWidget({
                 >
                   {msg.content && (
                     <p className="text-sm">
-                      {msg.content.split(/\n/g).map((line, index) => (
-                        <span key={index}>
-                          {line}
-                          <br />
-                        </span>
-                      ))}
+                      {ContentMultipleLines(msg.content)}
                     </p>
                   )}
 
@@ -210,12 +206,12 @@ export default function ChatWidget({
                     </a>
                   )}
 
-                  <span className="text-xs opacity-75 mt-1 block text-right">
+                  <span className="block mt-1 text-xs text-right opacity-75">
                     {msg.timestamp}
                   </span>
                 </div>
               ) : (
-                <div className="mt-1 max-w-[75%] rounded-lg">
+                <div className="w-3/4 mt-1 rounded-lg">
                   {msg.file.type === "image" && (
                     <img
                       src={msg.file.url || "/placeholder.svg"}
@@ -228,7 +224,7 @@ export default function ChatWidget({
                     <video src={msg.file.url} controls className="rounded-md" />
                   )}
                   {msg.file.type === "audio" && (
-                    <audio src={msg.file.url} controls className="w-[200px]" />
+                    <audio src={msg.file.url} controls className="w-full" />
                   )}
                 </div>
               )}
@@ -238,8 +234,8 @@ export default function ChatWidget({
         </div>
 
         {/* Input Area */}
-        <div className="p-3 border-t border-gray-300 dark:border-gray-700 flex items-center space-x-2">
-          <button className="p-1 text-gray-500 hover:text-blue-500 transition-colors cursor-pointer">
+        <div className="flex items-center p-3 space-x-2 border-t border-gray-300 dark:border-gray-700">
+          <button className="p-1 text-gray-500 transition-colors cursor-pointer hover:text-blue-500">
             <Smile className="w-5 h-5" />
           </button>
           <input
@@ -251,7 +247,7 @@ export default function ChatWidget({
           />
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="p-1 text-gray-500 hover:text-blue-500 transition-colors cursor-pointer"
+            className="p-1 text-gray-500 transition-colors cursor-pointer hover:text-blue-500"
           >
             <Paperclip className="w-5 h-5" />
           </button>
@@ -261,11 +257,11 @@ export default function ChatWidget({
             onKeyDown={handleKeyDown}
             placeholder="Aa"
             rows={newMessage.split(/\n/g).length}
-            className="flex-1 bg-gray-100 dark:bg-gray-700 max-h-20 rounded-xl px-3 py-2 text-sm resize-none outline-none text-black dark:text-white placeholder-gray-500"
+            className="flex-1 px-3 py-2 text-sm text-black placeholder-gray-500 bg-gray-100 outline-none resize-none dark:bg-gray-700 max-h-20 rounded-xl dark:text-white"
           />
           <button
             onClick={handleSendMessage}
-            className="p-1 text-blue-500 hover:text-blue-600 transition-colors cursor-pointer"
+            className="p-1 text-blue-500 transition-colors cursor-pointer hover:text-blue-600"
             disabled={!newMessage.trim()}
           >
             <Send className="w-5 h-5" />

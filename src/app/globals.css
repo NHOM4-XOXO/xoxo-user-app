@@ -1,8 +1,14 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
+}
+
+html.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
 }
 
 @theme inline {
@@ -22,6 +28,7 @@
   --color-fb-light-quaternary: #F1F2F6;
   
 }
+
 
 @layer utilities {
   /* Hide scrollbar by default */
@@ -61,12 +68,12 @@
 }
 
 
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
   }
-}
+} */
 
 body {
   background: var(--background);
@@ -76,14 +83,15 @@ body {
 
 /* Tuỳ chỉnh modal khi dark mode */
 .custom-dark-modal .ant-modal-content {
-  background-color: #1C1C1D; 
+ 
+  background-color: #252728 !important;
   color: #E4E6EB; 
   padding-left: 0;
   padding-right: 0;
 }
 
 .custom-dark-modal .ant-modal-header {
-  background-color: #1C1C1D;
+  background-color: #252728;
   border-bottom: 1px solid #333333; 
 }
 
@@ -118,7 +126,7 @@ body {
 
 /* Target ul.ant-dropdown-menu bên trong popup */
 .custom-dropdown .ant-dropdown-menu {
-  background-color: #252728 !important;
+  background-color: #1C1C1D !important;
   color: #e4e6eb !important;
   min-width: 150px;
 }
@@ -135,7 +143,7 @@ body {
 
 .custom-dropdown .ant-dropdown-arrow::before, 
 .custom-dropdown .ant-dropdown-arrow::after{
-    background-color: #252728 !important;
+    background-color: #1C1C1D !important;
 }
 
 .custom-scrollbar {
