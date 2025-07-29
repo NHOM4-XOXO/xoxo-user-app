@@ -1,5 +1,6 @@
 "use client";
 
+import { Settings } from "lucide-react";
 import { useState } from "react";
 
 const myGroups = [
@@ -43,8 +44,8 @@ export default function GroupsSidebar({ activeTab, setActiveTab }) {
         <div className="relative">
           <div className="flex items-center space-x-58">
             <h1 className="text-2xl font-bold text-gray-900">Nhóm</h1>
-            <button className="text-blue-600 hover:text-blue-700 font-medium">
-              ⚙️
+            <button className="text-blue-600 hover:text-blue-700 font-medium cursor-pointer">
+              <Settings />
             </button>
           </div>
           <div className="absolute inset-y-13 left-0 pl-3 flex items-center pointer-events-none">

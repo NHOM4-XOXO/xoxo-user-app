@@ -23,7 +23,7 @@ const items = [
   { icon: <FaRegSave />, label: "Đã lưu", href: "/saves" },
   { icon: <FaPlaceOfWorship />, label: "Marketplace", href: "marketplaces" },
   { icon: <FaGamepad />, label: "Chơi game", href: "/games" },
-  { icon: <FaRegMessage />, label: "Message kid", href: "/messages" },
+  { icon: <FaRegMessage />, label: "Messages", href: "/messages" },
   { icon: <MdEvent />, label: "Sự kiện", href: "/events" },
 ];
 
@@ -79,7 +79,7 @@ export default function Sidebar() {
     <>
       {isOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
+          className="lg:hidden fixed inset-0 bg-black/50 z-40"
           onClick={closeSidebar}
         />
       )}
