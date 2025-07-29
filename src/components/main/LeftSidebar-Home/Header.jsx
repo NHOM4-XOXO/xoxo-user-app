@@ -92,7 +92,15 @@ export default function Header({ onContactClick }) {
       <header className="fixed top-0 left-0 right-0 bg-white dark:bg-fb-dark-secondary shadow z-50 px-2 sm:px-4 flex justify-between items-center">
         <div className="flex items-center space-x-2">
           <Link href="/" className="flex items-center">
-            <FaFacebook className="text-blue-600 text-3xl sm:text-4xl" />
+            <div className="flex items-center">
+              <div className="w-14 h-14 bg-amber-50 flex items-center justify-center mr-4">
+                <img
+                  src="./logo_xoxo_500px-removebg-preview.png"
+                  alt="Logo"
+                  className="h-full w-full bg-white dark:bg-fb-dark-secondary"
+                />
+              </div>
+            </div>
           </Link>
 
           <div className="bg-gray-100 dark:bg-fb-dark-tertiary sm:flex px-3 py-1 items-center space-x-2 rounded-full min-w-[240px] hidden relative">
