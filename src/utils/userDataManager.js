@@ -5,7 +5,7 @@ export const userDataManager = {
         localStorage.getItem("registeredUsers") || "[]"
       );
 
-      // Kiểm tra email/phone đã tồn tại chưa
+      
       const userExists = existingUsers.some(
         (user) => user.email === userData.email
       );

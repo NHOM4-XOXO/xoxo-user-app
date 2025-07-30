@@ -34,7 +34,7 @@ export default function ResetPasswordModal({
   const validatePasswords = () => {
     const newErrors = {};
 
-    // Kiểm tra mật khẩu có hợp lệ không (giống như signup)
+   
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{6,}$/;
 
