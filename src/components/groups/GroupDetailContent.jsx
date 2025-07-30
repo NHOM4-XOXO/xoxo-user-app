@@ -227,7 +227,7 @@ export default function GroupDetailContent({ groupId }) {
         </nav>
       </div>
 
-      {/* Content based on active tab */}
+      
       {activeTab === "discussion" && (
         <div className="flex gap-6">
           <div className="w-2/3 space-y-4">
@@ -241,7 +241,7 @@ export default function GroupDetailContent({ groupId }) {
             ))}
           </div>
 
-          {/* Group Info Column - Bên phải */}
+        
           <div className="w-1/3">
             <div className="bg-white rounded-lg shadow-md p-4">
               <h3 className="font-semibold text-gray-900 mb-4">Giới thiệu</h3>
