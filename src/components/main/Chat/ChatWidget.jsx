@@ -1,7 +1,8 @@
+"use client";
+
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { Minus, X, Smile, Paperclip, Send, Download } from "lucide-react";
-import ScrollableContainer from "../../common/ScrollableContainer";
 import { HEADER_HEIGHT } from "@/constants";
 import { BASE_HEIGHT } from "@/constants/ChatWidget";
 import ImagePreviewModal from "./ImagePreviewModal";
@@ -10,6 +11,7 @@ import { ContentMultipleLines } from "@/utils/ContentMultipleLines";
 export default function ChatWidget({
   contact,
   onClose,
+  onMinimize,
   positionOffset = 0,
   windowHeight,
 }) {
@@ -27,8 +29,8 @@ export default function ChatWidget({
     : BASE_HEIGHT;
 
   // Calculate position for each the chat widget
-  // 64px (right-16) + index * (width (w-80) + gap)
-  const rightPosition = 64 + positionOffset * (320 + 16);
+  // 80px + index * (width (w-80) + gap)
+  const rightPosition = 80 + positionOffset * (320 + 16);
 
   useEffect(() => {
     // Simulate fetching messages for the contact
@@ -129,7 +131,7 @@ export default function ChatWidget({
   return (
     <>
       <div
-        className="fixed bottom-0 z-50 flex flex-col bg-white border border-gray-300 rounded-lg shadow-lg w-80 dark:bg-fb-dark-secondary dark:border-gray-700"
+        className="fixed bottom-0 z-40 flex flex-col bg-white border border-gray-300 rounded-lg shadow-lg w-80 dark:bg-fb-dark-secondary dark:border-gray-700"
         style={{
           right: `${rightPosition}px`,
           height: `${Math.min(BASE_HEIGHT, dynamicMaxHeight)}px`,
@@ -158,7 +160,10 @@ export default function ChatWidget({
             </span>
           </div>
           <div className="flex items-center space-x-1">
-            <button className="p-1 transition-colors rounded-full cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700">
+            <button
+              onClick={onMinimize}
+              className="p-1 transition-colors rounded-full cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
+            >
               <Minus className="w-4 h-4 text-gray-600 dark:text-gray-400" />
             </button>
             <button
