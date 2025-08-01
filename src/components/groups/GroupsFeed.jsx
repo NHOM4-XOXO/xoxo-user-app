@@ -12,7 +12,7 @@ const posts = [
     author: "Người tham gia ấn danh",
     authorAvatar: "/default-avatar.jpg",
     timeAgo: "14 phút",
-    content: "Ối dồi ôi, ối dồi ơi....😭",
+    content: "Ối dồi ôi, ối dồi ơi....Trình😭",
     hasImage: true,
     imageUrl: "/image/group1.jpg",
     likes: 24,
