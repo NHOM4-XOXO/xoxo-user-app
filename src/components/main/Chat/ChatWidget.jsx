@@ -7,6 +7,7 @@ import { HEADER_HEIGHT } from "@/constants";
 import { BASE_HEIGHT } from "@/constants/ChatWidget";
 import ImagePreviewModal from "./ImagePreviewModal";
 import { ContentMultipleLines } from "@/utils/ContentMultipleLines";
+import ScrollableContainer from "@/components/common/ScrollableContainer";
 
 export default function ChatWidget({
   contact,
@@ -176,67 +177,75 @@ export default function ChatWidget({
         </div>
 
         {/* Message Area */}
-        <div className="flex-1 p-3 space-y-3 overflow-y-auto scrollbar-show">
-          {messages.map((msg) => (
-            <div
-              key={msg.id}
-              className={`flex ${
-                msg.sender === "me" ? "justify-end" : "justify-start"
-              }`}
-            >
-              {msg.content || msg.file?.type === "other" ? (
-                <div
-                  className={`max-w-[75%] p-2 rounded-lg break-all ${
-                    msg.file
-                      ? "bg-fb-light-tertiary dark:bg-fb-dark-tertiary dark:text-white"
-                      : msg.sender === "me"
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-200 dark:bg-gray-700 text-black dark:text-white"
-                  }`}
-                >
-                  {msg.content && (
-                    <p className="text-sm">
-                      {ContentMultipleLines(msg.content)}
-                    </p>
-                  )}
+        <ScrollableContainer className="flex-1">
+          <div className="p-3 space-y-3">
+            {messages.map((msg) => (
+              <div
+                key={msg.id}
+                className={`flex ${
+                  msg.sender === "me" ? "justify-end" : "justify-start"
+                }`}
+              >
+                {msg.content || msg.file?.type === "other" ? (
+                  <div
+                    className={`max-w-[75%] p-2 rounded-lg break-all ${
+                      msg.file
+                        ? "bg-fb-light-tertiary dark:bg-fb-dark-tertiary dark:text-white"
+                        : msg.sender === "me"
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200 dark:bg-gray-700 text-black dark:text-white"
+                    }`}
+                  >
+                    {msg.content && (
+                      <p className="text-sm">
+                        {ContentMultipleLines(msg.content)}
+                      </p>
+                    )}
 
-                  {msg.file && (
-                    <a
-                      href={msg.file.url}
-                      download={msg.file.name}
-                      className="flex items-center space-x-2 hover:underline"
-                    >
-                      <Download className="w-4 h-4" />
-                      <span className="text-sm font-bold">{msg.file.name}</span>
-                    </a>
-                  )}
+                    {msg.file && (
+                      <a
+                        href={msg.file.url}
+                        download={msg.file.name}
+                        className="flex items-center space-x-2 hover:underline"
+                      >
+                        <Download className="w-4 h-4" />
+                        <span className="text-sm font-bold">
+                          {msg.file.name}
+                        </span>
+                      </a>
+                    )}
 
-                  <span className="block mt-1 text-xs text-right opacity-75">
-                    {msg.timestamp}
-                  </span>
-                </div>
-              ) : (
-                <div className="w-3/4 mt-1 rounded-lg">
-                  {msg.file.type === "image" && (
-                    <img
-                      src={msg.file.url || "/placeholder.svg"}
-                      alt={msg.file.name}
-                      className="rounded-md cursor-pointer"
-                      onClick={() => openImagePreview(msg.file.url)}
-                    />
-                  )}
-                  {msg.file.type === "video" && (
-                    <video src={msg.file.url} controls className="rounded-md" />
-                  )}
-                  {msg.file.type === "audio" && (
-                    <audio src={msg.file.url} controls className="w-full" />
-                  )}
-                </div>
-              )}
-            </div>
-          ))}
-          <div ref={messagesEndRef} />
-        </div>
+                    <span className="block mt-1 text-xs text-right opacity-75">
+                      {msg.timestamp}
+                    </span>
+                  </div>
+                ) : (
+                  <div className="w-3/4 mt-1 rounded-lg">
+                    {msg.file.type === "image" && (
+                      <img
+                        src={msg.file.url || "/placeholder.svg"}
+                        alt={msg.file.name}
+                        className="rounded-md cursor-pointer"
+                        onClick={() => openImagePreview(msg.file.url)}
+                      />
+                    )}
+                    {msg.file.type === "video" && (
+                      <video
+                        src={msg.file.url}
+                        controls
+                        className="rounded-md"
+                      />
+                    )}
+                    {msg.file.type === "audio" && (
+                      <audio src={msg.file.url} controls className="w-full" />
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
+        </ScrollableContainer>
 
         {/* Input Area */}
         <div className="flex items-center p-3 space-x-2 border-t border-gray-300 dark:border-gray-700">
