@@ -1,5 +1,4 @@
 
-
 import GroupDetailLayout from "@/components/groups/GroupDetailLayout";
 
 export default async function GroupDetailPage({ params }) {

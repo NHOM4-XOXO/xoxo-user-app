@@ -2,13 +2,16 @@
 
 import { allPosts } from "@/data/posts";
 import { useState } from "react";
+import { useParams } from "next/navigation";
 import Post from "../main/Post/PostItem";
 import PostCreation from "../main/PostCreation";
 import ScrollableContainer from "../common/ScrollableContainer";
 
-export default function GroupDetailContent({ groupId }) {
+export default function GroupDetailContent() {
   const [activeTab, setActiveTab] = useState("discussion");
-  // Mock data cho nhóm
+  const params = useParams();
+  const groupId = params.id;
+
   const groupData = {
     1: {
       name: "Học lập trình cùng nhau",
@@ -83,8 +86,10 @@ export default function GroupDetailContent({ groupId }) {
       ],
     },
   };
+  const group = groupData[parseInt(groupId)] || groupData[1];
+  console.log("groupId:", groupId);
+  console.log("group:", group);
 
-  const group = groupData[groupId] || groupData[1];
 
   const posts = [
     {
@@ -124,9 +129,7 @@ export default function GroupDetailContent({ groupId }) {
   ];
 
   return (
-    <div
-      className="max-w-12xl mx-2" >
-      
+    <div className="max-w-12xl mx-2">
       {/* Group Cover & Info */}
       <div className="bg-white rounded-lg shadow-sm mb-4">
         <div
@@ -227,7 +230,6 @@ export default function GroupDetailContent({ groupId }) {
         </nav>
       </div>
 
-      
       {activeTab === "discussion" && (
         <div className="flex gap-6">
           <div className="w-2/3 space-y-4">
@@ -241,8 +243,7 @@ export default function GroupDetailContent({ groupId }) {
             ))}
           </div>
 
-        
-          <div className="w-1/3">
+          <div className="w-1/3 sticky top-4 self-start">
             <div className="bg-white rounded-lg shadow-md p-4">
               <h3 className="font-semibold text-gray-900 mb-4">Giới thiệu</h3>
               <p className="text-gray-600 text-md mb-4">
