@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function MessageDropdown({ messages, onClose, onContactClick }) {
   const dropdownRef = useRef(null);
@@ -67,13 +68,12 @@ export default function MessageDropdown({ messages, onClose, onContactClick }) {
           </div>
         ))}
       </div>
-      <a
-        href="#"
+      <Link
+        href="/messages"
         className="block text-center text-blue-500 text-sm mt-2 dark:text-white"
-        s
       >
         Xem tất cả trong Messenger
-      </a>
+      </Link>
     </div>
   );
 }

@@ -1,8 +1,8 @@
 "use client";
 
-import { allPosts } from "@/data/posts";
 import { useState } from "react";
 import Post from "../main/Post/PostItem";
+import { allPosts } from "@/data/posts";
 
 const posts = [
   {
