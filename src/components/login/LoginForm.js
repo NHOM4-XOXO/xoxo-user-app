@@ -56,7 +56,7 @@ export default function LoginForm() {
             <div className="text-center lg:text-left">
               <div className="flex justify-center lg:justify-start">
                 <img
-                  src="./logo_xoxo_500px-removebg-preview.png"
+                  src="/logo_xoxo_500px-removebg-preview.png"
                   alt="Logo"
                   className="h-50 w-50 rounded-full"
                 />
