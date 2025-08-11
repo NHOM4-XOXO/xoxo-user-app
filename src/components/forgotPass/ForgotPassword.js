@@ -88,7 +88,7 @@ export default function ForgotPassword() {
                   onChange={(e) =>
                     setHeaderLogin({ ...headerLogin, email: e.target.value })
                   }
-                  className="px-3 py-2 border border-gray-300 rounded-md text-sm placeholder-gray-600"
+                  className="px-3 py-2 border border-gray-300 rounded-md text-black text-sm placeholder-gray-600"
                   disabled={headerLoading}
                 />
                 <input
@@ -98,17 +98,16 @@ export default function ForgotPassword() {
                   onChange={(e) =>
                     setHeaderLogin({ ...headerLogin, password: e.target.value })
                   }
-                  className="px-3 py-2 border border-gray-300 rounded-md text-sm placeholder-gray-600"
+                  className="px-3 py-2 border border-gray-300 text-black rounded-md text-sm placeholder-gray-600"
                   disabled={headerLoading}
                 />
                 <button
                   type="submit"
                   disabled={headerLoading}
-                  className={`px-4 py-2 rounded-md text-sm font-medium ${
-                    headerLoading
-                      ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-                      : "bg-blue-600 text-white hover:bg-blue-700"
-                  }`}
+                  className={`px-4 py-2 rounded-md text-sm font-medium ${headerLoading
+                    ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+                    : "bg-blue-600 text-white hover:bg-blue-700"
+                    }`}
                 >
                   {headerLoading ? "Đang đăng nhập..." : "Đăng nhập"}
                 </button>
@@ -133,9 +132,8 @@ export default function ForgotPassword() {
                 placeholder="Email"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg placeholder-gray-600 ${
-                  error ? "border-red-500" : "border-gray-300"
-                }`}
+                className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-black text-lg placeholder-gray-600 ${error ? "border-red-500" : "border-gray-300"
+                  }`}
               />
 
               {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
