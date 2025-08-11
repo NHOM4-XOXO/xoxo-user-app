@@ -24,14 +24,12 @@ export default function GroupDetailLayout({ groupId }) {
 
           {/* Main Content */}
           <ScrollableContainer className=" overflow-y-auto flex-2">
-            <div
-          
-              style={{ maxHeight: `calc(100vh - ${HEADER_HEIGHT}px)` }}
-            >
+            <div style={{ maxHeight: `calc(100vh - ${HEADER_HEIGHT}px)` }}>
               <GroupDetailContent
                 group={groupData}
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
+                groupId={groupId}
               />
             </div>
           </ScrollableContainer>
