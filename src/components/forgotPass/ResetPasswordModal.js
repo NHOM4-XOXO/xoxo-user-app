@@ -34,7 +34,7 @@ export default function ResetPasswordModal({
   const validatePasswords = () => {
     const newErrors = {};
 
-    // Kiểm tra mật khẩu có hợp lệ không (giống như signup)
+   
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{6,}$/;
 
@@ -69,16 +69,16 @@ export default function ResetPasswordModal({
         throw new Error("User ID không hợp lệ!");
       }
 
-      // Sử dụng userDataManager trực tiếp thay vì UserContext
+    
       const updatedUser = userDataManager.updateUser(user.id, {
         password: passwords.newPassword,
       });
 
-      // Simulate API call delay
+     
       setTimeout(() => {
         setIsLoading(false);
 
-        // Call success callback if provided
+        
         if (onSuccess) {
           onSuccess();
           alert(
@@ -91,13 +91,13 @@ export default function ResetPasswordModal({
           onClose();
         }
 
-        // Reset form
+     
         setPasswords({
           newPassword: "",
           confirmPassword: "",
         });
 
-        // Redirect to login page
+        
         setTimeout(() => {
           window.location.href = "/login";
         }, 1000);
@@ -129,8 +129,7 @@ export default function ResetPasswordModal({
 
           <div className="mb-6">
             <p className="text-gray-600 mb-4">
-              Tạo mật khẩu mới có ít nhất 6 ký tự. Mật khẩu mạnh phải bao gồm:
-              chữ hoa, chữ thường, số và ký tự đặc biệt (!@#$%^&*).
+              Tạo mật khẩu mới có ít nhất 6 ký tự.
             </p>
 
             {/* User Info */}
