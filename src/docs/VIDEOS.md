@@ -272,4 +272,4 @@ Response: {
 ---
 
 *Last updated: March 8, 2025*
-*For more help, see the [main README](../README.md) or other help files.*
+*For more help, see the [main README](../../README.md) or other help files.*
