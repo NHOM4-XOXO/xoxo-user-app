@@ -151,7 +151,7 @@ export default function DetailedVideoView({ postId }) {
           </div>
 
           {/* Post Content */}
-          <div className="mb-3 text-sm text-black dark:text-white break-all">
+          <div className="mb-3 text-sm text-black dark:text-white break-words">
             <p className={showFullContent ? "" : "line-clamp-3"}>
               {post.content}
             </p>
