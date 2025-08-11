@@ -1,5 +1,5 @@
 import { useState } from "react";
-import ImagePreviewModal from "@/components/main/Chat/ImagePreviewModal"; // Reusing existing modal
+import ImagePreviewModal from "@/components/common/ImagePreviewModal"; // Reusing existing modal
 
 export default function MediaView({ media }) {
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
