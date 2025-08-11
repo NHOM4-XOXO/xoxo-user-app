@@ -12,23 +12,21 @@ html.dark {
 }
 
 @theme inline {
-  --color-background: var(--background);  
+  --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
-  --color-fb-dark-primary: #1C1C1D;
+  --color-fb-dark-primary: #1c1c1d;
   --color-fb-dark-secondary: #252728;
   --color-fb-dark-tertiary: #333333;
   --color-fb-dark-quaternary: #484849;
 
-  --color-fb-light-primary: #FFFFFF;
-  --color-fb-light-secondary: #F2F4F7;
-  --color-fb-light-tertiary: #E6E8EA;
-  --color-fb-light-quaternary: #F1F2F6;
-  
+  --color-fb-light-primary: #ffffff;
+  --color-fb-light-secondary: #f2f4f7;
+  --color-fb-light-tertiary: #e6e8ea;
+  --color-fb-light-quaternary: #f1f2f6;
 }
-
 
 @layer utilities {
   /* Hide scrollbar by default */
@@ -67,7 +65,6 @@ html.dark {
   }
 }
 
-
 /* @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -83,32 +80,31 @@ body {
 
 /* Tuỳ chỉnh modal khi dark mode */
 .custom-dark-modal .ant-modal-content {
- 
   background-color: #252728 !important;
-  color: #E4E6EB; 
+  color: #e4e6eb;
   padding-left: 0;
   padding-right: 0;
 }
 
 .custom-dark-modal .ant-modal-header {
   background-color: #252728;
-  border-bottom: 1px solid #333333; 
+  border-bottom: 1px solid #333333;
 }
 
 .custom-dark-modal .ant-modal-title {
-  color: #E4E6EB;
+  color: #e4e6eb;
 }
 
 .custom-dark-modal .ant-modal-close {
-  color: #E4E6EB;
+  color: #e4e6eb;
 }
 
 .custom-dark-modal .ant-input {
-  background-color: #3A3B3C !important; 
-  color: #E4E6EB;
+  background-color: #3a3b3c !important;
+  color: #e4e6eb;
 }
-.custom-dark-modal .ant-input::placeholder{
-  color: #9e9e9e;;
+.custom-dark-modal .ant-input::placeholder {
+  color: #9e9e9e;
 }
 
 .custom-dark-modal ::-webkit-scrollbar {
@@ -116,17 +112,17 @@ body {
 }
 
 .custom-dark-modal ::-webkit-scrollbar-track {
-    background: transparent;
+  background: transparent;
 }
 
 .custom-dark-modal ::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.3); 
-    border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
 }
 
 /* Target ul.ant-dropdown-menu bên trong popup */
 .custom-dropdown .ant-dropdown-menu {
-  background-color: #1C1C1D !important;
+  background-color: #1c1c1d !important;
   color: #e4e6eb !important;
   min-width: 150px;
 }
@@ -141,25 +137,31 @@ body {
   background-color: rgba(255, 255, 255, 0.1) !important;
 }
 
-.custom-dropdown .ant-dropdown-arrow::before, 
-.custom-dropdown .ant-dropdown-arrow::after{
-    background-color: #1C1C1D !important;
+.custom-dropdown .ant-dropdown-arrow::before,
+.custom-dropdown .ant-dropdown-arrow::after {
+  background-color: #1c1c1d !important;
 }
 
 .custom-scrollbar {
-  background-color:#e4e6eb ;
+  background-color: #e4e6eb;
   border-radius: 10px;
 }
 
 .custom-scrollbar ::-webkit-scrollbar {
-    width: 6px;
+  width: 6px;
 }
 
 .custom-scrollbar ::-webkit-scrollbar-track {
-    background: transparent;
+  background: transparent;
 }
 
 .custom-scrollbar ::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.3); 
-    border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+}
+
+@layer utilities {
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    @apply cursor-pointer;
+  }
 }
