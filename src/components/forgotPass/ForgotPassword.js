@@ -132,8 +132,9 @@ export default function ForgotPassword() {
                 placeholder="Email"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-black text-lg placeholder-gray-600 ${error ? "border-red-500" : "border-gray-300"
-                  }`}
+                className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg placeholder-gray-600 text-black ${
+                  error ? "border-red-500" : "border-gray-300"
+                }`}
               />
 
               {error && <p className="text-red-500 text-sm mt-2">{error}</p>}

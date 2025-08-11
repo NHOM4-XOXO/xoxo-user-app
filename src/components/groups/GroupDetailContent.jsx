@@ -2,89 +2,28 @@
 
 import { allPosts } from "@/data/posts";
 import { useState } from "react";
+import { useParams } from "next/navigation";
+import { useGroups } from "@/contexts/GroupsContext";
 import Post from "../main/Post/PostItem";
 import PostCreation from "../main/PostCreation";
 import ScrollableContainer from "../common/ScrollableContainer";
 
-export default function GroupDetailContent({ groupId }) {
+export default function GroupDetailContent() {
   const [activeTab, setActiveTab] = useState("discussion");
-  // Mock data cho nhóm
-  const groupData = {
-    1: {
-      name: "Học lập trình cùng nhau",
-      members: "2.3K thành viên",
-      description: "Nhóm chia sẻ kiến thức lập trình",
-      coverImage:
-        "https://via.placeholder.com/800x300/3b82f6/ffffff?text=Programming+Group",
-      memberAvatars: [
-        "https://picsum.photos/40/40?random=1",
-        "https://picsum.photos/40/40?random=2",
-        "https://picsum.photos/40/40?random=3",
-        "https://picsum.photos/40/40?random=4",
-        "https://picsum.photos/40/40?random=5",
-        "https://picsum.photos/40/40?random=6",
-        "https://picsum.photos/40/40?random=7",
-        "https://picsum.photos/40/40?random=8",
-        "https://picsum.photos/40/40?random=9",
-        "https://picsum.photos/40/40?random=10",
-        "https://picsum.photos/40/40?random=11",
-        "https://picsum.photos/40/40?random=12",
-        "https://picsum.photos/40/40?random=13",
-        "https://picsum.photos/40/40?random=14",
-        "https://picsum.photos/40/40?random=15",
-      ],
-    },
-    2: {
-      name: "Ẩm thực Việt Nam",
-      members: "5.7K thành viên",
-      description: "Chia sẻ công thức và món ăn ngon",
-      coverImage:
-        "https://via.placeholder.com/800x300/10b981/ffffff?text=Vietnamese+Food",
-      memberAvatars: [
-        "https://picsum.photos/40/40?random=1",
-        "https://picsum.photos/40/40?random=2",
-        "https://picsum.photos/40/40?random=3",
-        "https://picsum.photos/40/40?random=4",
-        "https://picsum.photos/40/40?random=5",
-        "https://picsum.photos/40/40?random=6",
-        "https://picsum.photos/40/40?random=7",
-        "https://picsum.photos/40/40?random=8",
-        "https://picsum.photos/40/40?random=9",
-        "https://picsum.photos/40/40?random=10",
-        "https://picsum.photos/40/40?random=11",
-        "https://picsum.photos/40/40?random=12",
-        "https://picsum.photos/40/40?random=13",
-        "https://picsum.photos/40/40?random=14",
-        "https://picsum.photos/40/40?random=15",
-      ],
-    },
-    3: {
-      name: "Du lịch khắp thế giới",
-      members: "8.1K thành viên",
-      description: "Kinh nghiệm và hình ảnh du lịch",
-      coverImage:
-        "https://via.placeholder.com/800x300/f59e0b/ffffff?text=Travel+World",
-      memberAvatars: [
-        "https://picsum.photos/40/40?random=1",
-        "https://picsum.photos/40/40?random=2",
-        "https://picsum.photos/40/40?random=3",
-        "https://picsum.photos/40/40?random=4",
-        "https://picsum.photos/40/40?random=5",
-        "https://picsum.photos/40/40?random=6",
-        "https://picsum.photos/40/40?random=7",
-        "https://picsum.photos/40/40?random=8",
-        "https://picsum.photos/40/40?random=9",
-        "https://picsum.photos/40/40?random=10",
-        "https://picsum.photos/40/40?random=11",
-        "https://picsum.photos/40/40?random=12",
-        "https://picsum.photos/40/40?random=13",
-        "https://picsum.photos/40/40?random=14",
-        "https://picsum.photos/40/40?random=15",
-      ],
-    },
-  };
+  const params = useParams();
+  const groupId = parseInt(params.id);
+  const { getGroupById } = useGroups();
 
-  const group = groupData[groupId] || groupData[1];
+  const group = getGroupById(groupId);
+
+  // Check if group exists, if not show error or redirect
+  if (!group) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-gray-500">Group not found</p>
+      </div>
+    );
+  }
 
   const posts = [
     {
@@ -124,9 +63,7 @@ export default function GroupDetailContent({ groupId }) {
   ];
 
   return (
-    <div
-      className="max-w-12xl mx-2" >
-      
+    <div className="max-w-12xl mx-2">
       {/* Group Cover & Info */}
       <div className="bg-white rounded-lg shadow-sm mb-4">
         <div
@@ -146,20 +83,21 @@ export default function GroupDetailContent({ groupId }) {
             <span>{group.members}</span>
           </div>
           <p className="text-gray-700 mb-2">{group.description}</p>
-          <div className="flex items-center space-x-8 ">
-            <div className="flex -space-x-1">
-              {(group.memberAvatars || [])
-                .slice(0, 15)
-                .map((_avatar, index) => (
+          <div className="flex items-center justify-between">
+            <div className="flex -space-x-1 min-w-[200px]">
+              {Array.from(
+                { length: Math.min(15, group.members) },
+                (_, index) => (
                   <img
                     key={index}
-                    src={`https://picsum.photos/800/300?random=${index + 1}`}
-                    alt={`Member`}
+                    src={`https://picsum.photos/40/40?random=${index + 1}`}
+                    alt={`Member ${index + 1}`}
                     className="w-9 h-9 rounded-full border-2 border-white"
                   />
-                ))}
+                )
+              )}
             </div>
-            <div className="flex space-x-3 ml-24">
+            <div className="flex space-x-3">
               <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 font-medium">
                 💬 Đã tham gia
               </button>
@@ -227,7 +165,6 @@ export default function GroupDetailContent({ groupId }) {
         </nav>
       </div>
 
-      {/* Content based on active tab */}
       {activeTab === "discussion" && (
         <div className="flex gap-6">
           <div className="w-2/3 space-y-4">
@@ -241,23 +178,22 @@ export default function GroupDetailContent({ groupId }) {
             ))}
           </div>
 
-          {/* Group Info Column - Bên phải */}
-          <div className="w-1/3">
+          <div className="w-1/3 sticky top-4 self-start">
             <div className="bg-white rounded-lg shadow-md p-4">
               <h3 className="font-semibold text-gray-900 mb-4">Giới thiệu</h3>
-              <p className="text-gray-600 text-md mb-4">
-                Nơi dành cho tất cả các bạn thích giao lưu âm nhạc, cũng như
-                nghệ nhạc và cùng nhau học hỏi.
-              </p>
+              <p className="text-gray-600 text-md mb-4">{group.description}</p>
 
               <div className="space-y-3">
                 <div className="flex items-center space-x-2 text-md text-gray-600">
                   <span>🔒</span>
                   <div>
-                    <div className="font-medium text-gray-500">Công khai</div>
+                    <div className="font-medium text-gray-500">
+                      {group.privacy === "public" ? "Công khai" : "Riêng tư"}
+                    </div>
                     <div>
-                      Bất kỳ ai cũng có thể nhìn thấy mọi người trong nhóm và
-                      những gì họ đăng.
+                      {group.privacy === "public"
+                        ? "Bất kỳ ai cũng có thể nhìn thấy mọi người trong nhóm và những gì họ đăng."
+                        : "Chỉ thành viên mới có thể xem nội dung nhóm."}
                     </div>
                   </div>
                 </div>
@@ -303,7 +239,9 @@ export default function GroupDetailContent({ groupId }) {
 
       {activeTab === "members" && (
         <div className="bg-white rounded-lg shadow-sm p-6">
-          <h3 className="text-lg font-semibold mb-4">Thành viên của nhóm</h3>
+          <h3 className="text-lg font-semibold mb-4">
+            Thành viên của nhóm ({group.members} thành viên)
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[1, 2, 3, 4, 5, 6].map((member) => (
               <div
