@@ -107,11 +107,10 @@ export default function LoginForm() {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className={`w-full py-3 px-4 rounded-md font-semibold text-lg transition duration-200 ${
-                      isLoading
+                    className={`w-full py-3 px-4 rounded-md font-semibold text-lg transition duration-200 ${isLoading
                         ? "bg-gray-400 text-gray-200 cursor-not-allowed"
                         : "bg-blue-600 text-white hover:bg-blue-700"
-                    }`}
+                      }`}
                   >
                     {isLoading ? (
                       <span className="flex items-center justify-center">
@@ -155,7 +154,7 @@ export default function LoginForm() {
                 <div className="mt-6 pt-4 border-t border-gray-200">
                   <button
                     onClick={() => setIsSignupModalOpen(true)}
-                    className="w-full bg-green-500 text-white py-3 px-4 rounded-md hover:bg-green-600 transition duration-200 text-lg font-semibold"
+                    className="w-full bg-green-500 text-white py-3 px-4 rounded-md hover:bg-green-600 transition duration-200 text-lg font-semibold cursor-pointer"
                   >
                     Tạo tài khoản mới
                   </button>
