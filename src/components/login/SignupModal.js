@@ -89,12 +89,13 @@ export default function SignupModal({ isOpen, onClose }) {
         <div className="p-6">
           <div className="flex justify-between items-center mb-4">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">Đăng ký</h2>
+              <h2 className="text-2xl font-bold text-gray-900 ">Đăng ký</h2>
               <p className="text-gray-600">Nhanh chóng và dễ dàng.</p>
             </div>
             <button
               onClick={onClose}
               className="text-gray-400 cursor-pointer hover:text-gray-600 text-2xl"
+            
             >
               ×
             </button>
@@ -107,8 +108,9 @@ export default function SignupModal({ isOpen, onClose }) {
                   type="text"
                   {...register("lastName")}
                   placeholder="Họ"
-                  className={`w-full px-3 py-2 border rounded-md bg-white placeholder-gray-600 text-gray-900 focus:outline-none focus:ring-2 ${errors.lastName ? "border-red-500" : "border-gray-300"
-                    }`}
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg text-gray-900 placeholder-gray-500 disabled:bg-gray-100 disabled:cursor-not-allowed ${
+                    errors.lastName ? "border-red-500" : "border-gray-300"
+                  }`}
                 />
 
                 {errors.lastName && (
@@ -124,8 +126,9 @@ export default function SignupModal({ isOpen, onClose }) {
                   type="text"
                   {...register("firstName")}
                   placeholder="Tên"
-                  className={`w-full px-3 py-2 border rounded-md bg-white placeholder-gray-600 text-gray-900 focus:outline-none focus:ring-2 ${errors.firstName ? "border-red-500" : "border-gray-300"
-                    }`}
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg text-gray-900 placeholder-gray-500 disabled:bg-gray-100 disabled:cursor-not-allowed ${
+                    errors.firstName ? "border-red-500" : "border-gray-300"
+                  }`}
                 />
                 {errors.firstName && (
                   <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
@@ -141,8 +144,9 @@ export default function SignupModal({ isOpen, onClose }) {
                 type="text"
                 {...register("email")}
                 placeholder="Email "
-                className={`w-full px-3 py-2 border rounded-md bg-white placeholder-gray-600 text-gray-900 focus:outline-none focus:ring-2 ${errors.email ? "border-red-500" : "border-gray-300"
-                  }`}
+                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg text-gray-900 placeholder-gray-500 disabled:bg-gray-100 disabled:cursor-not-allowed ${
+                  errors.email ? "border-red-500" : "border-gray-300"
+                }`}
               />
               {errors.email && (
                 <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
@@ -157,13 +161,14 @@ export default function SignupModal({ isOpen, onClose }) {
                 type={showPassword ? "text" : "password"}
                 placeholder="Mật khẩu"
                 {...register("password")}
-                className={`w-full px-3 py-2 border rounded-md bg-white placeholder-gray-600 text-gray-900 focus:outline-none focus:ring-2 ${errors.password ? "border-red-500" : "border-gray-300"
-                  } pr-10`}
+                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg text-gray-900 placeholder-gray-500 disabled:bg-gray-100 disabled:cursor-not-allowed ${
+                  errors.password ? "border-red-500" : "border-gray-300"
+                } pr-10`}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute right-2 top-2 text-gray-500"
+                className="absolute right-2 top-2.5 text-gray-500 cursor-pointer"
                 tabIndex={-1}
               >
                 {showPassword ? (
@@ -181,50 +186,25 @@ export default function SignupModal({ isOpen, onClose }) {
             </div>
 
             <div className="relative">
-              <input
-                type={showConfirmPassword ? "text" : "password"}
-                placeholder="Nhập lại mật khẩu"
-                {...register("confirmPassword")}
-                className={`w-full px-3 py-2 border rounded-md bg-white placeholder-gray-600 text-gray-900 focus:outline-none focus:ring-2 ${errors.confirmPassword ? "border-red-500" : "border-gray-300"
-                  } pr-10`}
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword((prev) => !prev)}
-                className="absolute right-2 top-2 text-gray-500"
-                tabIndex={-1}
-              >
-                {showConfirmPassword ? (
-                  <EyeOff className="w-5 h-5" />
-                ) : (
-                  <Eye className="w-5 h-5" />
-                )}
-              </button>
-              {errors.confirmPassword && (
-                <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
-                  <AlertCircle className="w-4 h-4" />
-                  {errors.confirmPassword.message}
-                </p>
-              )}
-            </div>
-
-            <div className="relative">
               <label className="block text-sm text-gray-600 mb-1">
                 Ngày sinh
               </label>
               <input
                 type="date"
                 {...register("birthday")}
-                className={`w-full cursor-pointer px-3 py-2 border rounded-md bg-white placeholder-gray-600 text-gray-900 focus:outline-none focus:ring-2 ${errors.birthday ? "border-red-500" : "border-gray-300"
-                  }`}
+                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg text-gray-900 placeholder-gray-500 disabled:bg-gray-100 disabled:cursor-not-allowed cursor-pointer ${
+                  errors.birthday ? "border-red-500" : "border-gray-300"
+                }`}
               />
               {errors.birthday && (
-                <p className="text-red-500 cursor-pointer text-sm mt-1 flex items-center gap-1">
+                <p className="text-red-500 text-sm mt-1 flex items-center gap-1 cursor-pointer ">
                   <AlertCircle className="w-4 h-4" />
                   {errors.birthday.message}
                 </p>
               )}
             </div>
+
+           
 
             <div className="relative">
               <label className="block text-sm text-gray-600 mb-1">
@@ -282,7 +262,7 @@ export default function SignupModal({ isOpen, onClose }) {
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`w-full cursor-pointer py-2 px-4 rounded-md font-semibold transition duration-200 ${isSubmitting
+              className={`w-full py-2 px-4 rounded-md font-semibold transition duration-200 ${isSubmitting
                 ? "bg-gray-400 text-gray-200 cursor-not-allowed"
                 : submitSuccess
                   ? "bg-green-600 text-white"
@@ -290,7 +270,7 @@ export default function SignupModal({ isOpen, onClose }) {
                 }`}
             >
               {isSubmitting ? (
-                <span className="flex items-center justify-center">
+                <span className="flex items-center justify-center ">
                   <svg
                     className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
                     xmlns="http://www.w3.org/2000/svg"

@@ -2,43 +2,16 @@
 
 import { Settings } from "lucide-react";
 import { useState } from "react";
-
-const myGroups = [
-  {
-    id: 1,
-    name: "GIÚP TUỔI CẤY SHOPEE",
-    image: "/image/group1.jpg",
-    hasNotification: true,
-    lastActivity: "Lần hoạt động gần nhất: 5 phút trước",
-  },
-  {
-    id: 2,
-    name: "Garena Liên Quân Mobile",
-    image: "/image/group2.jpg",
-    hasNotification: false,
-    lastActivity: "Lần hoạt động gần nhất: khoảng 1 giờ trước",
-  },
-  {
-    id: 3,
-    name: "Garena Liên Quân Mobile vn",
-    image: "/image/group1.jpg",
-    hasNotification: false,
-    lastActivity: "Lần hoạt động gần nhất: 46 phút trước",
-  },
-  {
-    id: 4,
-    name: "SỐ GÌ ĐẤY SHOPEE ?",
-    image: "/image/group2.jpg",
-    hasNotification: false,
-    lastActivity: "Lần hoạt động gần nhất: 24 phút trước",
-  },
-];
+import { useRouter } from "next/navigation";
+import { useGroups } from "@/contexts/GroupsContext";
 
 export default function GroupsSidebar({ activeTab, setActiveTab }) {
   const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
+  const { myGroups } = useGroups();
 
   return (
-    <div className=" bg-white rounded-lg shadow-sm w-90 ">
+    <div className="bg-white rounded-lg shadow-sm w-90">
       {/* Search */}
       <div className="p-3 border-b border-gray-200">
         <div className="relative">
@@ -48,12 +21,18 @@ export default function GroupsSidebar({ activeTab, setActiveTab }) {
               <Settings />
             </button>
           </div>
-          <div className="absolute inset-y-13 left-0 pl-3 flex items-center pointer-events-none">
+        </div>
+      </div>
+
+      {/* Search Bar */}
+      <div className="p-4 border-b border-gray-200">
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <svg
               className="h-5 w-5 text-gray-400"
               fill="none"
-              viewBox="0 0 24 24"
               stroke="currentColor"
+              viewBox="0 0 24 24"
             >
               <path
                 strokeLinecap="round"
@@ -65,38 +44,20 @@ export default function GroupsSidebar({ activeTab, setActiveTab }) {
           </div>
           <input
             type="text"
-            placeholder="Tìm kiếm nhóm"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-600 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Tìm kiếm nhóm"
           />
         </div>
       </div>
 
       {/* Navigation */}
       <div className="p-4 border-b border-gray-200">
-        <nav className="space-y-2">
+        <nav className="space-y-1">
           <button
-            onClick={() => setActiveTab("feed")}
-            className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md ${
-              activeTab === "feed"
-                ? "bg-blue-50 text-blue-700"
-                : "text-gray-900 hover:bg-gray-50"
-            }`}
-          >
-            <div className="w-10 h-10 bg-blue-400 rounded-full flex items-center justify-center mr-4">
-              📰
-            </div>
-            Bảng feed của bạn
-          </button>
-
-          <button
-            onClick={() => setActiveTab("discovery")}
-            className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md ${
-              activeTab === "discovery"
-                ? "bg-blue-50 text-blue-700"
-                : "text-gray-900 hover:bg-gray-50"
-            }`}
+            className="w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-900 hover:bg-gray-50"
+            onClick={() => router.push("/groups")}
           >
             <div className="w-10 h-10 bg-blue-400 rounded-full flex items-center justify-center mr-4">
               🔍
@@ -115,7 +76,10 @@ export default function GroupsSidebar({ activeTab, setActiveTab }) {
 
       {/* Create Group Button */}
       <div className="p-4 border-b border-gray-200">
-        <button className="w-full flex items-center justify-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700">
+        <button
+          onClick={() => router.push("/groups/create")}
+          className="w-full flex items-center justify-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 cursor-pointer"
+        >
           ➕ Tạo nhóm mới
         </button>
       </div>
@@ -135,8 +99,8 @@ export default function GroupsSidebar({ activeTab, setActiveTab }) {
           {myGroups.map((group) => (
             <div
               key={group.id}
-              className="flex items-center p-2 rounded-lg hover:bg-gray-50 cursor-pointer"
-              onClick={() => (window.location.href = `/groups/${group.id}`)}
+              className="flex items-center p-2 rounded-md hover:bg-gray-50 cursor-pointer"
+              onClick={() => router.push(`/groups/${group.id}`)}
             >
               <div className="relative">
                 <img
