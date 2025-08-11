@@ -94,7 +94,7 @@ export default function SignupModal({ isOpen, onClose }) {
             </div>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 text-2xl"
+              className="text-gray-400 cursor-pointer hover:text-gray-600 text-2xl"
             >
               ×
             </button>
@@ -215,11 +215,11 @@ export default function SignupModal({ isOpen, onClose }) {
               <input
                 type="date"
                 {...register("birthday")}
-                className={`w-full px-3 py-2 border rounded-md bg-white placeholder-gray-600 text-gray-900 focus:outline-none focus:ring-2 ${errors.birthday ? "border-red-500" : "border-gray-300"
+                className={`w-full cursor-pointer px-3 py-2 border rounded-md bg-white placeholder-gray-600 text-gray-900 focus:outline-none focus:ring-2 ${errors.birthday ? "border-red-500" : "border-gray-300"
                   }`}
               />
               {errors.birthday && (
-                <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                <p className="text-red-500 cursor-pointer text-sm mt-1 flex items-center gap-1">
                   <AlertCircle className="w-4 h-4" />
                   {errors.birthday.message}
                 </p>
@@ -282,7 +282,7 @@ export default function SignupModal({ isOpen, onClose }) {
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`w-full py-2 px-4 rounded-md font-semibold transition duration-200 ${isSubmitting
+              className={`w-full cursor-pointer py-2 px-4 rounded-md font-semibold transition duration-200 ${isSubmitting
                 ? "bg-gray-400 text-gray-200 cursor-not-allowed"
                 : submitSuccess
                   ? "bg-green-600 text-white"

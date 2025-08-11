@@ -107,9 +107,9 @@ export default function LoginForm() {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className={`w-full py-3 px-4 rounded-md font-semibold text-lg transition duration-200 ${isLoading
-                        ? "bg-gray-400 text-gray-200 cursor-not-allowed"
-                        : "bg-blue-600 text-white hover:bg-blue-700"
+                    className={`w-full cursor-pointer py-3 px-4 rounded-md font-semibold text-lg transition duration-200 ${isLoading
+                      ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                      : "bg-blue-600 text-white hover:bg-blue-700"
                       }`}
                   >
                     {isLoading ? (
