@@ -15,9 +15,14 @@ export default function GroupsLayout() {
       <div className="max-7xl mx-auto ">
         <div className="flex gap-12">
           {/* Left Sidebar */}
-          <div className="w-80">
-            <ScrollableContainer className="overflow-y-auto">
-              <GroupsSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+          <div className="w-100 sticky top-12 self-start">
+            <ScrollableContainer className=" overflow-y-auto flex-2">
+              <div style={{ maxHeight: `calc(100vh - ${HEADER_HEIGHT}px)` }}>
+                <GroupsSidebar
+                  activeTab={activeTab}
+                  setActiveTab={setActiveTab}
+                />
+              </div>
             </ScrollableContainer>
           </div>
           {/* Main Content */}

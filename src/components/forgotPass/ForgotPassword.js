@@ -66,7 +66,7 @@ export default function ForgotPassword() {
               <div className="flex items-center">
                 <div className="w-14 h-14 bg-amber-50 rounded-full flex items-center justify-center mr-4">
                   <img
-                    src="./logo_xoxo_500px-removebg-preview.png"
+                    src="/logo_xoxo_500px-removebg-preview.png"
                     alt="Logo"
                     className="h-16 w-16 rounded-full"
                   />
@@ -133,7 +133,7 @@ export default function ForgotPassword() {
                 placeholder="Email"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg placeholder-gray-600 ${
+                className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg placeholder-gray-600 text-black ${
                   error ? "border-red-500" : "border-gray-300"
                 }`}
               />
