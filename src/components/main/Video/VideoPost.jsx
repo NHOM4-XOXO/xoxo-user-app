@@ -88,7 +88,7 @@ export default function VideoPost({ post }) {
       </div>
 
       {/* Post Content */}
-      <div className="mb-3 text-sm break-all">
+      <div className="mb-3 text-sm break-words">
         <p className={showFullContent ? "" : "line-clamp-3"}>{post.content}</p>
         {!showFullContent ? (
           post.content.length > 100 && ( // Simple check for "Xem thêm"
