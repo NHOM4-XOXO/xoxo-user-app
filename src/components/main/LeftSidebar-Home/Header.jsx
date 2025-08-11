@@ -31,6 +31,8 @@ export default function Header({ onContactClick }) {
   const [showMarketPlace, setShowMarketplace] = useState(false);
 
   const [searchTerm, setsearchTerm] = useState("");
+  const searchContainerRef = useRef(null);
+  const searchWrapperRef = useRef(null);
 
   useEffect(() => {
     if (searchTerm.trim() === "") {
@@ -43,6 +45,21 @@ export default function Header({ onContactClick }) {
     );
     setResults(filtered);
   }, [searchTerm]);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (
+        searchWrapperRef.current &&
+        !searchWrapperRef.current.contains(e.target)
+      ) {
+        setsearchTerm("");
+        setResults([]);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const [results, setResults] = useState([]);
 
@@ -72,21 +89,6 @@ export default function Header({ onContactClick }) {
     );
   };
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (messageRef.current && !messageRef.current.contains(event.target)) {
-        setShowMessages(false);
-      }
-
-      if (notiRef.current && !notiRef.current.contains(event.target)) {
-        setShowNotifications(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
   return (
     <>
       <header className="fixed top-0 left-0 right-0 bg-white dark:bg-fb-dark-secondary shadow z-50 px-2 sm:px-4 flex justify-between items-center">
@@ -103,7 +105,10 @@ export default function Header({ onContactClick }) {
             </div>
           </Link>
 
-          <div className="bg-gray-100 dark:bg-fb-dark-tertiary sm:flex px-3 py-1 items-center space-x-2 rounded-full min-w-[240px] hidden relative">
+          <div
+            ref={searchWrapperRef}
+            className="bg-gray-100 dark:bg-fb-dark-tertiary sm:flex px-3 py-1 items-center space-x-2 rounded-full min-w-[240px] hidden relative"
+          >
             {/* <FiSearch className="text-gray-500" /> */}
             {/* <input type="text" placeholder="Tìm kiếm" /> */}
 
@@ -127,7 +132,7 @@ export default function Header({ onContactClick }) {
             )}
 
             <SearchBar
-              type="text"
+              type="Search .... "
               placeholder=""
               value={searchTerm}
               onChange={(e) => setsearchTerm(e.target.value)}
