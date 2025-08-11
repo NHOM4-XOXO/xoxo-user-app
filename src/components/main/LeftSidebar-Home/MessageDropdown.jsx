@@ -20,7 +20,7 @@ export default function MessageDropdown({ messages, onClose, onContactClick }) {
   return (
     <div
       ref={dropdownRef}
-      className="absolute -right-5 top-10 w-96 bg-white dark:bg-fb-dark-secondary shadow-lg rounded-lg p-4 z-50"
+      className="absolute -right-2 top-10 w-96 bg-white dark:bg-fb-dark-secondary shadow-lg rounded-lg p-4 z-50"
     >
       <h3 className="text-lg font-semibold mb-2 text-black dark:text-white">
         Đoạn chat

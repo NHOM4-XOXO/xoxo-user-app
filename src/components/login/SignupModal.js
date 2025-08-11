@@ -240,20 +240,20 @@ export default function SignupModal({ isOpen, onClose }) {
                 {["female", "male", "other"].map((value) => (
                   <label
                     key={value}
-                    className="flex items-center p-2 border border-gray-300 rounded-md text-gray-800"
+                    className="flex items-center p-2 border border-gray-300 rounded-md text-gray-800 cursor-pointer"
                   >
                     <input
                       type="radio"
                       value={value}
                       {...register("gender")}
-                      className="mr-2 w-5 h-5 text-blue-600 focus:ring-blue-500 accent-blue-600"
+                      className="mr-2 w-5 h-5 rounded-full border-2 cursor-pointer broder-gray-200 appearance-none checked:bg-blue-600 checked:before:bg-white checked:border-blue-200 accent-blue-600"
                     />
                     <span>
                       {value === "female"
                         ? "Nữ"
                         : value === "male"
-                        ? "Nam"
-                        : "Khác"}
+                          ? "Nam"
+                          : "Khác"}
                     </span>
                   </label>
                 ))}
@@ -294,7 +294,7 @@ export default function SignupModal({ isOpen, onClose }) {
                   : submitSuccess
                   ? "bg-green-600 text-white"
                   : "bg-green-500 text-white hover:bg-green-600"
-              }`}
+                }`}
             >
               {isSubmitting ? (
                 <span className="flex items-center justify-center ">

@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import FindAccountModal from "./FindAccountModal";
-import { useUser } from "../../contexts/UserContext";
-import Footer from "../common/Footer";
+import { useUser } from "../contexts/UserContext";
+import Footer from "./common/Footer";
 
 export default function ForgotPassword() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -66,7 +66,7 @@ export default function ForgotPassword() {
               <div className="flex items-center">
                 <div className="w-14 h-14 bg-amber-50 rounded-full flex items-center justify-center mr-4">
                   <img
-                    src="/logo_xoxo_500px-removebg-preview.png"
+                    src="./logo_xoxo_500px-removebg-preview.png"
                     alt="Logo"
                     className="h-16 w-16 rounded-full"
                   />
@@ -88,7 +88,7 @@ export default function ForgotPassword() {
                   onChange={(e) =>
                     setHeaderLogin({ ...headerLogin, email: e.target.value })
                   }
-                  className="px-3 py-2 border border-gray-300 rounded-md text-black text-sm placeholder-gray-600"
+                  className="px-3 py-2 border border-gray-300 rounded-md text-sm placeholder-gray-600"
                   disabled={headerLoading}
                 />
                 <input
@@ -98,16 +98,17 @@ export default function ForgotPassword() {
                   onChange={(e) =>
                     setHeaderLogin({ ...headerLogin, password: e.target.value })
                   }
-                  className="px-3 py-2 border border-gray-300 text-black rounded-md text-sm placeholder-gray-600"
+                  className="px-3 py-2 border border-gray-300 rounded-md text-sm placeholder-gray-600"
                   disabled={headerLoading}
                 />
                 <button
                   type="submit"
                   disabled={headerLoading}
-                  className={`px-4 py-2 rounded-md text-sm font-medium ${headerLoading
-                    ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-                    : "bg-blue-600 text-white hover:bg-blue-700"
-                    }`}
+                  className={`px-4 py-2 rounded-md text-sm font-medium ${
+                    headerLoading
+                      ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+                      : "bg-blue-600 text-white hover:bg-blue-700"
+                  }`}
                 >
                   {headerLoading ? "Đang đăng nhập..." : "Đăng nhập"}
                 </button>
@@ -132,7 +133,7 @@ export default function ForgotPassword() {
                 placeholder="Email"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg placeholder-gray-600 text-black ${
+                className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg placeholder-gray-600 ${
                   error ? "border-red-500" : "border-gray-300"
                 }`}
               />
