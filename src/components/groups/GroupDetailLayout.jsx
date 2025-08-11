@@ -6,15 +6,7 @@ import GroupDetailContent from "./GroupDetailContent";
 import { HEADER_HEIGHT } from "@/constants";
 import ScrollableContainer from "../common/ScrollableContainer";
 
-// Mock data cho nhóm
-const groupData = {
-  id: 1,
-  name: "TỰ HỌC GUITAR - PIANO VÀ UKULELE",
-  coverImage: "https://picsum.photos/800/300?random=1",
-  members: "501.2K thành viên",
-  isPublic: true,
-  description: "Nhóm Công khai • 501,2K thành viên",
-};
+const groupData = {};
 
 export default function GroupDetailLayout({ groupId }) {
   const [activeTab, setActiveTab] = useState("discussion");
@@ -32,14 +24,12 @@ export default function GroupDetailLayout({ groupId }) {
 
           {/* Main Content */}
           <ScrollableContainer className=" overflow-y-auto flex-2">
-            <div
-          
-              style={{ maxHeight: `calc(100vh - ${HEADER_HEIGHT}px)` }}
-            >
+            <div style={{ maxHeight: `calc(100vh - ${HEADER_HEIGHT}px)` }}>
               <GroupDetailContent
                 group={groupData}
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
+                groupId={groupId}
               />
             </div>
           </ScrollableContainer>
