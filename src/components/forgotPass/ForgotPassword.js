@@ -104,7 +104,7 @@ export default function ForgotPassword() {
                 <button
                   type="submit"
                   disabled={headerLoading}
-                  className={`px-4 py-2 rounded-md text-sm font-medium ${headerLoading
+                  className={`px-4 py-2 cursor-pointer rounded-md text-sm font-medium ${headerLoading
                     ? "bg-gray-400 text-gray-600 cursor-not-allowed"
                     : "bg-blue-600 text-white hover:bg-blue-700"
                     }`}
