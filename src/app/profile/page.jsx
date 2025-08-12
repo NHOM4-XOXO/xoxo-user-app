@@ -1,3 +1,4 @@
+"use client"
 import Post from "@/components/main/Post/PostItem";
 import PostCreation from "@/components/main/PostCreation";
 
@@ -8,12 +9,35 @@ import {
 
 import Link from "next/link";
 import { allPosts } from "@/data/posts";
+import { useEffect, useRef, useState } from "react";
 
 const ProfilePost = () => {
+    const rightColumnRef = useRef(null);
+    const [topValue, setTopValue] = useState("0px");
+
+    useEffect(() => {
+        const updateTop = () => {
+            if (!rightColumnRef.current) return;
+
+            const screenHeight = window.innerHeight;
+            const rightColHeight = rightColumnRef.current.offsetHeight;
+
+            // Nếu right column cao hơn màn hình, thì cần top âm
+            const diff = screenHeight - rightColHeight;
+
+            // Ví dụ: nếu diff = -100 => top = "-100px"
+            // Nếu diff > 0 thì giữ nguyên 0
+            setTopValue(`${Math.min(diff, 0)}px`);
+        };
+
+        updateTop();
+        window.addEventListener("resize", updateTop);
+        return () => window.removeEventListener("resize", updateTop);
+    }, []);
     return (
-        <div className="flex flex-col-reverse md:flex-row gap-4">
+        <div className="flex flex-col-reverse md:flex-row gap-4 ">
             {/* Left Column */}
-            <div className="w-full md:w-[60%] space-y-3">
+            <div className="w-full md:w-[60%] space-y-3 pb-2">
 
                 <PostCreation />
 
@@ -23,7 +47,7 @@ const ProfilePost = () => {
             </div>
 
             {/* Right Column */}
-            <div className="w-full md:w-[40%] space-y-3">
+            <div className="w-full md:w-[40%] space-y-3  sticky  self-start pb-2" ref={rightColumnRef} style={{ top: topValue }}>
                 {/* About */}
                 <div className="rounded-lg bg-fb-light-primary dark:bg-fb-dark-secondary p-4 shadow-sm  dark:border-fb-dark-quaternary text-sm text-gray-800 dark:text-white">
                     <h1 className="font-bold mb-2 text-gray-900 dark:text-white">
