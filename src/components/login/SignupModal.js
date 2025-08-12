@@ -94,7 +94,8 @@ export default function SignupModal({ isOpen, onClose }) {
             </div>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 text-2xl cursor-pointer"
+              className="text-gray-400 cursor-pointer hover:text-gray-600 text-2xl"
+            
             >
               ×
             </button>
@@ -185,52 +186,25 @@ export default function SignupModal({ isOpen, onClose }) {
             </div>
 
             <div className="relative">
-              <input
-                type={showConfirmPassword ? "text" : "password"}
-                placeholder="Nhập lại mật khẩu"
-                {...register("confirmPassword")}
-                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg text-gray-900 placeholder-gray-500 disabled:bg-gray-100 disabled:cursor-not-allowed ${
-                  errors.confirmPassword ? "border-red-500" : "border-gray-300"
-                } pr-10`}
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword((prev) => !prev)}
-                className="absolute right-2 top-2.5 text-gray-500 cursor-pointer"
-                tabIndex={-1}
-              >
-                {showConfirmPassword ? (
-                  <EyeOff className="w-5 h-5" />
-                ) : (
-                  <Eye className="w-5 h-5" />
-                )}
-              </button>
-              {errors.confirmPassword && (
-                <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
-                  <AlertCircle className="w-4 h-4" />
-                  {errors.confirmPassword.message}
-                </p>
-              )}
-            </div>
-
-            <div className="relative">
               <label className="block text-sm text-gray-600 mb-1">
                 Ngày sinh
               </label>
               <input
                 type="date"
                 {...register("birthday")}
-                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg text-gray-900 placeholder-gray-500 disabled:bg-gray-100 disabled:cursor-not-allowed ${
+                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg text-gray-900 placeholder-gray-500 disabled:bg-gray-100 disabled:cursor-not-allowed cursor-pointer ${
                   errors.birthday ? "border-red-500" : "border-gray-300"
                 }`}
               />
               {errors.birthday && (
-                <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                <p className="text-red-500 text-sm mt-1 flex items-center gap-1 cursor-pointer ">
                   <AlertCircle className="w-4 h-4" />
                   {errors.birthday.message}
                 </p>
               )}
             </div>
+
+           
 
             <div className="relative">
               <label className="block text-sm text-gray-600 mb-1">
@@ -288,10 +262,9 @@ export default function SignupModal({ isOpen, onClose }) {
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`w-full py-2 px-4 rounded-md font-semibold transition duration-200 cursor-pointer ${
-                isSubmitting
-                  ? "bg-gray-400 text-gray-200 cursor-not-allowed"
-                  : submitSuccess
+              className={`w-full py-2 px-4 rounded-md font-semibold transition duration-200 ${isSubmitting
+                ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                : submitSuccess
                   ? "bg-green-600 text-white"
                   : "bg-green-500 text-white hover:bg-green-600"
                 }`}
