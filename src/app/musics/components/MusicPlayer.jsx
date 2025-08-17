@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import {
   BsMusicPlayerFill,
   BsPlayFill,
@@ -16,21 +16,37 @@ import {
 } from "react-icons/bs";
 import { HiOutlineQueueList } from "react-icons/hi2";
 import VinylDisc from "./VinylDisc";
+import { useMergeState } from "../hooks/useMergeState";
 
 const MusicPlayer = () => {
   const audioRef = useRef(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(1);
-  const [isMuted, setIsMuted] = useState(false);
-  const [currentSong, setCurrentSong] = useState(0);
-  const [isShuffled, setIsShuffled] = useState(false);
-  const [isRepeated, setIsRepeated] = useState(false);
-  const [showPlaylist, setShowPlaylist] = useState(false);
-  const [favorites, setFavorites] = useState(new Set());
-  const [customSongs, setCustomSongs] = useState([]);
-  // const [showUpgradePopup, setShowUpgradePopup] = useState(false);
+  const [state, setState] = useMergeState({
+    isPlaying: false,
+    currentTime: 0,
+    duration: 0,
+    volume: 1,
+    isMuted: false,
+    currentSong: 0,
+    isShuffled: false,
+    isRepeated: false,
+    showPlaylist: false,
+    favorites: new Set(),
+    customSongs: [],
+  });
+
+  const {
+    isPlaying,
+    currentTime,
+    duration,
+    volume,
+    isMuted,
+    currentSong,
+    isShuffled,
+    isRepeated,
+    showPlaylist,
+    favorites,
+    customSongs,
+  } = state;
 
   const playlist = [
     {
@@ -70,8 +86,8 @@ const MusicPlayer = () => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    const updateTime = () => setCurrentTime(audio.currentTime);
-    const updateDuration = () => setDuration(audio.duration);
+    const updateTime = () => setState({ currentTime: audio.currentTime });
+    const updateDuration = () => setState({ duration: audio.duration });
     const onEnded = () => {
       if (isRepeated) {
         audio.currentTime = 0;
@@ -87,7 +103,7 @@ const MusicPlayer = () => {
 
     // Tự động phát khi chuyển bài
     audio.play().catch(() => {});
-    setIsPlaying(true);
+    setState({ isPlaying: true });
 
     return () => {
       audio.removeEventListener("timeupdate", updateTime);
@@ -99,24 +115,23 @@ const MusicPlayer = () => {
   const togglePlay = () => {
     const audio = audioRef.current;
     if (!audio) return;
-    if (isPlaying) {
-      audio.pause();
-    } else {
-      audio.play().catch(() => {});
-    }
-    setIsPlaying(!isPlaying);
+    if (isPlaying) audio.pause();
+    else audio.play().catch(() => {});
+    setState({ isPlaying: !isPlaying });
   };
 
   const handleNext = () => {
-    setCurrentSong((prev) =>
-      isShuffled
+    setState({
+      currentSong: isShuffled
         ? Math.floor(Math.random() * playlist.length)
-        : (prev + 1) % playlist.length
-    );
+        : (currentSong + 1) % playlist.length,
+    });
   };
 
   const handlePrevious = () => {
-    setCurrentSong((prev) => (prev - 1 + playlist.length) % playlist.length);
+    setState({
+      currentSong: (currentSong - 1 + playlist.length) % playlist.length,
+    });
   };
 
   const handleSeek = (e) => {
@@ -124,30 +139,26 @@ const MusicPlayer = () => {
     const percent = (e.clientX - rect.left) / rect.width;
     const newTime = percent * duration;
     audioRef.current.currentTime = newTime;
-    setCurrentTime(newTime);
+    setState({ currentTime: newTime });
   };
 
   const handleVolumeChange = (e) => {
     const newVolume = Number.parseFloat(e.target.value);
-    setVolume(newVolume);
+    setState({ volume: newVolume, isMuted: newVolume === 0 });
     audioRef.current.volume = newVolume;
-    setIsMuted(newVolume === 0);
   };
 
   const toggleMute = () => {
     const audio = audioRef.current;
-    if (isMuted) {
-      audio.volume = volume;
-    } else {
-      audio.volume = 0;
-    }
-    setIsMuted(!isMuted);
+    if (isMuted) audio.volume = volume;
+    else audio.volume = 0;
+    setState({ isMuted: !isMuted });
   };
 
   const toggleFavorite = (id) => {
     const updated = new Set(favorites);
     updated.has(id) ? updated.delete(id) : updated.add(id);
-    setFavorites(updated);
+    setState({ favorites: updated });
   };
 
   const formatTime = (time) => {
@@ -159,10 +170,10 @@ const MusicPlayer = () => {
 
   const handleAddCustomSong = (song) => {
     if (customSongs.length >= 10) {
-      setShowUpgradePopup(true);
+      // setShowUpgradePopup(true);
       return;
     }
-    setCustomSongs((prev) => [...prev, song]);
+    setState({ customSongs: [...customSongs, song] });
   };
 
   return (
