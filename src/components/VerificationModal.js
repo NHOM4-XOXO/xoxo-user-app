@@ -1,61 +1,67 @@
 "use client";
 
-import { useState } from "react";
+import useMergeState from "@/hooks/useMergeState";
 import ResetPasswordModal from "./ResetPasswordModal";
 
 export default function VerificationModal({ isOpen, onClose, method, user }) {
-  const [verificationCode, setVerificationCode] = useState("");
-  const [showResetPassword, setShowResetPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [resendCount, setResendCount] = useState(0);
-  const [showSuccessNotification, setShowSuccessNotification] = useState(false);
-  const [passwordChangeSuccess, setPasswordChangeSuccess] = useState(false);
+  const [state, setState] = useMergeState({
+    verificationCode: "",
+    showResetPassword: false,
+    isLoading: false,
+    resendCount: 0,
+    showSuccessNotification: false,
+    passwordChangeSuccess: false,
+  });
 
-  // Callback để nhận thông báo từ ResetPasswordModal
+  const {
+    verificationCode,
+    showResetPassword,
+    isLoading,
+    resendCount,
+    showSuccessNotification,
+    passwordChangeSuccess,
+  } = state;
+
+  // Callback từ ResetPasswordModal
   const handlePasswordChangeSuccess = () => {
-    setPasswordChangeSuccess(true);
+    setState({ passwordChangeSuccess: true });
     setTimeout(() => {
-      onClose(); // Đóng modal sau khi thành công
+      onClose();
     }, 3000);
   };
 
-  // Mã test để demo
   const testVerificationCode = "123456";
 
   const handleVerifyCode = async () => {
     if (verificationCode.length === 6) {
-      setIsLoading(true);
+      setState({ isLoading: true });
 
       const isValidCode =
         verificationCode === testVerificationCode ||
         verificationCode === "000000";
 
-      // Simulate API call
       setTimeout(() => {
-        setIsLoading(false);
+        setState({ isLoading: false });
 
         if (isValidCode) {
-          // Show success notification with animation
-          setShowSuccessNotification(true);
+          setState({ showSuccessNotification: true });
 
-          // Hide notification after 2 seconds and proceed to reset password
           setTimeout(() => {
-            setShowSuccessNotification(false);
-            setShowResetPassword(true);
+            setState({
+              showSuccessNotification: false,
+              showResetPassword: true,
+            });
           }, 2000);
         } else {
           alert("Mã xác thực không đúng!");
-          return;
         }
       }, 1500);
     }
   };
 
   const handleResendCode = () => {
-    setResendCount((prev) => prev + 1);
-
-    alert(message);
-
+    setState({ resendCount: resendCount + 1 });
+    alert("Mã xác thực mới đã được gửi!");
   };
 
   if (!isOpen) return null;
@@ -73,7 +79,7 @@ export default function VerificationModal({ isOpen, onClose, method, user }) {
 
   return (
     <div className="fixed inset-0 bg-blue-300 bg-opacity-50 flex items-center justify-center p-4 z-50">
-      {/* Success Notification for verification */}
+      {/* Success Notification */}
       {showSuccessNotification && (
         <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-60 animate-bounce">
           <div className="flex items-center space-x-2">
@@ -127,10 +133,10 @@ export default function VerificationModal({ isOpen, onClose, method, user }) {
           <div className="mb-6">
             <p className="text-gray-600 mb-4">
               Vui lòng kiểm tra {method === "email" ? "email" : "tin nhắn"} của
-              bạn để lấy tin nhắn có mã gồm 6 chữ số. Mã này có thể mất vài phút
-              để đến.
+              bạn để lấy mã gồm 6 chữ số. Mã này có thể mất vài phút để đến.
             </p>
 
+            {/* hint email */}
             {method === "email" && (
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
                 <div className="flex items-start">
@@ -194,7 +200,7 @@ export default function VerificationModal({ isOpen, onClose, method, user }) {
                 value={verificationCode}
                 onChange={(e) => {
                   const value = e.target.value.replace(/\D/g, "");
-                  setVerificationCode(value);
+                  setState({ verificationCode: value });
                 }}
                 className="w-full px-4 py-3 text-center text-2xl font-mono border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 tracking-widest"
               />
@@ -202,22 +208,21 @@ export default function VerificationModal({ isOpen, onClose, method, user }) {
                 Nhập 6 chữ số
               </p>
             </div>
-            <div className="text-center space-y-2">
 
-              {/* Alternative options */}
+            <div className="text-center space-y-2">
               <div className="pt-0 border-t border-gray-200">
                 <p className="text-xs text-gray-600 mb-2">
                   Hoặc thử các cách khác:
                 </p>
                 <div className="flex justify-center space-x-4">
                   <button
-                    onClick={() => setVerificationCode("123456")}
+                    onClick={() => setState({ verificationCode: "123456" })}
                     className="text-xs text-blue-600 hover:underline"
                   >
                     Dùng mã test
                   </button>
                   <button
-                    onClick={() => setVerificationCode("000000")}
+                    onClick={() => setState({ verificationCode: "000000" })}
                     className="text-xs text-green-600 hover:underline"
                   >
                     Mã backup
@@ -237,11 +242,10 @@ export default function VerificationModal({ isOpen, onClose, method, user }) {
             <button
               onClick={handleVerifyCode}
               disabled={verificationCode.length !== 6 || isLoading}
-              className={`px-6 py-2 rounded-md font-medium ${
-                verificationCode.length === 6 && !isLoading
-                  ? "bg-blue-600 text-white hover:bg-blue-700"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
-              }`}
+              className={`px-6 py-2 rounded-md font-medium ${verificationCode.length === 6 && !isLoading
+                ? "bg-blue-600 text-white hover:bg-blue-700"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                }`}
             >
               {isLoading ? "Đang xác thực..." : "Tiếp tục"}
             </button>
