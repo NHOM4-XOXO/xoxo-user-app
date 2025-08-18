@@ -18,7 +18,7 @@ import CommentSection from "./CommentSection";
 import Divider from "../../common/Divider";
 import { HEADER_HEIGHT } from "@/constants";
 import ReactionPopup from "../Post/ReactionPopup";
-import { useMergeState } from "@/hooks/useMergeState";
+import useMergeState from "../../../hooks/useMergeState";
 
 export default function DetailedVideoView({ postId }) {
   const router = useRouter();

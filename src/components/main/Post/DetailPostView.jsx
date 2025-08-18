@@ -18,10 +18,9 @@ import { useRouter } from "next/navigation";
 import { allPosts } from "@/data/posts";
 
 import Divider from "../../common/Divider";
-import { HEADER_HEIGHT } from "@/constants";
 import ReactionPopup from "../Post/ReactionPopup";
 import CommentSection from "../Video/CommentSection";
-import useMergeState from "@/hooks/useMergeState";
+import useMergeState from "../../../hooks/useMergeState";
 
 export default function DetailedVideoView({ postId }) {
   const router = useRouter();
