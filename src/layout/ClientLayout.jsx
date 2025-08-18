@@ -50,10 +50,27 @@ const ClientLayout = ({ children }) => {
   // Effect to adjust active chat contacts when window resizes
   useEffect(() => {
     if (activeChatContacts.length > maxChatWindows) {
-      // Remove oldest chats (from the left) if limit is exceeded
-      setActiveChatContacts((prev) => prev.slice(prev.length - maxChatWindows));
+      setActiveChatContacts((prev) => {
+        const excessCount = prev.length - maxChatWindows;
+        const chatsToMinimize = prev.slice(0, excessCount);
+        const chatsToKeep = prev.slice(excessCount);
+
+        // chuyển các chat thừa sang minimized
+        setMinimizedChats((prevMinimized) => {
+          const newMinimized = [...prevMinimized];
+          chatsToMinimize.forEach((chat) => {
+            if (!newMinimized.some((c) => c.id === chat.id)) {
+              newMinimized.push(chat);
+            }
+          });
+          return newMinimized;
+        });
+
+        return chatsToKeep; // giữ lại chat mới nhất
+      });
     }
   }, [windowWidth, activeChatContacts.length, maxChatWindows]);
+
 
   const handleMinimizeChat = (contact) => {
     setActiveChatContacts((prev) =>
@@ -71,21 +88,32 @@ const ClientLayout = ({ children }) => {
   const handleRestoreChat = (contact) => {
     setMinimizedChats((prev) => prev.filter((chat) => chat.id !== contact.id));
 
-    // Check if contact is already in activeChatContacts array
     const isChatOpen = activeChatContacts.some(
       (chat) => chat.id === contact.id
     );
 
     if (!isChatOpen) {
       setActiveChatContacts((prev) => {
-        // If adding this chat would exceed the limit, remove the oldest one
         if (prev.length >= maxChatWindows) {
+          const oldestChat = prev[0];
+
+          // đưa chat cũ nhất sang minimized thay vì xoá hẳn
+          setMinimizedChats((prevMinimized) => {
+            const isAlreadyMinimized = prevMinimized.some(
+              (chat) => chat.id === oldestChat.id
+            );
+            return isAlreadyMinimized
+              ? prevMinimized
+              : [...prevMinimized, oldestChat];
+          });
+
           return [...prev.slice(1), contact];
         }
         return [...prev, contact];
       });
     }
   };
+
 
   const handleCloseMinimizedChat = (contactId) => {
     setMinimizedChats((prev) => prev.filter((chat) => chat.id !== contactId));
@@ -136,36 +164,42 @@ const ClientLayout = ({ children }) => {
     const handleOpenChat = (event) => {
       const contact = event.detail;
 
-      // First check if it's in minimized chats and restore it
-      const isMinimized = minimizedChats.some((chat) => chat.id === contact.id);
-      if (isMinimized) {
-        handleRestoreChat(contact);
-        return;
-      }
+      setActiveChatContacts((prevActive) => {
+        // nếu đã mở thì bỏ qua
+        if (prevActive.some((chat) => chat.id === contact.id)) {
+          return prevActive;
+        }
 
-      // Check if contact is already in activeChatContacts array
-      const isChatOpen = activeChatContacts.some(
-        (chat) => chat.id === contact.id
-      );
+        // nếu đang minimized → restore
+        if (minimizedChats.some((chat) => chat.id === contact.id)) {
+          setMinimizedChats((prev) =>
+            prev.filter((chat) => chat.id !== contact.id)
+          );
+          return [...prevActive, contact];
+        }
 
-      if (!isChatOpen) {
-        setActiveChatContacts((prev) => {
-          // If adding this chat would exceed the limit, remove the oldest one
-          if (prev.length >= maxChatWindows) {
-            return [...prev.slice(1), contact]; // Remove the first (oldest) and add new
-          }
-          return [...prev, contact];
-        });
-      }
+        // nếu full → move oldest sang minimized
+        if (prevActive.length >= maxChatWindows) {
+          const [oldest, ...rest] = prevActive;
+
+          setMinimizedChats((prev) => {
+            if (prev.some((c) => c.id === oldest.id)) return prev;
+            return [...prev, oldest];
+          });
+
+          return [...rest, contact];
+        }
+
+        // mặc định → thêm mới
+        return [...prevActive, contact];
+      });
     };
 
-    // Listen for global chat open events
     window.addEventListener("openChat", handleOpenChat);
+    return () => window.removeEventListener("openChat", handleOpenChat);
+  }, [maxChatWindows, minimizedChats]);
 
-    return () => {
-      window.removeEventListener("openChat", handleOpenChat);
-    };
-  }, [activeChatContacts, minimizedChats, maxChatWindows]);
+
 
   // Auto-hide expanded bubbles after 5 seconds of no interaction
   useEffect(() => {
@@ -179,10 +213,21 @@ const ClientLayout = ({ children }) => {
   }, [showAllBubbles]);
 
   const handleCloseChat = (contactId) => {
-    setActiveChatContacts((prev) =>
-      prev.filter((chat) => chat.id !== contactId)
-    );
+    setActiveChatContacts((prevActive) => {
+      const newActive = prevActive.filter((chat) => chat.id !== contactId);
+
+      // nếu còn minimize thì pop ra 1 chat để fill vào
+      if (minimizedChats.length > 0) {
+        const [restore, ...rest] = minimizedChats;
+
+        setMinimizedChats(rest);
+        return [...newActive, restore];
+      }
+
+      return newActive;
+    });
   };
+
 
   return (
     <UserProvider>
