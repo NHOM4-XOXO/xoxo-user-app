@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import Image from "next/image";
 import {
   X,
@@ -18,33 +18,47 @@ import CommentSection from "./CommentSection";
 import Divider from "../../common/Divider";
 import { HEADER_HEIGHT } from "@/constants";
 import ReactionPopup from "../Post/ReactionPopup";
+import useMergeState from "../../../hooks/useMergeState";
 
 export default function DetailedVideoView({ postId }) {
   const router = useRouter();
 
-  const [post, setPost] = useState(null);
-  const [likesCount, setLikesCount] = useState(0);
-  const [showFullContent, setShowFullContent] = useState(false);
-
-  const [showPopup, setShowPopup] = useState(false);
   const defaultReaction = {
     icon: <ThumbsUp />,
     name: "Thích",
   };
-  const [selectedReaction, setSelectedReaction] = useState(defaultReaction);
-  const [isLiked, setIsLiked] = useState(false);
+
+  const [state, setState] = useMergeState({
+    post: null,
+    likesCount: 0,
+    showFullContent: false,
+    showPopup: false,
+    selectedReaction: defaultReaction,
+    isLiked: false,
+  });
+
+  const {
+    post,
+    likesCount,
+    showFullContent,
+    showPopup,
+    selectedReaction,
+    isLiked,
+  } = state;
 
   useEffect(() => {
     const foundPost = allPosts.find((p) => p.id === postId);
     if (foundPost) {
-      setPost(foundPost);
-      setIsLiked(false); // Reset like state for new post
-      setLikesCount(foundPost.likes);
+      setState({
+        post: foundPost,
+        isLiked: false, // reset like
+        likesCount: foundPost.likes,
+        selectedReaction: defaultReaction,
+      });
     } else {
-      // Handle post not found, e.g., redirect to 404 or video list
       router.push("/videos");
     }
-  }, [postId, router]);
+  }, [postId, router, setState]);
 
   const getPrivacyIcon = (privacy) => {
     switch (privacy) {
@@ -77,7 +91,6 @@ export default function DetailedVideoView({ postId }) {
     >
       {/* Left Section: Video Player */}
       <div className="relative flex-1 bg-black flex items-center justify-center">
-        {/* Close Button */}
         <div className="absolute top-4 left-4 flex items-center space-x-4 z-10">
           <button
             onClick={() => router.back()}
@@ -108,11 +121,8 @@ export default function DetailedVideoView({ postId }) {
         )}
       </div>
 
-      {/* Right Section: Post Details and Comments Sidebar */}
-      <div
-        className={`lg:w-1/4 h-[calc(100vh-56px)] flex-shrink-0 bg-fb-light-primary dark:bg-fb-dark-secondary border-l border-gray-300 dark:border-gray-700 flex flex-col`}
-      >
-        {/* Fixed top part: Post Header, Content, Likes/Comments/Shares Info, Action Buttons */}
+      {/* Right Section: Post Details and Comments */}
+      <div className="lg:w-1/4 h-[calc(100vh-56px)] flex-shrink-0 bg-fb-light-primary dark:bg-fb-dark-secondary border-l border-gray-300 dark:border-gray-700 flex flex-col">
         <div className="p-4">
           {/* Post Header */}
           <div className="flex items-center justify-between mb-3">
@@ -156,9 +166,9 @@ export default function DetailedVideoView({ postId }) {
               {post.content}
             </p>
             {!showFullContent ? (
-              post.content.length > 100 && ( // Simple check for "Xem thêm"
+              post.content.length > 100 && (
                 <button
-                  onClick={() => setShowFullContent(true)}
+                  onClick={() => setState({ showFullContent: true })}
                   className="text-blue-600 dark:text-blue-400 hover:underline mt-1 cursor-pointer"
                 >
                   Xem thêm
@@ -166,7 +176,7 @@ export default function DetailedVideoView({ postId }) {
               )
             ) : (
               <button
-                onClick={() => setShowFullContent(false)}
+                onClick={() => setState({ showFullContent: false })}
                 className="text-blue-600 dark:text-blue-400 hover:underline mt-1 cursor-pointer"
               >
                 Ẩn bớt
@@ -174,7 +184,7 @@ export default function DetailedVideoView({ postId }) {
             )}
           </div>
 
-          {/* Likes, Comments, Shares Info */}
+          {/* Likes, Comments, Shares */}
           <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 mb-3">
             <div className="flex items-center space-x-2">
               <span className="hover:underline cursor-pointer">
@@ -197,21 +207,25 @@ export default function DetailedVideoView({ postId }) {
           <div className="flex -mx-4 px-4">
             <div
               className="w-1/3 relative flex justify-center"
-              onMouseEnter={() => setShowPopup(true)}
-              onMouseLeave={() => setShowPopup(false)}
+              onMouseEnter={() => setState({ showPopup: true })}
+              onMouseLeave={() => setState({ showPopup: false })}
             >
               <button
                 className="flex-1 flex items-center justify-center space-x-2 py-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-fb-light-tertiary dark:hover:bg-fb-dark-quaternary transition-colors cursor-pointer"
                 onClick={() => {
                   if (isLiked) {
-                    setSelectedReaction(defaultReaction); // bỏ thích
-                    setIsLiked(false);
+                    setState({
+                      selectedReaction: defaultReaction,
+                      isLiked: false,
+                    });
                   } else {
-                    setSelectedReaction({
-                      ...defaultReaction,
-                      icon: <ThumbsUp className="text-blue-600" />,
-                    }); // thích
-                    setIsLiked(true);
+                    setState({
+                      selectedReaction: {
+                        ...defaultReaction,
+                        icon: <ThumbsUp className="text-blue-600" />,
+                      },
+                      isLiked: true,
+                    });
                   }
                 }}
               >
@@ -229,9 +243,11 @@ export default function DetailedVideoView({ postId }) {
               >
                 <ReactionPopup
                   onSelect={(reaction) => {
-                    setSelectedReaction(reaction);
-                    setShowPopup(false); // ẩn popup sau khi chọn
-                    setIsLiked(true);
+                    setState({
+                      selectedReaction: reaction,
+                      showPopup: false,
+                      isLiked: true,
+                    });
                   }}
                 />
               </div>
@@ -247,7 +263,7 @@ export default function DetailedVideoView({ postId }) {
           </div>
         </div>
 
-        {/* Comment Section - takes remaining height and handles its own scrolling */}
+        {/* Comments */}
         <div className="flex-1 overflow-hidden">
           <CommentSection comments={post.comments} postId={post.id} />
         </div>
