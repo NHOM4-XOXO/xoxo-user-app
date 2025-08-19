@@ -52,22 +52,39 @@ const defaultGroups = [
 ];
 
 export function GroupsProvider({ children }) {
-  const [myGroups, setMyGroups] = useState(defaultGroups);
+  const [myGroups, setMyGroups] = useState([]);
+    // const savedGroups = localStorage.getItem("myGroups");
+    // if (savedGroups) {
+    //   try {
+    //     return JSON.parse(savedGroups);
+    //   } catch {
+    //     return defaultGroups;
+    //   }
+    // }
+    // return defaultGroups;
 
-  // Load groups from localStorage on mount
+
   useEffect(() => {
-    const savedGroups = localStorage.getItem("myGroups");
-    if (savedGroups) {
+    const saved = localStorage.getItem("myGroups");
+    if (saved) {
       try {
-        const parsedGroups = JSON.parse(savedGroups);
-        setMyGroups(parsedGroups);
-      } catch (error) {
-        console.error("Error loading groups from localStorage:", error);
+        const userGroups = JSON.parse(saved);
+       
+        const merged = [
+          ...defaultGroups.filter(
+            (mock) => !userGroups.some((g) => g.id === mock.id)
+          ),
+          ...userGroups,
+        ];
+        setMyGroups(merged);
+      } catch {
+        setMyGroups(defaultGroups);
       }
+    } else {
+      setMyGroups(defaultGroups);
     }
   }, []);
 
-  // Save groups to localStorage whenever myGroups changes
   useEffect(() => {
     localStorage.setItem("myGroups", JSON.stringify(myGroups));
   }, [myGroups]);
@@ -78,9 +95,9 @@ export function GroupsProvider({ children }) {
       id: Math.max(...myGroups.map((g) => g.id), 0) + 1,
       hasNotification: false,
       lastActivity: "Vừa tạo",
-      members: 1, // Creator is the first member
+      members: 1, 
       postsCount: 0,
-      createdBy: "Bạn", // Current user
+      createdBy: "Bạn",
       joinedAt: new Date().toISOString(),
     };
     setMyGroups((prev) => [group, ...prev]);

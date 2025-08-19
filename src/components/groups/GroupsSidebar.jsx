@@ -90,7 +90,7 @@ export default function GroupsSidebar({ activeTab, setActiveTab }) {
           <h3 className="text-sm font-medium text-gray-900">
             Nhóm bạn đã tham gia
           </h3>
-          <button className="text-blue-600 hover:text-blue-700 text-sm">
+          <button className="text-blue-600 hover:text-blue-700 text-sm cursor-pointer">
             Xem tất cả
           </button>
         </div>

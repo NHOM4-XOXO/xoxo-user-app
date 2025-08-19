@@ -167,7 +167,7 @@ export default function SignupModal({ isOpen, onClose }) {
               <button
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute right-2 top-2.5 text-gray-500 cursor-pointer"
+                className="absolute right-2 top-3 text-gray-500 cursor-pointer"
                 tabIndex={-1}
               >
                 {showPassword ? (
@@ -196,7 +196,7 @@ export default function SignupModal({ isOpen, onClose }) {
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword((prev) => !prev)}
-                className="absolute right-2 top-2.5 text-gray-500 cursor-pointer"
+                className="absolute right-2 top-3 text-gray-500 cursor-pointer"
                 tabIndex={-1}
               >
                 {showConfirmPassword ? (
@@ -220,12 +220,12 @@ export default function SignupModal({ isOpen, onClose }) {
               <input
                 type="date"
                 {...register("birthday")}
-                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg text-gray-900 placeholder-gray-500 disabled:bg-gray-100 disabled:cursor-not-allowed ${
+                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg text-gray-900 placeholder-gray-500 disabled:bg-gray-100 disabled:cursor-not-allowed cursor-pointer ${
                   errors.birthday ? "border-red-500" : "border-gray-300"
                 }`}
               />
               {errors.birthday && (
-                <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                <p className="text-red-500 text-sm mt-1 flex items-center gap-1 cursor-pointer ">
                   <AlertCircle className="w-4 h-4" />
                   {errors.birthday.message}
                 </p>
