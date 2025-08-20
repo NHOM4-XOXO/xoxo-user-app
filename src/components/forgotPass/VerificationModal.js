@@ -210,13 +210,13 @@ export default function VerificationModal({ isOpen, onClose, method, user }) {
                 <div className="flex justify-center space-x-4">
                   <button
                     onClick={() => setVerificationCode("123456")}
-                    className="text-xs text-blue-600 hover:underline"
+                    className="text-xs text-blue-600 hover:underline cursor-pointer"
                   >
                     Dùng mã test
                   </button>
                   <button
                     onClick={() => setVerificationCode("000000")}
-                    className="text-xs text-green-600 hover:underline"
+                    className="text-xs text-green-600 cursor-pointer hover:underline"
                   >
                     Mã backup
                   </button>
@@ -228,14 +228,14 @@ export default function VerificationModal({ isOpen, onClose, method, user }) {
           <div className="flex justify-end space-x-3">
             <button
               onClick={onClose}
-              className="px-6 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 font-medium"
+              className="px-6 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 font-medium cursor-pointer"
             >
               Hủy
             </button>
             <button
               onClick={handleVerifyCode}
               disabled={verificationCode.length !== 6 || isLoading}
-              className={`px-6 py-2 rounded-md font-medium ${
+              className={`px-6 py-2 rounded-md font-medium  cursor-pointer ${
                 verificationCode.length === 6 && !isLoading
                   ? "bg-blue-600 text-white hover:bg-blue-700"
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"

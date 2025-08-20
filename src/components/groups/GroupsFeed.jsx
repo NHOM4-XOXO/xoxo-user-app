@@ -4,22 +4,6 @@ import { useState } from "react";
 import Post from "../main/Post/PostItem";
 import { allPosts } from "@/data/posts";
 
-const posts = [
-  {
-    id: 1,
-    groupName: "SHOPEE GROUP - Cộng đồng Shopee Việt Nam",
-    groupImage: "/image/group1.jpg",
-    author: "Người tham gia ấn danh",
-    authorAvatar: "/default-avatar.jpg",
-    timeAgo: "14 phút",
-    content: "Ối dồi ôi, ối dồi ơi....Trình😭",
-    hasImage: true,
-    imageUrl: "/image/group1.jpg",
-    likes: 24,
-    comments: 8,
-    shares: 2,
-  },
-];
 
 export default function GroupsFeed() {
   const [postContent, setPostContent] = useState("");

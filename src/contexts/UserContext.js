@@ -17,7 +17,7 @@ export const UserProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load user từ localStorage khi app khởi động
+
   useEffect(() => {
     const loadUser = () => {
       try {
@@ -33,7 +33,6 @@ export const UserProvider = ({ children }) => {
 
     loadUser();
 
-    // Listen for storage changes từ tabs khác
     const handleStorageChange = (e) => {
       if (e.key === "currentUser") {
         loadUser();

@@ -168,7 +168,7 @@ export default function SignupModal({ isOpen, onClose }) {
               <button
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute right-2 top-2.5 text-gray-500 cursor-pointer"
+                className="absolute right-2 top-3 text-gray-500 cursor-pointer"
                 tabIndex={-1}
               >
                 {showPassword ? (
@@ -262,7 +262,7 @@ export default function SignupModal({ isOpen, onClose }) {
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`w-full py-2 px-4 rounded-md font-semibold transition duration-200 ${isSubmitting
+              className={`w-full py-2 px-4 rounded-md font-semibold transition duration-200 cursor-pointer ${isSubmitting
                 ? "bg-gray-400 text-gray-200 cursor-not-allowed"
                 : submitSuccess
                   ? "bg-green-600 text-white"
@@ -294,7 +294,7 @@ export default function SignupModal({ isOpen, onClose }) {
                   Đang đăng ký...
                 </span>
               ) : submitSuccess ? (
-                <span className="flex items-center justify-center">
+                <span className="flex items-center justify-center ">
                   <svg
                     className="w-5 h-5 mr-2"
                     fill="currentColor"
