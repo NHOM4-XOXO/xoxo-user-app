@@ -151,14 +151,14 @@ export default function FindAccountModal({ isOpen, onClose, searchQuery }) {
           <div className="flex justify-end space-x-3">
             <button
               onClick={onClose}
-              className="px-6 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 font-medium"
+              className="px-6 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 font-medium cursor-pointer"
             >
               Không phải bạn?
             </button>
             <button
               onClick={handleSendCode}
               disabled={!selectedMethod}
-              className={`px-6 py-2 rounded-md font-medium ${
+              className={`px-6 py-2 rounded-md font-medium cursor-pointer ${
                 selectedMethod
                   ? "bg-blue-600 text-white hover:bg-blue-700"
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"

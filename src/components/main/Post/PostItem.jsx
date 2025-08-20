@@ -59,12 +59,12 @@ const Post = ({ data }) => {
 
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className="w-1/3 hover:bg-gray-100 dark:hover:bg-fb-dark-tertiary flex items-center justify-center gap-2 py-2 rounded-md"
+                    className="w-1/3 hover:bg-gray-100 dark:hover:bg-fb-dark-tertiary flex items-center justify-center gap-2 py-2 rounded-md cursor-pointer"
                 >
                     <MessageCircle size={18} /> Bình luận
                 </button>
 
-                <button className="w-1/3 hover:bg-gray-100 dark:hover:bg-fb-dark-tertiary flex items-center justify-center gap-2 py-2 rounded-md">
+                <button className="w-1/3 hover:bg-gray-100 dark:hover:bg-fb-dark-tertiary flex items-center justify-center gap-2 py-2 rounded-md cursor-pointer">
                     <Share2 size={18} /> Chia sẻ
                 </button>
             </div>

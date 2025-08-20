@@ -6,7 +6,7 @@ export default function Footer() {
           <div className="space-y-4">
             <div className="flex items-center">
               <img
-                src="./logo_xoxo_500px-removebg-preview.png"
+                src="/logo_xoxo_500px-removebg-preview.png"
                 alt="XOXO"
                 className="h-10 w-10 rounded-full mr-3"
               />

@@ -94,7 +94,8 @@ export default function SignupModal({ isOpen, onClose }) {
             </div>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 text-2xl cursor-pointer"
+              className="text-gray-400 cursor-pointer hover:text-gray-600 text-2xl"
+            
             >
               ×
             </button>
@@ -196,7 +197,7 @@ export default function SignupModal({ isOpen, onClose }) {
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword((prev) => !prev)}
-                className="absolute right-2 top-3 text-gray-500 cursor-pointer"
+                className="absolute right-2 top-2.5 text-gray-500 cursor-pointer"
                 tabIndex={-1}
               >
                 {showConfirmPassword ? (
@@ -232,6 +233,8 @@ export default function SignupModal({ isOpen, onClose }) {
               )}
             </div>
 
+           
+
             <div className="relative">
               <label className="block text-sm text-gray-600 mb-1">
                 Giới tính
@@ -240,20 +243,20 @@ export default function SignupModal({ isOpen, onClose }) {
                 {["female", "male", "other"].map((value) => (
                   <label
                     key={value}
-                    className="flex items-center p-2 border border-gray-300 rounded-md text-gray-800"
+                    className="flex items-center p-2 border border-gray-300 rounded-md text-gray-800 cursor-pointer"
                   >
                     <input
                       type="radio"
                       value={value}
                       {...register("gender")}
-                      className="mr-2 w-5 h-5 text-blue-600 focus:ring-blue-500 accent-blue-600"
+                      className="mr-2 w-5 h-5 rounded-full border-2 cursor-pointer broder-gray-200 appearance-none checked:bg-blue-600 checked:before:bg-white checked:border-blue-200 accent-blue-600"
                     />
                     <span>
                       {value === "female"
                         ? "Nữ"
                         : value === "male"
-                        ? "Nam"
-                        : "Khác"}
+                          ? "Nam"
+                          : "Khác"}
                     </span>
                   </label>
                 ))}
@@ -288,13 +291,12 @@ export default function SignupModal({ isOpen, onClose }) {
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`w-full py-2 px-4 rounded-md font-semibold transition duration-200 cursor-pointer ${
-                isSubmitting
-                  ? "bg-gray-400 text-gray-200 cursor-not-allowed"
-                  : submitSuccess
+              className={`w-full py-2 px-4 rounded-md font-semibold transition duration-200 cursor-pointer ${isSubmitting
+                ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                : submitSuccess
                   ? "bg-green-600 text-white"
                   : "bg-green-500 text-white hover:bg-green-600"
-              }`}
+                }`}
             >
               {isSubmitting ? (
                 <span className="flex items-center justify-center ">
@@ -321,7 +323,7 @@ export default function SignupModal({ isOpen, onClose }) {
                   Đang đăng ký...
                 </span>
               ) : submitSuccess ? (
-                <span className="flex items-center justify-center">
+                <span className="flex items-center justify-center ">
                   <svg
                     className="w-5 h-5 mr-2"
                     fill="currentColor"
