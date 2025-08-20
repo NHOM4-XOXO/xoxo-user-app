@@ -193,14 +193,14 @@ export default function ResetPasswordModal({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-6 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 font-medium"
+                  className="px-6 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 font-medium cursor-pointer"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className={`px-6 py-2 rounded-md font-medium ${
+                  className={`px-6 py-2 rounded-md font-medium cursor-pointer ${
                     isLoading
                       ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                       : "bg-blue-600 text-white hover:bg-blue-700"

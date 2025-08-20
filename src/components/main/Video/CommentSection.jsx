@@ -74,7 +74,7 @@ export default function CommentSection({ comments: initialComments, postId }) {
           <p className="font-semibold text-sm text-black dark:text-white">
             {comment.author.name}
           </p>
-          <p className="text-sm text-gray-800 dark:text-gray-200 break-all">
+          <p className="text-sm text-gray-800 dark:text-gray-200 break-words">
             {comment.content}
           </p>
         </div>

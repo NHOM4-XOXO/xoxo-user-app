@@ -35,7 +35,7 @@ export default function ProfileDropdown() {
       </button>
 
       {isOpen && (
-        <div className="absolute -right-4 mt-2 w-48 bg-white dark:bg-fb-dark-secondary shadow-lg rounded-lg py-2 z-50">
+        <div className="absolute -right-2 top-11 mt-2 w-48 bg-white dark:bg-fb-dark-secondary shadow-lg rounded-lg py-2 z-50">
           {profileMenuItems.map((item) =>
             item.type === "divider" ? (
               <hr

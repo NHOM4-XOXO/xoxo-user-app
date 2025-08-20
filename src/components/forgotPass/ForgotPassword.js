@@ -88,7 +88,7 @@ export default function ForgotPassword() {
                   onChange={(e) =>
                     setHeaderLogin({ ...headerLogin, email: e.target.value })
                   }
-                  className="px-3 py-2 border border-gray-300 rounded-md text-sm placeholder-gray-600"
+                  className="px-3 py-2 border border-gray-300 rounded-md text-black text-sm placeholder-gray-600"
                   disabled={headerLoading}
                 />
                 <input
@@ -98,17 +98,16 @@ export default function ForgotPassword() {
                   onChange={(e) =>
                     setHeaderLogin({ ...headerLogin, password: e.target.value })
                   }
-                  className="px-3 py-2 border border-gray-300 rounded-md text-sm placeholder-gray-600"
+                  className="px-3 py-2 border border-gray-300 text-black rounded-md text-sm placeholder-gray-600"
                   disabled={headerLoading}
                 />
                 <button
                   type="submit"
                   disabled={headerLoading}
-                  className={`px-4 py-2 rounded-md text-sm font-medium ${
-                    headerLoading
-                      ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-                      : "bg-blue-600 text-white hover:bg-blue-700"
-                  }`}
+                  className={`px-4 py-2 cursor-pointer rounded-md text-sm font-medium ${headerLoading
+                    ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+                    : "bg-blue-600 text-white hover:bg-blue-700"
+                    }`}
                 >
                   {headerLoading ? "Đang đăng nhập..." : "Đăng nhập"}
                 </button>
@@ -144,13 +143,13 @@ export default function ForgotPassword() {
             <div className="flex space-x-3 justify-end">
               <button
                 onClick={() => (window.location.href = "/login")}
-                className="px-6 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 font-medium"
+                className="px-6 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 font-medium cursor-pointer"
               >
                 Hủy
               </button>
               <button
                 onClick={handleSearch}
-                className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium"
+                className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium cursor-pointer"
               >
                 Tìm kiếm
               </button>

@@ -2,20 +2,21 @@
 
 import { useState, useEffect } from "react";
 import userDataManager from "../../utils/userDataManager";
+import { useUser } from "../../contexts/UserContext";
 
 export default function UserList() {
   const [users, setUsers] = useState([]);
-  const [currentUser, setCurrentUser] = useState(null);
+  const { currentUser, logout, refreshUser } = useUser();
 
   useEffect(() => {
     // Load users when component mounts
     setUsers(userDataManager.getAllUsers());
-    setCurrentUser(userDataManager.getCurrentUser());
   }, []);
+  
 
   const handleRefresh = () => {
     setUsers(userDataManager.getAllUsers());
-    setCurrentUser(userDataManager.getCurrentUser());
+    refreshUser();
   };
 
   const handleDeleteUser = (userId) => {
@@ -36,8 +37,7 @@ export default function UserList() {
   };
 
   const handleLogout = () => {
-    userDataManager.logoutUser();
-    setCurrentUser(null);
+    logout();
     alert("Đã đăng xuất!");
   };
 
@@ -54,7 +54,6 @@ export default function UserList() {
           </button>
         </div>
 
-        {/* Current User */}
         {currentUser && (
           <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
             <div className="flex justify-between items-center">
@@ -135,19 +134,18 @@ export default function UserList() {
                       {user.gender === "male"
                         ? "Nam"
                         : user.gender === "female"
-                        ? "Nữ"
-                        : "Khác"}
+                          ? "Nữ"
+                          : "Khác"}
                     </td>
                     <td className="px-4 py-2 border-b text-sm text-gray-900">
                       {new Date(user.birthday).toLocaleDateString("vi-VN")}
                     </td>
                     <td className="px-4 py-2 border-b text-sm">
                       <span
-                        className={`px-2 py-1 rounded-full text-xs ${
-                          user.isVerified
+                        className={`px-2 py-1 rounded-full text-xs ${user.isVerified
                             ? "bg-green-100 text-green-800"
                             : "bg-yellow-100 text-yellow-800"
-                        }`}
+                          }`}
                       >
                         {user.isVerified ? "Đã xác thực" : "Chưa xác thực"}
                       </span>
