@@ -89,7 +89,6 @@ export default function GroupsDiscovery() {
         </div>
       </div>
 
-      {/* Suggested Groups */}
       <div className="bg-white rounded-lg shadow-sm p-6">
         <h3 className="text-lg font-medium text-gray-900 mb-4">
           Nhóm được đề xuất
@@ -137,7 +136,6 @@ export default function GroupsDiscovery() {
         </div>
       </div>
 
-      {/* Create Your Own Group */}
       <div className="bg-white rounded-lg shadow-sm p-6">
         <div className="text-center">
           <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">

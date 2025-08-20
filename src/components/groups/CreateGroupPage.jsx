@@ -34,25 +34,21 @@ export default function CreateGroupPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Create new group object
     const newGroup = {
       name: formData.groupName,
       description: formData.description,
       privacy: formData.privacy,
       image: formData.coverImage
         ? URL.createObjectURL(formData.coverImage)
-        : "/image/group1.jpg", // default image
+        : "https://picsum.photos/id/237/200/300",
     };
 
-    // Add group to context
     const newGroupId = addGroup(newGroup);
 
     console.log("Group created successfully:", newGroup);
 
-    // Show success message
     alert(`Tạo nhóm "${formData.groupName}" thành công!`);
 
-    // Redirect to the newly created group page
     router.push(`/groups/${newGroupId}`);
   };
 
@@ -63,7 +59,6 @@ export default function CreateGroupPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-2xl mx-auto py-8 px-4">
-        {/* Header */}
         <div className="bg-white rounded-lg shadow-sm mb-6">
           <div className="flex items-center justify-between p-6 border-b">
             <div className="flex items-center space-x-4">
@@ -77,9 +72,8 @@ export default function CreateGroupPage() {
             </div>
           </div>
 
-          {/* Form */}
+      
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
-            {/* Cover Image */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-3">
                 Ảnh bìa nhóm
@@ -111,10 +105,10 @@ export default function CreateGroupPage() {
               </div>
             </div>
 
-            {/* Group Name */}
+      
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Tên nhóm *
+                Tên nhóm <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -127,7 +121,6 @@ export default function CreateGroupPage() {
               />
             </div>
 
-            {/* Description */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Mô tả nhóm (tùy chọn)
@@ -172,7 +165,7 @@ export default function CreateGroupPage() {
                   </div>
                 </label>
 
-                {/* Private */}
+      
                 <label className="flex items-start space-x-3 p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
                   <input
                     type="radio"
@@ -198,7 +191,6 @@ export default function CreateGroupPage() {
               </div>
             </div>
 
-            {/* Invite Friends */}
             <div className="flex items-start space-x-3 p-4 border border-gray-200 rounded-lg">
               <input
                 type="checkbox"
@@ -222,19 +214,18 @@ export default function CreateGroupPage() {
               </div>
             </div>
 
-            {/* Buttons */}
             <div className="flex space-x-4 pt-6">
               <button
                 type="button"
                 onClick={handleCancel}
-                className="flex-1 px-6 py-3 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 font-medium transition-colors"
+                className="flex-1 px-6 py-3 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 font-medium transition-colors cursor-pointer"
               >
                 Hủy
               </button>
               <button
                 type="submit"
                 disabled={!formData.groupName.trim()}
-                className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium transition-colors"
+                className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium transition-colors cursor-pointer"
               >
                 Tạo nhóm
               </button>
