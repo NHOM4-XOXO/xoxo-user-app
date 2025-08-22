@@ -20,7 +20,8 @@ jobs:
 
       # 3. Save image để copy sang EC2
       - name: Save Docker image
-        run: docker save nphoang151/xoxo-app:latest | gzip > nphoang151/xoxo-app.tar.gz
+        run: docker save nphoang151/xoxo-app:latest | gzip > xoxo-app.tar.gz
+
 
       # 4. Copy image + docker-compose.yml sang EC2
       - name: Copy files to EC2
