@@ -3,7 +3,7 @@ name: CI/CD Deploy to EC2 (Docker Hub + Docker Compose)
 on:
   push:
     branches:
-      - main   # hoặc dev, tuỳ bạn muốn deploy nhánh nào
+      - create/ec2 # hoặc dev, tuỳ bạn muốn deploy nhánh nào
 
 jobs:
   deploy:
