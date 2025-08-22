@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   web:
     image: nphoang151/xoxo-app:latest
