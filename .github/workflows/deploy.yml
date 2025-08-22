@@ -1,9 +1,9 @@
-name: CI/CD Deploy to EC2 (Docker Compose)
+name: CI/CD Deploy to EC2 (Docker Hub + Docker Compose)
 
 on:
   push:
     branches:
-      - create/ec2
+      - main   # hoặc dev, tuỳ bạn muốn deploy nhánh nào
 
 jobs:
   deploy:
@@ -14,28 +14,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. Build Docker image
-      - name: Build Docker image
-        run: docker build -t nphoang151/xoxo-app:latest .
-
-      # 3. Save image để copy sang EC2
-      - name: Save Docker image
-        run: docker save nphoang151/xoxo-app:latest | gzip > xoxo-app.tar.gz
-
-
-      # 4. Copy image + docker-compose.yml sang EC2
-      - name: Copy files to EC2
-        uses: appleboy/scp-action@v0.1.7
+      # 2. Login Docker Hub
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ec2-user
-          key: ${{ secrets.EC2_KEY }}
-          source: |
-            xoxo-app.tar.gz
-            docker-compose.yml
-          target: "/home/ec2-user/app/"
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # 5. SSH vào EC2 để deploy
+      # 3. Build & Push Docker image
+      - name: Build and Push Docker image
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/xoxo-app:latest .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/xoxo-app:latest
+
+      # 4. Deploy trên EC2 (pull từ Docker Hub)
       - name: Deploy on EC2
         uses: appleboy/ssh-action@v0.1.7
         with:
@@ -44,6 +36,6 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           script: |
             cd /home/ec2-user/app
-            docker load < xoxo-app.tar.gz
+            docker-compose pull
             docker-compose down
             docker-compose up -d
