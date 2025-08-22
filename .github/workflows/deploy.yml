@@ -3,7 +3,7 @@ name: CI/CD Deploy to EC2 (Docker Compose)
 on:
   push:
     branches:
-      - dev
+      - create/ec2
 
 jobs:
   deploy:
