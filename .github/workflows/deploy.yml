@@ -44,6 +44,6 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           script: |
             cd /home/ec2-user/app
-            docker-compose pull
-            docker-compose down
-            docker-compose up -d
+            docker-compose -f docker-compose-user.yml pull
+            docker-compose -f docker-compose-user.yml down
+            docker-compose -f docker-compose-user.yml up -d
