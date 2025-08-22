@@ -1,0 +1,9 @@
+version: "3.8"
+
+services:
+  web:
+    image: nphoang151/xoxo-app:latest
+    container_name: xoxo-app
+    restart: always
+    ports:
+      - "80:3000"
