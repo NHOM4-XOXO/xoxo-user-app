@@ -12,7 +12,6 @@ export default function UserList() {
     // Load users when component mounts
     setUsers(userDataManager.getAllUsers());
   }, []);
-  
 
   const handleRefresh = () => {
     setUsers(userDataManager.getAllUsers());
@@ -37,8 +36,12 @@ export default function UserList() {
   };
 
   const handleLogout = () => {
+    // Xóa cookie đăng nhập
+    document.cookie = "currentUser=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    // Gọi logout trong context nếu cần
     logout();
-    alert("Đã đăng xuất!");
+    // Chuyển hướng về trang login
+    window.location.href = "/login";
   };
 
   return (
