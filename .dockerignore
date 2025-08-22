@@ -1,0 +1,32 @@
+# Node modules (cài trong Docker, không copy từ local)
+node_modules
+
+# Thư mục build tạm
+.next
+
+# Log file
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Git folder
+.gitignore
+
+# Env files (nếu có)
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# VSCode & editor config
+.vscode
+.idea
+*.swp
+
+# Dockerfile cũ hoặc scripts không cần thiết
+Dockerfile.old
+*.md
+
+# MacOS & hệ điều hành khác
+.DS_Store
