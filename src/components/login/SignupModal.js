@@ -95,7 +95,6 @@ export default function SignupModal({ isOpen, onClose }) {
             <button
               onClick={onClose}
               className="text-gray-400 cursor-pointer hover:text-gray-600 text-2xl"
-            
             >
               ×
             </button>
@@ -186,6 +185,35 @@ export default function SignupModal({ isOpen, onClose }) {
             </div>
 
             <div className="relative">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                placeholder="Nhập lại mật khẩu"
+                {...register("confirmPassword")}
+                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg text-gray-900 placeholder-gray-500 disabled:bg-gray-100 disabled:cursor-not-allowed ${
+                  errors.confirmPassword ? "border-red-500" : "border-gray-300"
+                } pr-10`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword((prev) => !prev)}
+                className="absolute right-2 top-3 text-gray-500 cursor-pointer"
+                tabIndex={-1}
+              >
+                {showConfirmPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-4 h-4" />
+                  {errors.password.message}
+                </p>
+              )}
+            </div>
+
+            <div className="relative">
               <label className="block text-sm text-gray-600 mb-1">
                 Ngày sinh
               </label>
@@ -203,8 +231,6 @@ export default function SignupModal({ isOpen, onClose }) {
                 </p>
               )}
             </div>
-
-           
 
             <div className="relative">
               <label className="block text-sm text-gray-600 mb-1">
@@ -226,8 +252,8 @@ export default function SignupModal({ isOpen, onClose }) {
                       {value === "female"
                         ? "Nữ"
                         : value === "male"
-                          ? "Nam"
-                          : "Khác"}
+                        ? "Nam"
+                        : "Khác"}
                     </span>
                   </label>
                 ))}
@@ -262,12 +288,13 @@ export default function SignupModal({ isOpen, onClose }) {
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`w-full py-2 px-4 rounded-md font-semibold transition duration-200 cursor-pointer ${isSubmitting
-                ? "bg-gray-400 text-gray-200 cursor-not-allowed"
-                : submitSuccess
+              className={`w-full py-2 px-4 rounded-md font-semibold transition duration-200 cursor-pointer ${
+                isSubmitting
+                  ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                  : submitSuccess
                   ? "bg-green-600 text-white"
                   : "bg-green-500 text-white hover:bg-green-600"
-                }`}
+              }`}
             >
               {isSubmitting ? (
                 <span className="flex items-center justify-center ">

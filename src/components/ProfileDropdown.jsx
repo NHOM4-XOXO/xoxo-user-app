@@ -36,13 +36,25 @@ export default function ProfileDropdown() {
 
       {isOpen && (
         <div className="absolute -right-2 top-11 mt-2 w-48 bg-white dark:bg-fb-dark-secondary shadow-lg rounded-lg py-2 z-50">
-          {profileMenuItems.map((item) =>
-            item.type === "divider" ? (
-              <hr
-                key={item.id}
-                className="my-1 border-t border-gray-300 dark:border-gray-600"
-              />
-            ) : (
+          {profileMenuItems.map((item) => {
+            if (item.type === "divider") {
+              return (
+                <hr
+                  key={item.id}
+                  className="my-1 border-t border-gray-300 dark:border-gray-600"
+                />
+              );
+            }
+            if (item.label === "Đăng Xuất") {
+              const LogoutButton =
+                require("@/components/common/LogoutButton.jsx").default;
+              return (
+                <div key={item.id} className="px-4 py-2">
+                  <LogoutButton />
+                </div>
+              );
+            }
+            return (
               <Link
                 href={item.href}
                 key={item.id}
@@ -51,8 +63,8 @@ export default function ProfileDropdown() {
                 <span>{item.icon}</span>
                 {item.label}
               </Link>
-            )
-          )}
+            );
+          })}
         </div>
       )}
     </div>

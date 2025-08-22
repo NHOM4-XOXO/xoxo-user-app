@@ -36,6 +36,10 @@ export default function LoginForm() {
       // Sử dụng login function từ UserContext
       const user = await login(formData.email, formData.password);
 
+      localStorage.setItem("currentUser", JSON.stringify(user));
+
+      // Lưu user id vào cookie (cho middleware)
+      document.cookie = `currentUser=${user.id}; path=/`;
       // Simulate loading time
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -111,7 +115,7 @@ export default function LoginForm() {
                       isLoading
                         ? "bg-gray-400 text-gray-200 cursor-not-allowed"
                         : "bg-blue-600 text-white hover:bg-blue-700"
-                      }`}
+                    }`}
                   >
                     {isLoading ? (
                       <span className="flex items-center justify-center">
