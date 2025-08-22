@@ -3,5 +3,5 @@ export const profileMenuItems = [
     { id: 2, label: "Cài Đặt", type: "item", href: "" },
     { id: 3, label: "Tuỳ Chỉnh Giao Diện", type: "item", href: "" },
     { id: 4, type: "divider" },
-    { id: 5, label: "Đăng Xuất", type: "item", href: "" },
+    { id: 5, label: "Đăng Xuất", type: "item", href: "/login" },
 ];
