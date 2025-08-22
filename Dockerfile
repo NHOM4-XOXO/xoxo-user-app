@@ -16,6 +16,7 @@ RUN npm run build
 FROM node:18-slim AS runner
 WORKDIR /app
 ENV NODE_ENV=production
+COPY . .
 
 # copy package.json + lock file để npm start có thể chạy
 COPY --from=builder /app/package*.json ./
