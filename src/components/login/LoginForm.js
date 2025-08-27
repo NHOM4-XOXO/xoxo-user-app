@@ -2,8 +2,12 @@
 
 import { useEffect, useState } from "react";
 import SignupModal from "./SignupModal";
-import { useUser } from "../../contexts/UserContext";
+import Cookies from "js-cookie";
 
+import { useDispatch } from "react-redux";
+import { useLoginMutation } from "@/features/auth/authApi";
+import { setCredentials } from "@/features/auth/authSlice";
+import { useRouter } from "next/navigation";
 
 
 export default function LoginForm() {
@@ -12,10 +16,20 @@ export default function LoginForm() {
     password: "",
   });
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const { login } = useUser();
+  const [login, { isLoading }] = useLoginMutation();
+  const dispatch = useDispatch();
+  const [verifyMessage, setVerifyMessage] = useState("");
+  const router = useRouter();
+
+  useEffect(() => {
+    const message = localStorage.getItem("verifyMessage");
+    if (message) {
+      setVerifyMessage(message);
+      localStorage.removeItem("verifyMessage"); // clear sau khi hiển thị
+    }
+  }, []);
 
 
   const handleChange = (e) => {
@@ -26,28 +40,21 @@ export default function LoginForm() {
     // Clear error when user types
     if (error) setError("");
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
-    setError("");
-
     try {
-      // Sử dụng login function từ UserContext
-      const user = await login(formData.email, formData.password);
+      const res = await login(formData).unwrap();
+      const { email, token } = res.data; // backend trả ra gì thì lấy thêm
 
-      localStorage.setItem("currentUser", JSON.stringify(user));
+      Cookies.set("token", token, { expires: 1 / 144, secure: true, sameSite: "strict" });
 
-      // Lưu user id vào cookie (cho middleware)
-      document.cookie = `currentUser=${user.id}; path=/`;
-      // Simulate loading time
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      dispatch(setCredentials({ email, token }));
 
-      window.location.href = "/";
-    } catch (error) {
-      setError(error.message);
-    } finally {
-      setIsLoading(false);
+      console.log("Đăng nhập thành công!");
+      router.replace("/");
+    } catch (err) {
+      console.error("Login error:", err);
+      setError(err?.data?.message || "Đăng nhập thất bại");
     }
   };
 
@@ -111,11 +118,10 @@ export default function LoginForm() {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className={`w-full py-3 px-4 rounded-md font-semibold text-lg transition duration-200 cursor-pointer ${
-                      isLoading
-                        ? "bg-gray-400 text-gray-200 cursor-not-allowed"
-                        : "bg-blue-600 text-white hover:bg-blue-700"
-                    }`}
+                    className={`w-full py-3 px-4 rounded-md font-semibold text-lg transition duration-200 cursor-pointer ${isLoading
+                      ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                      : "bg-blue-600 text-white hover:bg-blue-700"
+                      }`}
                   >
                     {isLoading ? (
                       <span className="flex items-center justify-center">
@@ -146,6 +152,17 @@ export default function LoginForm() {
                     )}
                   </button>
                 </form>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.location.href = "http://localhost:8080/login";
+                  }}
+                  className="w-full mt-4 flex items-center justify-center gap-2 bg-red-500 text-white py-3 px-4 rounded-md hover:bg-red-600 transition duration-200 text-lg font-semibold cursor-pointer"
+                >
+                  <img src="https://www.svgrepo.com/show/355037/google.svg" alt="Google" className="w-5 h-5" />
+                  Đăng nhập bằng Google
+                </button>
 
                 <div className="mt-4 text-center">
                   <a
@@ -181,6 +198,20 @@ export default function LoginForm() {
         isOpen={isSignupModalOpen}
         onClose={() => setIsSignupModalOpen(false)}
       />
+
+      {verifyMessage && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50">
+          <div className="bg-white p-6 rounded shadow-lg text-center">
+            <p>{verifyMessage}</p>
+            <button
+              onClick={() => setVerifyMessage("")}
+              className="mt-4 bg-blue-600 text-white px-4 py-2 rounded"
+            >
+              Đóng
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }

@@ -2,13 +2,13 @@ import { NextResponse } from "next/server";
 
 export function middleware(request) {
   const url = request.nextUrl;
-  const isLoggedIn = request.cookies.get("currentUser"); // hoặc token/session
+  const isLoggedIn = request.cookies.get("token"); // hoặc token/session
 
   // Nếu chưa đăng nhập, chặn truy cập các route cần bảo vệ
   if (
     !isLoggedIn &&
     url.pathname !== "/login" &&
-    !url.pathname.startsWith("/api") 
+    !url.pathname.startsWith("/api")
   ) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
