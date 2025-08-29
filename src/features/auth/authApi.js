@@ -1,18 +1,9 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { baseQueryWithReauth } from "./baseQueryWithReauth ";
 
 export const authApi = createApi({
     reducerPath: "authApi",
-    baseQuery: fetchBaseQuery({
-        baseUrl: process.env.NEXT_PUBLIC_API_URL + "/api/auth",
-        prepareHeaders: (headers, { getState }) => {
-            const token = getState().auth.token;
-            if (token) {
-                headers.set("Authorization", `Bearer ${token}`);
-            }
-            return headers;
-        },
-        credentials: "include", // để gửi cookie refreshToken
-    }),
+    baseQuery: baseQueryWithReauth,
     endpoints: (builder) => ({
         register: builder.mutation({
             query: (userData) => ({
@@ -25,7 +16,7 @@ export const authApi = createApi({
             query: (credentials) => ({
                 url: "/login",
                 method: "POST",
-                body: credentials, // { email, password }
+                body: credentials,
             }),
         }),
         logout: builder.mutation({
@@ -47,21 +38,21 @@ export const authApi = createApi({
             query: (data) => ({
                 url: "/forgot-password",
                 method: "POST",
-                body: data, // { email }
+                body: data,
             }),
         }),
         resetPassword: builder.mutation({
             query: (data) => ({
                 url: "/reset-password",
                 method: "POST",
-                body: data, // { token, newPassword }
+                body: data,
             }),
         }),
         changePassword: builder.mutation({
             query: (data) => ({
                 url: "/change-password",
                 method: "POST",
-                body: data, // { oldPassword, newPassword }
+                body: data,
             }),
         }),
     }),
