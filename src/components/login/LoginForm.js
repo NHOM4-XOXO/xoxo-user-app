@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from "react";
 import SignupModal from "./SignupModal";
-import Cookies from "js-cookie";
+
 
 import { useDispatch } from "react-redux";
 import { useLoginMutation } from "@/features/auth/authApi";
 import { setCredentials } from "@/features/auth/authSlice";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
+import { scheduleTokenRefresh } from "@/features/auth/authManager";
 
 
 export default function LoginForm() {
@@ -46,9 +48,10 @@ export default function LoginForm() {
       const res = await login(formData).unwrap();
       const { email, token } = res.data; // backend trả ra gì thì lấy thêm
 
-      Cookies.set("token", token, { expires: 1 / 144, secure: true, sameSite: "strict" });
+      Cookies.set("token", token, { secure: true, sameSite: "strict" });
 
       dispatch(setCredentials({ email, token }));
+      scheduleTokenRefresh(token);
 
       console.log("Đăng nhập thành công!");
       router.replace("/");

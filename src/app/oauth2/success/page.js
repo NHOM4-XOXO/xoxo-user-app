@@ -20,7 +20,6 @@ export default function OAuth2Success() {
 
             dispatch(setCredentials({ token }));
 
-            // ✅ chuyển thẳng về Home
             router.replace("/");
         } else {
             router.replace("/login"); // nếu không có token thì quay về login
