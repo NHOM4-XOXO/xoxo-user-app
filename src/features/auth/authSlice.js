@@ -1,24 +1,30 @@
-// slices/authSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialState = {
-    email: null,
-    token: null,
-    isAuthenticated: false,
-};
+const savedAuth = typeof window !== "undefined" ? localStorage.getItem("auth") : null;
+
+const initialState = savedAuth
+    ? JSON.parse(savedAuth)
+    : {
+        profile: null,
+        isAuthenticated: false,
+    };
 
 const authSlice = createSlice({
     name: "auth",
     initialState,
     reducers: {
         setCredentials: (state, action) => {
-            const { email = "exmaple@gmail.com", token } = action.payload;
-            state.email = email;
+            const { profile, token } = action.payload;
+            state.profile = profile;   // lưu cả object profile
             state.token = token;
             state.isAuthenticated = true;
+
+            localStorage.setItem("auth", JSON.stringify({
+                profile, isAuthenticated: true
+            }));
         },
         clearCredentials: (state) => {
-            state.user = null;
+            state.profile = null;
             state.token = null;
             state.isAuthenticated = false;
         },

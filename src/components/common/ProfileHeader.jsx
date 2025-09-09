@@ -21,7 +21,7 @@ function ProfileHeader({ setIsLoading, setNotifyModal }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const { data: profileRes, isFetching, error, refetch } = useGetMyProfileQuery();
-    const profile = profileRes?.data;
+    const profile = profileRes;
 
     const [updateAvatar] = useUpdateAvatarMutation();
     const [updateCover] = useUpdateCoverMutation();

@@ -48,8 +48,6 @@ export default function LoginForm() {
       const res = await login(formData).unwrap();
       const { email, token } = res.data; // backend trả ra gì thì lấy thêm
 
-      Cookies.set("token", token, { secure: true, sameSite: "strict" });
-
       dispatch(setCredentials({ email, token }));
       scheduleTokenRefresh(token);
 
@@ -159,7 +157,7 @@ export default function LoginForm() {
                 <button
                   type="button"
                   onClick={() => {
-                    window.location.href = "http://localhost:8080/login";
+                    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/login`;
                   }}
                   className="w-full mt-4 flex items-center justify-center gap-2 bg-red-500 text-white py-3 px-4 rounded-md hover:bg-red-600 transition duration-200 text-lg font-semibold cursor-pointer"
                 >
