@@ -6,7 +6,7 @@ export default function LogoutButton() {
   const handleLogout = () => {
     // Xóa cookie đăng nhập
     document.cookie =
-      "currentUser=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     // Xóa localStorage nếu muốn
     localStorage.removeItem("currentUser");
     // Chuyển hướng về trang login
