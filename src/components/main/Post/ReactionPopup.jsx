@@ -1,15 +1,14 @@
 import { Tooltip } from 'antd';
-import { Angry, Frown, Heart, Laugh, Smile, ThumbsUp } from 'lucide-react';
 import React from 'react'
 
 function ReactionPopup({ onSelect }) {
     const reactions = [
-        { name: "Thích", icon: <ThumbsUp className="text-blue-600" /> },
-        { name: "Yêu thích", icon: <Heart className="text-red-500" /> },
-        { name: "Haha", icon: <Laugh className="text-yellow-400" /> },
-        { name: "Wow", icon: <Smile className=" text-yellow-300" /> },
-        { name: "Buồn", icon: <Frown className=" text-yellow-500" /> },
-        { name: "Phẫn nộ", icon: <Angry className=" text-red-600" /> },
+        { name: "Thích", icon: "👍", colorName: "text-yellow-500", type: "LIKE" },
+        { name: "Yêu thích", icon: "❤️", colorName: "text-red-500", type: "LOVE" },
+        { name: "Haha", icon: "😂", colorName: "text-yellow-300", type: "HAHA" },
+        { name: "Wow", icon: "😮", colorName: "text-yellow-300", type: "WOW" },
+        { name: "Buồn", icon: "😢", colorName: "text-yellow-500", type: "SAD" },
+        { name: "Phẫn nộ", icon: "😡", colorName: "text-red-600", type: "ANGRY" },
     ];
 
     return (
@@ -17,7 +16,7 @@ function ReactionPopup({ onSelect }) {
             {reactions.map((reaction, id) => (
                 <Tooltip title={reaction.name} key={id}>
                     <div
-                        className="hover:scale-125 transition-transform duration-150 cursor-pointer"
+                        className="hover:scale-125 transition-transform text-2xl duration-150 cursor-pointer"
                         onClick={() => onSelect(reaction)}
                     >
                         {reaction.icon}
