@@ -2,35 +2,38 @@
 import { useRef, useState } from "react";
 import { Video, ImageIcon, Smile } from "lucide-react";
 import PostCreationModal from "./PostCreationModal";
+import { useSelector } from "react-redux";
 
 const PostCreation = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [postContent, setPostContent] = useState("");
   const [selectedFiles, setSelectedFiles] = useState([]);
   const fileInputRef = useRef(null);
+  const { profile } = useSelector((state) => state.auth); // lấy user từ redux
+  const lastName = profile?.lastName;
 
-  const handleFileSelect = (event) => {
-    const files = Array.from(event.target.files);
-    const fileObjects = files.map((file) => ({
+  const handleFileSelect = (e) => {
+    const files = Array.from(e.target.files).map((file) => ({
       file,
+      type: file.type.startsWith("image/")
+        ? "image"
+        : file.type.startsWith("video/")
+          ? "video"
+          : "audio",
       url: URL.createObjectURL(file),
-      type: file.type.startsWith("image/") ? "image" : "video",
     }));
-    setSelectedFiles((prev) => [...prev, ...fileObjects]);
-    console.log(fileObjects);
-    if (fileObjects.length > 0) {
+
+    setSelectedFiles((prev) => [...prev, ...files]);
+
+    if (files.length > 0) {
       setIsModalOpen(true);
     }
   };
 
   const removeFile = (index) => {
-    setSelectedFiles((prev) => {
-      const newFiles = [...prev];
-      URL.revokeObjectURL(newFiles[index].url);
-      newFiles.splice(index, 1);
-      return newFiles;
-    });
+    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
   };
+
 
   return (
     <>
@@ -50,7 +53,7 @@ const PostCreation = () => {
             value={
               postContent
                 ? postContent.replace(/\n/g, " ")
-                : "Minh ơi, bạn đang nghĩ gì thế?"
+                : `${lastName} ơi, bạn đang nghĩ gì thế?`
             }
             className="flex-1 bg-fb-light-secondary dark:bg-fb-dark-tertiary hover:bg-fb-light-tertiary dark:hover:bg-fb-dark-quaternary text-gray-600 dark:text-gray-300 text-left px-3 md:px-4 py-2 md:py-3 rounded-full transition-colors text-sm md:text-base cursor-pointer"
           />

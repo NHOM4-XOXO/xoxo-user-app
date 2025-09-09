@@ -1,48 +1,40 @@
 "use client";
 
 import { useState } from "react";
-import ReactionPopup from "./ReactionPopup";
 import { Dropdown } from "antd";
 import { useTheme } from "next-themes";
-import {
-    ThumbsUp,
-    Heart,
-    MoreHorizontal,
-    MessageCircle,
-    Share2,
-    Users,
-    Smile,
-    Edit,
-    Trash2,
-} from "lucide-react";
+import { ThumbsUp, Heart, MoreHorizontal, Users, Smile, Edit, Trash2 } from "lucide-react";
 import PostMediaGrid from "./PostMediaGrid";
+import { useGetPostReactionsQuery } from "@/features/postApi";
 
 const menuItems = {
     items: [
-        {
-            key: "edit",
-            icon: <Edit size={16} />,
-            label: <p className="text-sm font-semibold">Chỉnh sửa bài viết</p>,
-        },
-        {
-            key: "delete",
-            icon: <Trash2 size={16} />,
-            label: (
-                <p className="text-sm font-semibold text-red-500">Xóa bài viết</p>
-            ),
-        },
+        { key: "edit", icon: <Edit size={16} />, label: <p className="text-sm font-semibold">Chỉnh sửa bài viết</p> },
+        { key: "delete", icon: <Trash2 size={16} />, label: <p className="text-sm font-semibold text-red-500">Xóa bài viết</p> },
     ],
 };
 
 const MainPost = ({ data }) => {
-    const [showFullCaption, setShowFullCaption] = useState(false);
 
+    const [showFullCaption, setShowFullCaption] = useState(false);
     const { resolvedTheme } = useTheme();
     const isDark = resolvedTheme === "dark";
+    const { data: postReactions } = useGetPostReactionsQuery(data?.post.id);
+
+
+
+    // Nếu data chưa có, trả về null
+    if (!data) return null;
+
+    const { post, media = [] } = data;
+
+
+    const author = {
+        name: `${post?.authorFirstName || ""} ${post?.authorLastName || ""}`.trim() || "Người dùng",
+        avatar: post?.authorAvatarUrl,
+    };
 
     const toggleCaption = () => setShowFullCaption(!showFullCaption);
-    const { author, timestamp, content, media, likes, commentsCount, views, comments } = data;
-
 
     return (
         <>
@@ -57,7 +49,8 @@ const MainPost = ({ data }) => {
                     <div>
                         <h1 className="font-bold text-sm dark:text-white">{author.name}</h1>
                         <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                            {timestamp} <Users className="w-3 h-3" />
+                            {post?.createdAt ? new Date(post.createdAt).toLocaleString() : ""}
+                            <Users className="w-3 h-3" />
                         </p>
                     </div>
                 </div>
@@ -76,8 +69,8 @@ const MainPost = ({ data }) => {
 
             {/* Caption */}
             <div className="px-2 text-gray-700 dark:text-gray-300 text-sm">
-                <p className={showFullCaption ? "" : "line-clamp-2"}>{content}</p>
-                {content.length > 100 && (
+                <p className={showFullCaption ? "" : "line-clamp-2"}>{post?.content || ""}</p>
+                {post?.content && post.content.length > 100 && (
                     <button onClick={toggleCaption} className="text-blue-500 text-sm mt-1 hover:underline">
                         {showFullCaption ? "Thu gọn" : "Xem thêm"}
                     </button>
@@ -85,19 +78,18 @@ const MainPost = ({ data }) => {
             </div>
 
             {/* Media */}
-            {media && media.length > 0 && <PostMediaGrid media={media} postId={data.id} />}
+            {media.length > 0 && <PostMediaGrid media={media} postId={post?.id} />}
 
             {/* Reactions */}
-            <div className="flex justify-between items-center text-sm text-gray-600 dark:text-gray-400 px-2">
+            <div className="flex justify-between items-center text-sm text-gray-600 dark:text-gray-400 px-2 pt-2">
                 <div className="flex items-center gap-1">
                     <ThumbsUp size={18} className="text-blue-600" />
                     <Heart size={18} className="text-red-600" />
                     <Smile size={18} className="text-yellow-500" />
-                    <span className="text-sm hover:underline">{likes}</span>
+                    <span className="text-sm hover:underline">{postReactions?.content?.length || 0}</span>
                 </div>
-                <span className="text-sm hover:underline">{`${commentsCount} Bình luận`}</span>
+                <span className="text-sm hover:underline">{`${post?.commentCount || 0} Bình luận`}</span>
             </div>
-
         </>
     );
 };

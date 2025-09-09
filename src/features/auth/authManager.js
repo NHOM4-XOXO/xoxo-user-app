@@ -5,7 +5,9 @@ import { jwtDecode } from "jwt-decode";
 
 let refreshTimeout = null;
 
-//  Lấy thời gian hết hạn từ JWT
+/**
+ * Lấy thời gian hết hạn (ms) từ JWT
+ */
 const getTokenExpiry = (token) => {
     if (!token) return null;
     try {
@@ -17,8 +19,41 @@ const getTokenExpiry = (token) => {
     }
 };
 
-//  Lên lịch auto refresh token
+/**
+ * Lưu token vào cookie, đồng bộ theo exp trong JWT
+ */
+const setTokenCookie = (token) => {
+    try {
+        const expiry = getTokenExpiry(token);
+        if (!expiry) return;
+
+        const now = Date.now();
+        const expiryMs = expiry - now;
+
+        if (expiryMs <= 0) return;
+
+        // convert ms → ngày (js-cookie dùng days)
+        const expiresInDays = expiryMs / (1000 * 60 * 60 * 24);
+
+        Cookies.set("token", token, {
+            expires: expiresInDays,
+            secure: true,
+            sameSite: "strict",
+        });
+
+        console.log(
+            `[AuthManager] Token saved to cookie, expires in ${(expiryMs / 1000 / 60).toFixed(1)} min`
+        );
+    } catch (e) {
+        console.error("[AuthManager] Error setTokenCookie:", e);
+    }
+};
+
+/**
+ * Lên lịch auto refresh token trước khi hết hạn 1 phút
+ */
 export const scheduleTokenRefresh = (token) => {
+    setTokenCookie(token);
     const expiry = getTokenExpiry(token);
     if (!expiry) return;
 
@@ -32,10 +67,15 @@ export const scheduleTokenRefresh = (token) => {
             console.log("[AuthManager] Auto refreshing token...");
             refreshTokenFlow();
         }, refreshTime);
+        console.log(
+            `[AuthManager] Refresh scheduled in ${(refreshTime / 1000).toFixed(0)}s`
+        );
     }
 };
 
-//  Hàm gọi refresh token
+/**
+ * Hàm gọi refresh token
+ */
 export const refreshTokenFlow = async () => {
     try {
         const refreshResult = await store.dispatch(
@@ -49,11 +89,8 @@ export const refreshTokenFlow = async () => {
             // Lưu token vào Redux
             store.dispatch({ type: "auth/setToken", payload: newToken });
 
-            // Lưu token vào Cookies
-            Cookies.set("token", newToken, {
-                secure: true,
-                sameSite: "strict",
-            });
+            // Lưu token vào Cookie
+            setTokenCookie(newToken);
 
             // Lên lịch lại auto refresh
             scheduleTokenRefresh(newToken);
@@ -71,9 +108,12 @@ export const refreshTokenFlow = async () => {
     }
 };
 
-//  Logout
+/**
+ * Logout
+ */
 export const logoutFlow = () => {
     store.dispatch({ type: "auth/logout" });
     Cookies.remove("token");
     if (refreshTimeout) clearTimeout(refreshTimeout);
+    console.log("[AuthManager] Logged out, token cleared");
 };

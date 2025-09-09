@@ -18,7 +18,7 @@ export default function VerifyPage() {
         const verifyAccount = async () => {
             try {
                 const res = await fetch(
-                    `http://localhost:8080/api/auth/verify?token=${token}`
+                    `${process.env.NEXT_PUBLIC_API_URL}/api/auth/verify?token=${token}`
                 );
                 const data = await res.json();
 

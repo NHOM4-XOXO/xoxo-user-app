@@ -5,11 +5,15 @@ import PostCreation from "@/components/main/PostCreation";
 import SettingsDropdown from "@/components/main/RightSidebar-Home/SettingsDropdown";
 import ScrollableContainer from "@/components/common/ScrollableContainer";
 import Post from "@/components/main/Post/PostItem";
-import { allPosts } from "@/data/posts";
 import { HEADER_HEIGHT } from "@/constants";
+import { useGetPublicPostsQuery } from "@/features/postApi";
 
 export default function HomePage() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const {
+    data: posts = [],
+    isLoading,
+  } = useGetPublicPostsQuery();
 
   return (
     <main
@@ -29,8 +33,8 @@ export default function HomePage() {
 
             {/* Posts Feed */}
             <div className="space-y-4">
-              {allPosts.map((item, index) => (
-                <Post key={index} data={item} />
+              {posts.map((item, index) => (
+                <Post key={index} data={item} isLoading={isLoading} />
               ))}
             </div>
           </div>
