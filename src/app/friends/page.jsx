@@ -4,7 +4,7 @@ import sampleFriends from "@/data/sampleFriends";
 
 export default function FriendsPage() {
   return (
-    <div className="flex bg-white min-h-screen dark:text-white dark:bg-black">
+    <div className="flex bg-fb-light-secondary min-h-screen dark:text-white dark:bg-black">
       <SidebarFriend />
 
       <main className="flex-1 p-6">
