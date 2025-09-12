@@ -3,7 +3,7 @@ import Image from "next/image";
 
 const FriendRequestCard = ({ name, avatar }) => {
   return (
-    <div className="rounded-lg overflow-hidden bg-white dark:bg-[#242526] shadow-md border border-gray-300 dark:border-gray-700 cursor-pointer">
+    <div className="rounded-lg overflow-hidden dark:bg-[#242526] shadow-md border border-gray-300 dark:border-gray-700 cursor-pointer">
       {/* Avatar top full */}
       <div className="relative w-full h-40 sm:h-48 md:h-52 lg:h-56">
         <Image
