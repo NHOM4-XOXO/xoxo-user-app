@@ -160,6 +160,25 @@ body {
   border-radius: 10px;
 }
 
+@keyframes fadePulse {
+  0% {
+    opacity: 0.25;
+    filter: blur(2px);
+  }
+  50% {
+    opacity: 1;
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0.25;
+    filter: blur(2px);
+  }
+}
+
+.animate-fadePulse {
+  animation: fadePulse 1.6s ease-in-out infinite;
+}
+
 @layer utilities {
   input[type="date"]::-webkit-calendar-picker-indicator {
     @apply cursor-pointer;
