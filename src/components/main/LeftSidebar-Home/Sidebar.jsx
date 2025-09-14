@@ -7,11 +7,11 @@ import {
   FaVideo,
   FaRegSave,
   FaPlaceOfWorship,
-  FaGamepad,
 } from "react-icons/fa";
 import { FaMeta, FaRegMessage } from "react-icons/fa6";
 import { IoTimer, IoClose } from "react-icons/io5";
 import { MdEvent } from "react-icons/md";
+import { BsMusicPlayerFill } from "react-icons/bs";
 import Link from "next/link";
 
 const items = [
@@ -22,7 +22,7 @@ const items = [
   // { icon: <IoTimer />, label: "Kỷ niệm", href: "/" },
   { icon: <FaRegSave />, label: "Đã lưu", href: "/saved" },
   { icon: <FaPlaceOfWorship />, label: "Marketplace", href: "marketplaces" },
-  { icon: <FaGamepad />, label: "Chơi game", href: "/games" },
+  { icon: <BsMusicPlayerFill />, label: "Thư giãn", href: "/musics" },
   { icon: <FaRegMessage />, label: "Messages", href: "/messages" },
   { icon: <MdEvent />, label: "Sự kiện", href: "/events" },
 ];
