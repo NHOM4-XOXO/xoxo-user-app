@@ -47,3 +47,4 @@ next-env.d.ts
 certificates/
 
 node_modules/public/musics/*.mp3
+public/musics/*.mp3
