@@ -82,15 +82,15 @@ const MusicPlayer = () => {
       cover: "/image/chillout.jpeg",
       src: "/musics/relax.mp3",
     },
-    {
-      id: 4,
-      title: "Buzz",
-      artist: "PLI - MAKER",
-      album: "플리메이커",
-      duration: "2:58",
-      cover: "/image/korean.jpg",
-      src: "/musics/BurningSong.mp3",
-    },
+    // {
+    //   id: 4,
+    //   title: "Buzz",
+    //   artist: "PLI - MAKER",
+    //   album: "플리메이커",
+    //   duration: "2:58",
+    //   cover: "/image/korean.jpg",
+    //   src: "/musics/BurningSong.mp3",
+    // },
     
   ];
 
