@@ -18,6 +18,7 @@ import {
 } from "@/utils/ContentMultipleLines";
 import ImagePreviewModal from "@/components/common/ImagePreviewModal";
 import { useChat } from "@/hooks/useChat";
+import { useGetCurrentUserProfileQuery, useGetUserByIdQuery } from "@/features/chatApi";
 
 export default function ProductionMessagesChat({
   contact,
@@ -42,6 +43,21 @@ export default function ProductionMessagesChat({
     isLoadingMessages,
     handleSendMessage,
   } = useChat(contact?.userId || contact?.id, contact?.chatRoom);
+
+  // Resolve header name consistently with sidebar even after F5
+  const { data: profileData } = useGetCurrentUserProfileQuery();
+  const myId = profileData?.id;
+  const otherId = currentChatRoom?.participantIds && myId != null
+    ? (currentChatRoom.participantIds[0] === myId
+        ? currentChatRoom.participantIds[1]
+        : currentChatRoom.participantIds[0])
+    : null;
+  const { data: otherUser } = useGetUserByIdQuery(otherId, { skip: otherId == null });
+  const otherResolvedName = otherUser
+    ? `${(otherUser.firstName || "")} ${(otherUser.lastName || "")}`.trim() || otherUser.username || otherUser.email
+    : undefined;
+  // Prefer resolved name from API to keep consistent with sidebar
+  const headerName = otherResolvedName || contact?.name || (otherId ? `User ${otherId}` : "Unknown User");
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -149,7 +165,7 @@ export default function ProductionMessagesChat({
           </div>
           <div>
             <h3 className="font-semibold text-black dark:text-white">
-              {contact?.name || "Unknown User"}
+              {headerName}
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">
               {isConnected ? (

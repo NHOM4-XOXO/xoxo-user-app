@@ -27,10 +27,17 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Create .env.local (from base64 secret)
-        if: ${{ secrets.FRONTEND_ENV_FILE_BASE64 != '' }}
+      - name: Create .env.local (optional, for build-time)
         run: |
-          echo "$FRONTEND_ENV_FILE_BASE64" | base64 -d > .env.local
+          if [ -n "$FRONTEND_ENV_FILE_BASE64" ]; then
+            echo "Writing .env.local from secret"
+            echo "$FRONTEND_ENV_FILE_BASE64" | base64 -d > .env.local
+          else
+            echo "Generating .env.local from secrets (single var)"
+            {
+              echo "NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}";
+            } > .env.local
+          fi
         env:
           FRONTEND_ENV_FILE_BASE64: ${{ secrets.FRONTEND_ENV_FILE_BASE64 }}
 
@@ -56,6 +63,22 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
+      - name: Generate .env for runtime on EC2
+        run: |
+          mkdir -p fe-user-dist
+          {
+            echo "NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}";
+          } > fe-user-dist/.env
+
+      - name: Upload .env to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          source: "fe-user-dist/.env"
+          target: "~/fe-user"
+
       - name: Deploy on EC2 via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -69,8 +92,12 @@ jobs:
             if [ "$(docker ps -aq -f name=xoxo-user-app)" ]; then
               docker rm -f xoxo-user-app || true
             fi
+            mkdir -p ~/fe-user
+            # ensure env exists
+            if [ ! -f ~/fe-user/.env ]; then echo "NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}" > ~/fe-user/.env; fi
             docker run -d --name xoxo-user-app \
               -p 3000:3000 \
+              --env-file ~/fe-user/.env \
               --restart unless-stopped \
               ${{ secrets.DOCKERHUB_USERNAME }}/xoxo-user-app:latest
 
