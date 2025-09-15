@@ -1,49 +1,67 @@
-"use client";
-import Image from "next/image";
+"use client"
+import Image from "next/image"
 
 export default function LoadingOverlay({
   visible,
-  logoSrc = "/logo_xoxo_500px-removebg-preview.png", // đổi sang logo của bạn
+  logoSrc = "/logo_xoxo_500px-removebg-preview.png",
   dimBackground = true,
 }) {
-  if (!visible) return null;
+  if (!visible) return null
 
   return (
     <div
       className={`fixed inset-0 z-[60] ${
-        dimBackground ? "bg-black/35 backdrop-blur-[1px]" : ""
-      } 
-                  flex items-center justify-center`}
+        dimBackground ? "bg-black/40 backdrop-blur-sm" : ""
+      } flex items-center justify-center animate-in fade-in duration-300`}
       aria-live="polite"
       aria-busy="true"
       role="status"
     >
-      {/* Container */}
-      <div className="relative w-28 h-28 sm:w-32 sm:h-32">
-        {/* Vòng tròn xoay */}
-        <div className="absolute inset-0 rounded-full border-4 border-white/30 border-t-white/90 animate-spin" />
+      <div className="relative w-24 h-24 sm:w-28 sm:h-28">
+        {/* Outer spinning ring with gradient */}
+        <div
+          className="absolute inset-0 rounded-full border-3 border-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 animate-spin [animation-duration:2s]"
+          style={{
+            background: "conic-gradient(from 0deg, transparent, #3b82f6, transparent)",
+            mask: "radial-gradient(farthest-side, transparent calc(100% - 3px), white calc(100% - 3px))",
+            WebkitMask: "radial-gradient(farthest-side, transparent calc(100% - 3px), white calc(100% - 3px))",
+          }}
+        />
 
-        {/* Vòng tròn glow nhẹ */}
-        <div className="absolute inset-0 rounded-full shadow-[0_0_50px_8px_rgba(255,255,255,0.2)]" />
+        {/* Inner glow effect */}
+        <div className="absolute inset-2 rounded-full bg-gradient-to-br from-blue-100/20 to-purple-100/20 dark:from-blue-900/20 dark:to-purple-900/20 animate-pulse" />
 
-        {/* Logo ở giữa – nhấp nháy mờ→rõ→mờ */}
+        {/* Logo container with smooth fade animation */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden animate-fadePulse">
-            {/* Bạn có thể thay Image bằng <img> nếu không dùng Next/Image */}
+          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden bg-white dark:bg-gray-800 shadow-lg animate-[fadeScale_2s_ease-in-out_infinite]">
             <Image
-              src={logoSrc}
+              src={logoSrc || "/placeholder.svg"}
               alt="XoXo AI"
-              width={128}
-              height={128}
-              className="w-full h-full object-contain"
+              width={64}
+              height={64}
+              className="w-full h-full object-contain p-1"
               priority
+              unoptimized
             />
           </div>
         </div>
       </div>
 
-      {/* Text nhỏ (tùy chọn) */}
-      <span className="sr-only">Đang xử lý…</span>
+      {/* Screen reader text */}
+      <span className="sr-only">Đang xử lý, vui lòng đợi...</span>
+
+      <style jsx>{`
+        @keyframes fadeScale {
+          0%, 100% {
+            opacity: 0.8;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 1;
+            transform: scale(1.05);
+          }
+        }
+      `}</style>
     </div>
-  );
+  )
 }
