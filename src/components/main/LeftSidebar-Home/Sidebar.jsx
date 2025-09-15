@@ -20,7 +20,7 @@ const items = [
   { icon: <FaUsers />, label: "Nhóm", href: "/groups" },
   { icon: <FaVideo />, label: "Video", href: "/videos" },
   // { icon: <IoTimer />, label: "Kỷ niệm", href: "/" },
-  { icon: <FaRegSave />, label: "Đã lưu", href: "/saves" },
+  { icon: <FaRegSave />, label: "Đã lưu", href: "/saved" },
   { icon: <FaPlaceOfWorship />, label: "Marketplace", href: "marketplaces" },
   { icon: <FaGamepad />, label: "Chơi game", href: "/games" },
   { icon: <FaRegMessage />, label: "Messages", href: "/messages" },
