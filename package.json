@@ -12,6 +12,7 @@
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
     "@reduxjs/toolkit": "^2.9.0",
+    "@stomp/stompjs": "^7.1.1",
     "antd": "^5.26.6",
     "axios": "^1.11.0",
     "clsx": "^2.1.1",
@@ -29,6 +30,7 @@
     "react-markdown": "^10.1.0",
     "react-redux": "^9.2.0",
     "react-syntax-highlighter": "^15.6.6",
+    "sockjs-client": "^1.6.1",
     "yup": "^1.6.1"
   },
   "devDependencies": {
