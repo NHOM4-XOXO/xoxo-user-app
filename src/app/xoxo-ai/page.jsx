@@ -4,7 +4,7 @@ import ReactMarkdown from "react-markdown";
 import LoadingOverlay from "@/components/LoadingOverlay";
 
 const MAX_THREADS = 10;
-const WELCOME_MD = "Chào bạn 👋, mình là trợ lý **XoXo AI**.";
+const WELCOME_MD = "Chào bạn, mình là trợ lý **XoXo AI**.";
 
 // ====== UI helpers ======
 function Bubble({ role, children, innerRef }) {
