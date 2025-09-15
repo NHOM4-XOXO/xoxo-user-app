@@ -15,20 +15,14 @@ import {
   BsHeartFill,
 } from "react-icons/bs";
 import { HiOutlineQueueList } from "react-icons/hi2";
-<<<<<<< HEAD
-=======
 import YouTube from "react-youtube";
->>>>>>> e831905428471ab851098df54886f2b232d48738
 import VinylDisc from "./VinylDisc";
 import { useMergeState } from "../hooks/useMergeState";
 
 const MusicPlayer = () => {
   const audioRef = useRef(null);
-<<<<<<< HEAD
-=======
   const ytRef = useRef(null); 
 
->>>>>>> e831905428471ab851098df54886f2b232d48738
   const [state, setState] = useMergeState({
     isPlaying: false,
     currentTime: 0,
@@ -41,10 +35,7 @@ const MusicPlayer = () => {
     showPlaylist: false,
     favorites: new Set(),
     customSongs: [],
-<<<<<<< HEAD
-=======
     durationsBySrc: new Map(), 
->>>>>>> e831905428471ab851098df54886f2b232d48738
   });
 
   const {
@@ -59,15 +50,10 @@ const MusicPlayer = () => {
     showPlaylist,
     favorites,
     customSongs,
-<<<<<<< HEAD
-  } = state;
-
-=======
     durationsBySrc,
   } = state;
 
   // Playlist mặc định
->>>>>>> e831905428471ab851098df54886f2b232d48738
   const playlist = [
     {
       id: 1,
@@ -75,11 +61,7 @@ const MusicPlayer = () => {
       artist: "Thuỳ Dung",
       album: "France",
       duration: "3:20",
-<<<<<<< HEAD
-      cover: "/image/georgina.jpg",
-=======
       cover: "/image/BonjourVN.jpg",
->>>>>>> e831905428471ab851098df54886f2b232d48738
       src: "/musics/bonjoursVn.mp3",
     },
     {
@@ -100,15 +82,6 @@ const MusicPlayer = () => {
       cover: "/image/chillout.jpeg",
       src: "/musics/relax.mp3",
     },
-<<<<<<< HEAD
-  ];
-
-  // const currentTrack = playlist[currentSong];
-  const fullPlaylist = [...playlist, ...customSongs];
-  const currentTrack = fullPlaylist[currentSong];
-
-  useEffect(() => {
-=======
     // {
     //   id: 4,
     //   title: "Buzz",
@@ -221,18 +194,10 @@ const MusicPlayer = () => {
   // ===== Audio element bindings (cho file audio) =====
   useEffect(() => {
     if (isYT) return; // YouTube dùng effect riêng
->>>>>>> e831905428471ab851098df54886f2b232d48738
     const audio = audioRef.current;
     if (!audio) return;
 
     const updateTime = () => setState({ currentTime: audio.currentTime });
-<<<<<<< HEAD
-    const updateDuration = () => setState({ duration: audio.duration });
-    const onEnded = () => {
-      if (isRepeated) {
-        audio.currentTime = 0;
-        audio.play();
-=======
     const updateDurationFromMeta = () => {
       setState({ duration: audio.duration });
       if (currentTrack?.src && Number.isFinite(audio.duration)) {
@@ -245,42 +210,12 @@ const MusicPlayer = () => {
       if (isRepeated) {
         audio.currentTime = 0;
         audio.play().catch(() => {});
->>>>>>> e831905428471ab851098df54886f2b232d48738
       } else {
         handleNext();
       }
     };
 
     audio.addEventListener("timeupdate", updateTime);
-<<<<<<< HEAD
-    audio.addEventListener("loadedmetadata", updateDuration);
-    audio.addEventListener("ended", onEnded);
-
-    // Tự động phát khi chuyển bài
-    audio.play().catch(() => {});
-    setState({ isPlaying: true });
-
-    return () => {
-      audio.removeEventListener("timeupdate", updateTime);
-      audio.removeEventListener("loadedmetadata", updateDuration);
-      audio.removeEventListener("ended", onEnded);
-    };
-  }, [currentSong, isRepeated]);
-
-  const togglePlay = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    if (isPlaying) audio.pause();
-    else audio.play().catch(() => {});
-    setState({ isPlaying: !isPlaying });
-  };
-
-  const handleNext = () => {
-    setState({
-      currentSong: isShuffled
-        ? Math.floor(Math.random() * playlist.length)
-        : (currentSong + 1) % playlist.length,
-=======
     audio.addEventListener("loadedmetadata", updateDurationFromMeta);
     audio.addEventListener("ended", onEnded);
 
@@ -333,29 +268,19 @@ const MusicPlayer = () => {
       currentSong: isShuffled
         ? Math.floor(Math.random() * listLen)
         : (currentSong + 1) % listLen,
->>>>>>> e831905428471ab851098df54886f2b232d48738
     });
   };
 
   const handlePrevious = () => {
-<<<<<<< HEAD
-    setState({
-      currentSong: (currentSong - 1 + playlist.length) % playlist.length,
-=======
     if (!listLen) return;
     setState({
       currentSong: (currentSong - 1 + listLen) % listLen,
->>>>>>> e831905428471ab851098df54886f2b232d48738
     });
   };
 
   const handleSeek = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const percent = (e.clientX - rect.left) / rect.width;
-<<<<<<< HEAD
-    const newTime = percent * duration;
-    audioRef.current.currentTime = newTime;
-=======
     const newTime = percent * (duration || 0);
 
     if (isYT) {
@@ -367,22 +292,11 @@ const MusicPlayer = () => {
     if (audioRef.current) {
       audioRef.current.currentTime = newTime;
     }
->>>>>>> e831905428471ab851098df54886f2b232d48738
     setState({ currentTime: newTime });
   };
 
   const handleVolumeChange = (e) => {
     const newVolume = Number.parseFloat(e.target.value);
-<<<<<<< HEAD
-    setState({ volume: newVolume, isMuted: newVolume === 0 });
-    audioRef.current.volume = newVolume;
-  };
-
-  const toggleMute = () => {
-    const audio = audioRef.current;
-    if (isMuted) audio.volume = volume;
-    else audio.volume = 0;
-=======
 
     if (isYT) {
       // YouTube volume range 0–100
@@ -404,7 +318,6 @@ const MusicPlayer = () => {
     const audio = audioRef.current;
     if (!audio) return;
     if (isMuted) audio.volume = volume; else audio.volume = 0;
->>>>>>> e831905428471ab851098df54886f2b232d48738
     setState({ isMuted: !isMuted });
   };
 
@@ -423,11 +336,7 @@ const MusicPlayer = () => {
 
   const handleAddCustomSong = (song) => {
     if (customSongs.length >= 10) {
-<<<<<<< HEAD
-      // setShowUpgradePopup(true);
-=======
       // giới hạn demo
->>>>>>> e831905428471ab851098df54886f2b232d48738
       return;
     }
     setState({ customSongs: [...customSongs, song] });
@@ -437,16 +346,6 @@ const MusicPlayer = () => {
     <>
       <VinylDisc
         isPlaying={isPlaying}
-<<<<<<< HEAD
-        currentCover={currentTrack.cover}
-        showPlaylist={showPlaylist}
-        onAddMusic={handleAddCustomSong}
-      />
-
-      <div className="fixed bottom-0 left-0 right-0 z-50">
-        <div className="backdrop-blur-xl bg-white/10 dark:bg-neutral-900 border-t border-white/20 dark:border-white/10 shadow-2xl text-black dark:text-white">
-          <audio ref={audioRef} src={currentTrack.src} />
-=======
         currentCover={currentTrack?.cover}
         onAddMusic={handleAddCustomSong}
       />
@@ -489,41 +388,18 @@ const MusicPlayer = () => {
         <div className="backdrop-blur-xl bg-white/10 dark:bg-neutral-900 border-t border-white/20 dark:border-white/10 shadow-2xl text-black dark:text-white">
           {/* Audio element (chỉ dùng cho file audio) */}
           {!isYT && <audio ref={audioRef} src={currentTrack?.src || ""} />}
->>>>>>> e831905428471ab851098df54886f2b232d48738
 
           <div className="px-4 py-3 md:px-6">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 max-w-7xl mx-auto">
               {/* LEFT: Song Info */}
               <div className="flex items-center space-x-3 flex-1 min-w-0 md:max-w-sm">
                 <img
-<<<<<<< HEAD
-                  src={currentTrack.cover}
-                  alt={currentTrack.title}
-=======
                   src={currentTrack?.cover || "/image/default.jpg"}
                   alt={currentTrack?.title ?? "cover"}
->>>>>>> e831905428471ab851098df54886f2b232d48738
                   className="w-14 h-14 rounded-lg object-cover shadow-lg"
                 />
                 <div className="min-w-0 flex-1">
                   <h3 className="font-semibold truncate text-white dark:text-white">
-<<<<<<< HEAD
-                    {currentTrack.title}
-                  </h3>
-                  <p className="text-sm truncate text-gray-300 dark:text-gray-300">
-                    {currentTrack.artist}
-                  </p>
-                </div>
-                <button
-                  onClick={() => toggleFavorite(currentTrack.id)}
-                  className="text-xl hover:text-red-500 cursor-pointer text-red-700 hover:text-red-100"
-                >
-                  {favorites.has(currentTrack.id) ? (
-                    <BsHeartFill />
-                  ) : (
-                    <BsHeart />
-                  )}
-=======
                     {currentTrack?.title || "No track"}
                   </h3>
                   <p className="text-sm truncate text-gray-300 dark:text-gray-300">
@@ -535,63 +411,22 @@ const MusicPlayer = () => {
                   className="text-xl hover:text-red-500 cursor-pointer text-red-700 hover:text-red-100"
                 >
                   {currentTrack?.id && favorites.has(currentTrack.id) ? <BsHeartFill /> : <BsHeart />}
->>>>>>> e831905428471ab851098df54886f2b232d48738
                 </button>
               </div>
 
               {/* CENTER: Controls */}
               <div className="flex flex-col items-center space-y-2 flex-1 max-w-md mx-auto">
                 <div className="flex items-center space-x-4 ">
-<<<<<<< HEAD
-                  <button onClick={() => setIsShuffled(!isShuffled)}>
-                    <BsShuffle
-                      className={`text-white cursor-pointer w-5 h-5 ${
-                        isShuffled ? "text-blue-400" : "opacity-70"
-                      }`}
-                    />
-                  </button>
-                  <button
-                    onClick={handlePrevious}
-                    className="cursor-pointer text-white"
-                  >
-=======
                   <button onClick={() => setState({ isShuffled: !isShuffled })}>
                     <BsShuffle className={`text-white cursor-pointer w-5 h-5 ${isShuffled ? "text-blue-400" : "opacity-70"}`} />
                   </button>
                   <button onClick={handlePrevious} className="cursor-pointer text-white">
->>>>>>> e831905428471ab851098df54886f2b232d48738
                     <BsSkipStartFill className="w-6 h-6" />
                   </button>
                   <button
                     onClick={togglePlay}
                     className="p-2 bg-gray-100 dark:bg-gray-200 text-black rounded-full hover:bg-gray-200 dark:hover:bg-white cursor-pointer"
                   >
-<<<<<<< HEAD
-                    {isPlaying ? (
-                      <BsPauseFill className="w-6 h-6" />
-                    ) : (
-                      <BsPlayFill className="w-6 h-6" />
-                    )}
-                  </button>
-                  <button
-                    onClick={handleNext}
-                    className="cursor-pointer text-white "
-                  >
-                    <BsSkipEndFill className="w-6 h-6" />
-                  </button>
-                  <button onClick={() => setIsRepeated(!isRepeated)}>
-                    <BsRepeat
-                      className={`text-white cursor-pointer w-5 h-5 ${
-                        isRepeated ? "text-blue-400" : "opacity-70"
-                      }`}
-                    />
-                  </button>
-                </div>
-                <div className="flex items-center space-x-2 w-full">
-                  <span className="text-xs opacity-70 min-w-[35px] text-white">
-                    {formatTime(currentTime)}
-                  </span>
-=======
                     {isPlaying ? <BsPauseFill className="w-6 h-6" /> : <BsPlayFill className="w-6 h-6" />}
                   </button>
                   <button onClick={handleNext} className="cursor-pointer text-white ">
@@ -605,22 +440,12 @@ const MusicPlayer = () => {
                 {/* Progress */}
                 <div className="flex items-center space-x-2 w-full">
                   <span className="text-xs opacity-70 min-w-[35px] text-white">{formatTime(currentTime)}</span>
->>>>>>> e831905428471ab851098df54886f2b232d48738
                   <div
                     className="flex-1 h-1 bg-white/30 dark:bg-white/10 rounded-full cursor-pointer"
                     onClick={handleSeek}
                   >
                     <div
                       className="h-full bg-black dark:bg-blue-400 rounded-full "
-<<<<<<< HEAD
-                      style={{
-                        width: `${(currentTime / duration) * 100 || 0}%`,
-                      }}
-                    />
-                  </div>
-                  <span className="text-xs opacity-70 min-w-[35px] text-white">
-                    {formatTime(duration)}
-=======
                       style={{ width: `${(currentTime / (duration || 1)) * 100 || 0}%` }}
                     />
                   </div>
@@ -630,7 +455,6 @@ const MusicPlayer = () => {
                         ? duration
                         : durationsBySrc.get(currentTrack?.src) ?? currentTrack?.durationSec ?? duration
                     )}
->>>>>>> e831905428471ab851098df54886f2b232d48738
                   </span>
                 </div>
               </div>
@@ -638,15 +462,7 @@ const MusicPlayer = () => {
               {/* RIGHT: Volume + Playlist */}
               <div className="text-white flex items-center justify-end space-x-3 flex-1 min-w-[150px] md:max-w-sm">
                 <button onClick={toggleMute} className="cursor-pointer">
-<<<<<<< HEAD
-                  {isMuted || volume === 0 ? (
-                    <BsVolumeMuteFill />
-                  ) : (
-                    <BsVolumeUpFill />
-                  )}
-=======
                   {isMuted || volume === 0 ? <BsVolumeMuteFill /> : <BsVolumeUpFill />}
->>>>>>> e831905428471ab851098df54886f2b232d48738
                 </button>
                 <input
                   type="range"
@@ -657,11 +473,7 @@ const MusicPlayer = () => {
                   onChange={handleVolumeChange}
                   className="w-20 h-1 cursor-pointer"
                 />
-<<<<<<< HEAD
-                <button onClick={() => setShowPlaylist(!showPlaylist)}>
-=======
                 <button onClick={() => setState({ showPlaylist: !showPlaylist })}>
->>>>>>> e831905428471ab851098df54886f2b232d48738
                   <HiOutlineQueueList className="cursor-pointer w-5 h-5 text-white" />
                 </button>
               </div>
@@ -670,55 +482,6 @@ const MusicPlayer = () => {
 
           {/* Playlist */}
           {showPlaylist && (
-<<<<<<< HEAD
-            <div className="border-t border-white/10 dark:border-white/20 max-h-[40vh] md:max-h-[60vh] overflow-y-auto transition-all duration-300 ease-in-out rounded-t-xl backdrop-blur-md bg-white/10 dark:bg-white/5">
-              <div className="max-w-7xl mx-auto px-4 py-4 pt-4">
-                <h3 className="font-semibold mb-3 flex items-center text-black dark:text-gray-200">
-                  <BsMusicPlayerFill className="w-5 h-5 mr-2" /> Now Playing
-                </h3>
-                <div className="space-y-2">
-                  {playlist.map((song, index) => (
-                    <div
-                      key={song.id}
-                      onClick={() => setCurrentSong(index)}
-                      className={`flex items-center space-x-3 p-2 rounded-lg cursor-pointer transition ${
-                        index === currentSong
-                          ? "bg-white/20 dark:bg-white/10"
-                          : "hover:bg-white/10 dark:hover:bg-white/5"
-                      }`}
-                    >
-                      <img
-                        src={song.cover}
-                        alt={song.title}
-                        className="w-10 h-10 rounded object-cover"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium truncate text-black dark:text-white">
-                          {song.title}
-                        </p>
-                        <p className="text-sm opacity-70 truncate text-black dark:text-white">
-                          {song.artist}
-                        </p>
-                      </div>
-                      <span className="text-sm opacity-70 text-black dark:text-white">
-                        {song.duration}
-                      </span>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleFavorite(song.id);
-                        }}
-                        className="text-black dark:text-white"
-                      >
-                        {favorites.has(song.id) ? <BsHeartFill /> : <BsHeart />}
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-=======
   <div
     className="border-t border-white/10 dark:border-white/20
       max-h-[50vh] md:max-h-[60vh] overflow-y-auto
@@ -778,7 +541,6 @@ const MusicPlayer = () => {
   </div>
 )}
 
->>>>>>> e831905428471ab851098df54886f2b232d48738
         </div>
       </div>
     </>

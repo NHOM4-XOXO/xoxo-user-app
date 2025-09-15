@@ -1,11 +1,7 @@
 "use client";
 import { useRef, useEffect } from "react";
 import { FaUserFriends, FaStore } from "react-icons/fa";
-<<<<<<< HEAD
 import { FiSearch, FiMessageCircle, FiRefreshCw } from "react-icons/fi";
-=======
-import { FiSearch, FiMessageCircle } from "react-icons/fi";
->>>>>>> e831905428471ab851098df54886f2b232d48738
 import { IoMdHome, IoMdNotifications } from "react-icons/io";
 import { MdOndemandVideo } from "react-icons/md";
 import { RiGroup2Line } from "react-icons/ri";
@@ -18,27 +14,21 @@ import {
   sampleMessages,
   sampleNotifications,
 } from "../../../data/asideHeaderSampleData";
-<<<<<<< HEAD
-=======
 import sampleFriends from "../../../data/sampleFriends";
->>>>>>> e831905428471ab851098df54886f2b232d48738
 import NavItem from "../../../components/Navbar/NavItem";
 import ThemeToggle from "../../ThemeToggle";
 import ProfileDropdown from "../../../components/ProfileDropdown";
 import { BsMusicPlayerFill } from "react-icons/bs";
 import Link from "next/link";
-<<<<<<< HEAD
 import { useRouter } from "next/navigation";
 import { searchUsers } from "../../../features/searchApi";
 import useMergeState from "../../../hooks/useMergeState";
 
 export default function Header({ onContactClick }) {
   const router = useRouter();
-=======
-import useMergeState from "../../../hooks/useMergeState";
 
-export default function Header({ onContactClick }) {
->>>>>>> e831905428471ab851098df54886f2b232d48738
+
+
   const [state, setState] = useMergeState({
     showMessages: false,
     showNotifications: false,
@@ -46,7 +36,6 @@ export default function Header({ onContactClick }) {
     sidebarOpen: false,
     showMarketPlace: false,
     searchTerm: "",
-<<<<<<< HEAD
     results: {
       users: [],
       posts: [],
@@ -55,9 +44,6 @@ export default function Header({ onContactClick }) {
     },
     loading: false,
     showResults: false,
-=======
-    results: [],
->>>>>>> e831905428471ab851098df54886f2b232d48738
   });
 
   const {
@@ -68,18 +54,14 @@ export default function Header({ onContactClick }) {
     showMarketPlace,
     searchTerm,
     results,
-<<<<<<< HEAD
     loading,
     showResults,
-=======
->>>>>>> e831905428471ab851098df54886f2b232d48738
   } = state;
 
   const searchWrapperRef = useRef(null);
   const messageRef = useRef(null);
   const notiRef = useRef(null);
 
-<<<<<<< HEAD
   // Search functionality với API call
   useEffect(() => {
     const performSearch = async () => {
@@ -144,17 +126,6 @@ export default function Header({ onContactClick }) {
     // Debounce search - giảm thời gian xuống 200ms để responsive hơn
     const timeoutId = setTimeout(performSearch, 200);
     return () => clearTimeout(timeoutId);
-=======
-  useEffect(() => {
-    if (searchTerm.trim() === "") {
-      setState({ results: [] });
-      return;
-    }
-    const filtered = sampleFriends.filter((friend) =>
-      friend.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setState({ results: filtered });
->>>>>>> e831905428471ab851098df54886f2b232d48738
   }, [searchTerm]);
 
   useEffect(() => {
@@ -163,15 +134,11 @@ export default function Header({ onContactClick }) {
         searchWrapperRef.current &&
         !searchWrapperRef.current.contains(e.target)
       ) {
-<<<<<<< HEAD
         setState({ 
           searchTerm: "", 
           results: { users: [], posts: [], groups: [], totalResults: 0 },
           showResults: false 
         });
-=======
-        setState({ searchTerm: "", results: [] });
->>>>>>> e831905428471ab851098df54886f2b232d48738
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -205,7 +172,6 @@ export default function Header({ onContactClick }) {
     );
   };
 
-<<<<<<< HEAD
   const handleSearchSubmit = () => {
     if (searchTerm.trim()) {
       // Chuyển đến trang search với keyword
@@ -271,8 +237,6 @@ export default function Header({ onContactClick }) {
     window.location.reload();
   };
 
-=======
->>>>>>> e831905428471ab851098df54886f2b232d48738
   return (
     <header className="fixed top-0 left-0 right-0 bg-white dark:bg-fb-dark-secondary shadow z-50 px-2 sm:px-4 flex justify-between items-center">
       <div className="flex items-center space-x-2">
@@ -290,7 +254,6 @@ export default function Header({ onContactClick }) {
           ref={searchWrapperRef}
           className="bg-gray-100 dark:bg-fb-dark-tertiary sm:flex px-3 py-1 items-center space-x-2 rounded-full min-w-[240px] hidden relative"
         >
-<<<<<<< HEAD
           {/* Search Results Dropdown */}
           {showResults && (
             <div className="absolute top-14 bg-white dark:bg-fb-dark-secondary rounded-lg shadow-lg p-2 z-50 w-[350px] max-h-[400px] overflow-y-auto">
@@ -421,32 +384,6 @@ export default function Header({ onContactClick }) {
               <FiSearch className="w-4 h-4" />
             </button>
           </div>
-=======
-          {searchTerm && results.length > 0 && (
-            <div className="absolute top-14 bg-white dark:bg-fb-dark-secondary rounded shadow-md p-2 z-50 w-[250px]">
-              {results.map((friend) => (
-                <div
-                  key={friend.id}
-                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer"
-                >
-                  {friend.name}
-                </div>
-              ))}
-            </div>
-          )}
-
-          {searchTerm && results.length === 0 && (
-            <div className="absolute top-14 bg-white dark:bg-fb-dark-secondary rounded shadow-md p-2 z-50 w-[250px]">
-              <p className="text-gray-500 text-sm">Không tìm thấy kết quả.</p>
-            </div>
-          )}
-
-          <SearchBar
-            type="Search .... "
-            value={searchTerm}
-            onChange={(e) => setState({ searchTerm: e.target.value })}
-          />
->>>>>>> e831905428471ab851098df54886f2b232d48738
         </div>
       </div>
 
@@ -473,7 +410,6 @@ export default function Header({ onContactClick }) {
 
       <div className="flex space-x-1 sm:space-x-2 items-center relative">
         <ThemeToggle />
-<<<<<<< HEAD
         
         {/* Reload Button */}
         <button
@@ -484,8 +420,6 @@ export default function Header({ onContactClick }) {
           <FiRefreshCw className="text-xl" />
         </button>
 
-=======
->>>>>>> e831905428471ab851098df54886f2b232d48738
         <button
           ref={messageRef}
           className="p-2 bg-gray-100 dark:bg-fb-dark-tertiary hover:bg-fb-light-tertiary dark:hover:bg-gray-700 rounded-full relative"
@@ -515,33 +449,9 @@ export default function Header({ onContactClick }) {
               <SearchBar
                 value={searchTerm}
                 onChange={(e) => setState({ searchTerm: e.target.value })}
-<<<<<<< HEAD
                 onKeyDown={handleSearchKeyDown}
                 className="flex-1"
               />
-=======
-                className="flex-1"
-              />
-              {searchTerm && results.length > 0 && (
-                <div className="mt-2 bg-white dark:bg-fb-dark-secondary rounded shadow-md p-2 z-50">
-                  {results.map((friend) => (
-                    <div
-                      key={friend.id}
-                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer"
-                    >
-                      {friend.name}
-                    </div>
-                  ))}
-                </div>
-              )}
-              {searchTerm && results.length === 0 && (
-                <div className="mt-2 bg-white dark:bg-fb-dark-secondary rounded shadow-md p-2 z-50">
-                  <p className="text-gray-500 text-sm">
-                    Không tìm thấy kết quả.
-                  </p>
-                </div>
-              )}
->>>>>>> e831905428471ab851098df54886f2b232d48738
             </div>
             <button
               onClick={() => setState({ showSearch: false })}
