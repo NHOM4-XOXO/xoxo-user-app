@@ -11,8 +11,12 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
+<<<<<<< HEAD
     "@reduxjs/toolkit": "^2.9.0",
     "@stomp/stompjs": "^7.1.1",
+=======
+    "@reduxjs/toolkit": "^2.8.2",
+>>>>>>> e831905428471ab851098df54886f2b232d48738
     "antd": "^5.26.6",
     "axios": "^1.11.0",
     "clsx": "^2.1.1",
@@ -30,7 +34,11 @@
     "react-markdown": "^10.1.0",
     "react-redux": "^9.2.0",
     "react-syntax-highlighter": "^15.6.6",
+<<<<<<< HEAD
     "sockjs-client": "^1.6.1",
+=======
+    "react-youtube": "^10.1.0",
+>>>>>>> e831905428471ab851098df54886f2b232d48738
     "yup": "^1.6.1"
   },
   "devDependencies": {

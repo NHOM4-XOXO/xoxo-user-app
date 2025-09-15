@@ -46,4 +46,9 @@ next-env.d.ts
 *.p12
 certificates/
 
+<<<<<<< HEAD
 node_modules/
+=======
+node_modules/public/musics/*.mp3
+public/musics/*.mp3
+>>>>>>> e831905428471ab851098df54886f2b232d48738

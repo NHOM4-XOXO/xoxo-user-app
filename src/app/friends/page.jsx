@@ -1,7 +1,12 @@
 import SidebarFriend from "@/components/friends/SideFriends";
 import FriendRequestCard from "../../components/friends/FriendRequestCard";
+<<<<<<< HEAD
 
 const sampleFriends = [];
+=======
+import sampleFriends from "@/data/sampleFriends";
+
+>>>>>>> e831905428471ab851098df54886f2b232d48738
 export default function FriendsPage() {
   return (
     <div className="flex bg-fb-light-secondary min-h-screen dark:text-white dark:bg-black">

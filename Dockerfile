@@ -10,8 +10,11 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY . .
+<<<<<<< HEAD
 # If a base64 env file is provided at build time, write it
 
+=======
+>>>>>>> e831905428471ab851098df54886f2b232d48738
 RUN npm run build
 
 # Production image

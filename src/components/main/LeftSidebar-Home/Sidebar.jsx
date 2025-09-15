@@ -7,11 +7,18 @@ import {
   FaVideo,
   FaRegSave,
   FaPlaceOfWorship,
+<<<<<<< HEAD
   FaGamepad,
+=======
+>>>>>>> e831905428471ab851098df54886f2b232d48738
 } from "react-icons/fa";
 import { FaMeta, FaRegMessage } from "react-icons/fa6";
 import { IoTimer, IoClose } from "react-icons/io5";
 import { MdEvent } from "react-icons/md";
+<<<<<<< HEAD
+=======
+import { BsMusicPlayerFill } from "react-icons/bs";
+>>>>>>> e831905428471ab851098df54886f2b232d48738
 import Link from "next/link";
 
 const items = [
@@ -22,7 +29,11 @@ const items = [
   // { icon: <IoTimer />, label: "Kỷ niệm", href: "/" },
   { icon: <FaRegSave />, label: "Đã lưu", href: "/saved" },
   { icon: <FaPlaceOfWorship />, label: "Marketplace", href: "marketplaces" },
+<<<<<<< HEAD
   { icon: <FaGamepad />, label: "Chơi game", href: "/games" },
+=======
+  { icon: <BsMusicPlayerFill />, label: "Thư giãn", href: "/musics" },
+>>>>>>> e831905428471ab851098df54886f2b232d48738
   { icon: <FaRegMessage />, label: "Messages", href: "/messages" },
   { icon: <MdEvent />, label: "Sự kiện", href: "/events" },
 ];
@@ -46,13 +57,17 @@ export default function Sidebar() {
   const [showAll, setShowAll] = useState(false);
   const [showAllShortCut, setShowAllShortCut] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+<<<<<<< HEAD
   const [user, setUser] = useState(null);
   const [userName, setUserName] = useState("User");
   const [userAvatar, setUserAvatar] = useState("/image/georgina.jpg");
+=======
+>>>>>>> e831905428471ab851098df54886f2b232d48738
 
   const visibleItems = showAll ? items : items.slice(0, 4);
   const visibleShortcut = showAllShortCut ? shortcuts : shortcuts.slice(0, 4);
 
+<<<<<<< HEAD
   // Load user data from localStorage on client-side only
   useEffect(() => {
     try {
@@ -73,6 +88,8 @@ export default function Sidebar() {
     }
   }, []);
 
+=======
+>>>>>>> e831905428471ab851098df54886f2b232d48738
   useEffect(() => {
     const handleToggleSidebar = (event) => setIsOpen(event.detail);
     const handleResize = () => {
@@ -125,14 +142,22 @@ export default function Sidebar() {
         <div className="mb-4">
           <div className="flex items-center space-x-3 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg cursor-pointer">
             <Image
+<<<<<<< HEAD
               src={userAvatar}
+=======
+              src="/image/georgina.jpg"
+>>>>>>> e831905428471ab851098df54886f2b232d48738
               alt="User Avatar"
               width={40}
               height={40}
               className="rounded-full w-10 h-10 object-cover"
             />
             <span className="font-medium text-black dark:text-gray-100">
+<<<<<<< HEAD
               {userName}
+=======
+              Georgina Rodriguez
+>>>>>>> e831905428471ab851098df54886f2b232d48738
             </span>
           </div>
         </div>
@@ -230,4 +255,8 @@ export default function Sidebar() {
       </aside>
     </>
   );
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> e831905428471ab851098df54886f2b232d48738
