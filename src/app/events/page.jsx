@@ -9,13 +9,13 @@ import {
 // ------------------------
 // Mock data (frontend-only)
 // ------------------------
-const ORGS = ["Thể Thao", "Kỹ Thuật", "Game", "Âm Nhạc", "Sức Khoẻ", "Điện Ảnh"];
-const TAGS = ["tất cả", "F1", "esports", "bóng đá", "Phim", "sức khoẻ"];
+const ORGS = ["Thể Thao", "Kỹ Thuật", "Game", "Âm Nhạc", "Sức Khoẻ",];
+const TAGS = ["tất cả", "F1", "esports", "bóng đá", "Phim", "sức khoẻ","bóng rổ"];
 
 const INITIAL_EVENTS = [
   // thể Thao
-  { id: "e101", org: "thể Thao", title: "Quarterly All-hands", desc: "Thể Thao updates & Q&A với MU.", whenStart: "2025-10-11T16:00:00", whenEnd: "2025-10-11T17:00:00", where: "Kênh Thể Thao 14", tags: ["bóng đá"], capacity: 300 },
-  { id: "e102", org: "thể Thao", title: "R&D Lightning Talks", desc: "Chia sẻ nhanh 5–7 phút từ các nhóm R&D.", whenStart: "2025-10-20T15:00:00", whenEnd: "2025-10-20T16:30:00", where: "Room D2", tags: ["esports"], capacity: 80 },
+  { id: "e101", org: "thể Thao", title: "Bình luận thể thao", desc: "MU & MC", whenStart: "2025-10-11T16:00:00", whenEnd: "2025-10-11T17:00:00", where: "Kênh Thể Thao 14", tags: ["bóng đá"], capacity: 300 },
+  { id: "e102", org: "thể Thao", title: "Ngôi sao bóng rổ Linsanity chính thức giải nghệ", desc: "Bóng rổ .", whenStart: "2025-10-20T15:00:00", whenEnd: "2025-10-20T16:30:00", where: "Room D2", tags: ["bóng rổ"], capacity: 80 },
 
   // Kỹ Thuật
   { id: "e201", org: "Kỹ Thuật", title: "Physics Midterm", desc: "Hackathon • Class KTC", whenStart: "2025-10-03T10:00:00", whenEnd: "2025-10-03T11:30:00", where: "Room 403", tags: ["exam"], capacity: 60 },
