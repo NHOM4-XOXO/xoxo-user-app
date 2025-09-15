@@ -5,6 +5,7 @@ import MusicPlayer from "./components/MusicPlayer";
 export default function Page() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+<<<<<<< HEAD
       
 
       {/* <div className="max-w-4xl mx-auto py-10 px-4"> */}
@@ -14,6 +15,8 @@ export default function Page() {
       {/* </p> */}
       {/* Add more layout here in the future, if team wanna scale project */}
       {/* </div> */}
+=======
+>>>>>>> e831905428471ab851098df54886f2b232d48738
       <MusicPlayer />
     </main>
   );

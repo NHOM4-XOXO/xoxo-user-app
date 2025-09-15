@@ -6,9 +6,12 @@ import Link from "next/link";
 
 export default function ProfileDropdown() {
   const [isOpen, setIsOpen] = useState(false);
+<<<<<<< HEAD
   const [user, setUser] = useState(null);
   const [userName, setUserName] = useState("User");
   const [userAvatar, setUserAvatar] = useState("/image/georgina.jpg");
+=======
+>>>>>>> e831905428471ab851098df54886f2b232d48738
   const menuRef = useRef(null);
 
   const handleClickOutside = (e) => {
@@ -16,6 +19,7 @@ export default function ProfileDropdown() {
       setIsOpen(false);
     }
   };
+<<<<<<< HEAD
   useEffect(() => {
     try {
       const authData = localStorage.getItem("auth");
@@ -34,6 +38,9 @@ export default function ProfileDropdown() {
       setUserAvatar("/image/georgina.jpg");
     }
   }, []);
+=======
+
+>>>>>>> e831905428471ab851098df54886f2b232d48738
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -46,7 +53,11 @@ export default function ProfileDropdown() {
         onClick={() => setIsOpen(!isOpen)}
       >
         <Image
+<<<<<<< HEAD
           src={userAvatar || "/image/georgina.jpg"}
+=======
+          src="/image/georgina.jpg"
+>>>>>>> e831905428471ab851098df54886f2b232d48738
           alt="Avatar"
           width={32}
           height={32}
