@@ -11,10 +11,10 @@ const baseQuery = fetchBaseQuery({
     baseUrl: process.env.NEXT_PUBLIC_API_URL || "https://xoxo.id.vn",
     prepareHeaders: (headers) => {
         const token = Cookies.get("token");
-        console.log("Chat API - Token found:", !!token);
+        
         if (token) {
             headers.set("Authorization", `Bearer ${token}`);
-            console.log("Chat API - Authorization header set");
+            
         }
         headers.set("Content-Type", "application/json");
         return headers;
@@ -30,7 +30,7 @@ export const chatApi = createApi({
         // Get or create direct chat with another user
         getOrCreateDirectChat: builder.mutation({
             query: (otherUserId) => {
-                console.log('Chat API - Creating direct chat with user:', otherUserId);
+               
                 return {
                     url: `/api/v1/chat/direct/${otherUserId}`,
                     method: "POST",
@@ -38,14 +38,12 @@ export const chatApi = createApi({
             },
             invalidatesTags: ["ChatRoom"],
             transformResponse: (response) => {
-                console.log('Chat API - Full response:', response);
+               
                 // Return the data field if it exists, otherwise return the whole response
                 return response.data || response;
             },
             transformErrorResponse: (response, meta, arg) => {
-                console.error('Chat API - Error response:', response);
-                console.error('Chat API - Error meta:', meta);
-                console.error('Chat API - Error arg:', arg);
+              
                 return response;
             },
         }),
@@ -58,23 +56,10 @@ export const chatApi = createApi({
             }),
             providesTags: ["ChatRoom"],
             transformResponse: (response) => {
-                console.log('Chat API - getChatRooms full response:', response);
-                console.log('Chat API - getChatRooms data:', response.data);
-                
                 // API returns array directly, not wrapped in content
                 if (Array.isArray(response.data)) {
-                    console.log('Chat API - Found', response.data.length, 'chat rooms');
-                    response.data.forEach((room, index) => {
-                        console.log(`Chat API - Room ${index + 1}:`, {
-                            id: room.id,
-                            name: room.name,
-                            createdBy: room.createdBy,
-                            participantIds: room.participantIds
-                        });
-                    });
                     return response.data;
                 }
-                
                 return response.data;
             },
         }),
@@ -151,17 +136,8 @@ export const chatApi = createApi({
                 url: `/api/v1/chat/users/${userId}`,
                 method: "GET",
             }),
-            transformResponse: (response) => {
-                console.log('Chat User API - Full response:', response);
-                console.log('Chat User API - Data:', response.data);
-                return response.data;
-            },
-            transformErrorResponse: (response, meta, arg) => {
-                console.error('Chat User API - Error response:', response);
-                console.error('Chat User API - Error meta:', meta);
-                console.error('Chat User API - Error arg:', arg);
-                return response;
-            },
+            transformResponse: (response) => response.data,
+            transformErrorResponse: (response) => response,
         }),
 
         // Get current user's profile (to reliably obtain current user ID)
@@ -170,10 +146,7 @@ export const chatApi = createApi({
                 url: `/api/user/profile`,
                 method: "GET",
             }),
-            transformResponse: (response) => {
-                console.log('Profile API - Data:', response.data);
-                return response.data;
-            },
+            transformResponse: (response) => response.data,
         }),
     }),
 });
