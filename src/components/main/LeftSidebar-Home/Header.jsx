@@ -25,6 +25,9 @@ import { searchUsers } from "../../../features/searchApi";
 import useMergeState from "../../../hooks/useMergeState";
 
 export default function Header({ onContactClick }) {
+  const router = useRouter();
+
+
 
   const [state, setState] = useMergeState({
     showMessages: false,
