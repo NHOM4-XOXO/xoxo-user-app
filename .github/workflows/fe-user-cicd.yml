@@ -27,19 +27,6 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Create .env.local (optional, for build-time)
-        run: |
-          if [ -n "$FRONTEND_ENV_FILE_BASE64" ]; then
-            echo "Writing .env.local from secret"
-            echo "$FRONTEND_ENV_FILE_BASE64" | base64 -d > .env.local
-          else
-            echo "Generating .env.local from secrets (single var)"
-            {
-              echo "NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}";
-            } > .env.local
-          fi
-        env:
-          FRONTEND_ENV_FILE_BASE64: ${{ secrets.FRONTEND_ENV_FILE_BASE64 }}
 
       - name: Docker login
         uses: docker/login-action@v3
@@ -56,8 +43,6 @@ jobs:
           tags: |
             ${{ env.IMAGE_NAME }}:latest
             ${{ env.IMAGE_NAME }}:${{ github.sha }}
-          build-args: |
-            ENV_FILE_BASE64=${{ secrets.FRONTEND_ENV_FILE_BASE64 }}
 
   deploy-ec2:
     needs: build-and-push
