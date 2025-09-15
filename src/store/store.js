@@ -25,7 +25,7 @@ export const store = configureStore({
             userApi.middleware, 
             postApi.middleware, 
             mediaApi.middleware, 
-            postReactionApi.middleware, 
+            postReactionApi.middleware,
             chatApi.middleware,
             friendshipApi.middleware
         ),

@@ -122,3 +122,4 @@ export const generateDirectChatName = (otherUser) => {
         return otherUser.username || otherUser.email || "Unknown User";
     }
 };
+

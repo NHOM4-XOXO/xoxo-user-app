@@ -1,0 +1,76 @@
+name: FE User CI/CD
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'xoxo-user-app/**'
+  workflow_dispatch:
+
+env:
+  APP_DIR: xoxo-user-app
+  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/xoxo-user-app
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.APP_DIR }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Create .env.local (from base64 secret)
+        if: secrets.FRONTEND_ENV_FILE_BASE64 != ''
+        run: |
+          echo "$FRONTEND_ENV_FILE_BASE64" | base64 -d > .env.local
+        env:
+          FRONTEND_ENV_FILE_BASE64: ${{ secrets.FRONTEND_ENV_FILE_BASE64 }}
+
+      - name: Docker login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ env.APP_DIR }}
+          file: ${{ env.APP_DIR }}/Dockerfile
+          push: true
+          tags: |
+            ${{ env.IMAGE_NAME }}:latest
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
+          build-args: |
+            ENV_FILE_BASE64=${{ secrets.FRONTEND_ENV_FILE_BASE64 }}
+
+  deploy-ec2:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy on EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            set -e
+            docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/xoxo-user-app:latest
+            if [ "$(docker ps -aq -f name=xoxo-user-app)" ]; then
+              docker rm -f xoxo-user-app || true
+            fi
+            docker run -d --name xoxo-user-app \
+              -p 3000:3000 \
+              --restart unless-stopped \
+              ${{ secrets.DOCKERHUB_USERNAME }}/xoxo-user-app:latest
+

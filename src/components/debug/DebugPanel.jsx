@@ -11,6 +11,12 @@ import SimpleApiTest from "./SimpleApiTest";
 import ChatDebug from "./ChatDebug";
 import WebSocketOnlyTest from "./WebSocketOnlyTest";
 import ChatRoomsTest from "./ChatRoomsTest";
+import ChatRoomNamesTest from "./ChatRoomNamesTest";
+import RefreshTest from "./RefreshTest";
+import ApiResponseTest from "./ApiResponseTest";
+import ChatRoomAnalysis from "./ChatRoomAnalysis";
+import SimpleChatNameTest from "./SimpleChatNameTest";
+import UserApiTest from "./UserApiTest";
 
 export default function DebugPanel() {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,6 +26,12 @@ export default function DebugPanel() {
     flow: { name: "Complete Flow", component: CompleteFlowTest },
     websocket: { name: "WebSocket Only", component: WebSocketOnlyTest },
     chatrooms: { name: "Chat Rooms", component: ChatRoomsTest },
+    names: { name: "Chat Names", component: ChatRoomNamesTest },
+    refresh: { name: "Refresh Test", component: RefreshTest },
+    apiresponse: { name: "API Response", component: ApiResponseTest },
+    analysis: { name: "Chat Room Analysis", component: ChatRoomAnalysis },
+    simplename: { name: "Simple Chat Name", component: SimpleChatNameTest },
+    userapi: { name: "User API Test", component: UserApiTest },
     env: { name: "Environment", component: EnvTest },
     users: { name: "User ID Test", component: UserIdTest },
     api: { name: "API Debug", component: ApiDebugTest },

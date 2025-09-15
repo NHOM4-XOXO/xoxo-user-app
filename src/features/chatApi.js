@@ -57,7 +57,26 @@ export const chatApi = createApi({
                 method: "GET",
             }),
             providesTags: ["ChatRoom"],
-            transformResponse: (response) => response.data,
+            transformResponse: (response) => {
+                console.log('Chat API - getChatRooms full response:', response);
+                console.log('Chat API - getChatRooms data:', response.data);
+                
+                // API returns array directly, not wrapped in content
+                if (Array.isArray(response.data)) {
+                    console.log('Chat API - Found', response.data.length, 'chat rooms');
+                    response.data.forEach((room, index) => {
+                        console.log(`Chat API - Room ${index + 1}:`, {
+                            id: room.id,
+                            name: room.name,
+                            createdBy: room.createdBy,
+                            participantIds: room.participantIds
+                        });
+                    });
+                    return response.data;
+                }
+                
+                return response.data;
+            },
         }),
 
         // Get messages for a chat room
@@ -125,6 +144,37 @@ export const chatApi = createApi({
             }),
             invalidatesTags: ["ChatRoom"],
         }),
+
+        // Get user info by ID (for participant names)
+        getUserById: builder.query({
+            query: (userId) => ({
+                url: `/api/v1/chat/users/${userId}`,
+                method: "GET",
+            }),
+            transformResponse: (response) => {
+                console.log('Chat User API - Full response:', response);
+                console.log('Chat User API - Data:', response.data);
+                return response.data;
+            },
+            transformErrorResponse: (response, meta, arg) => {
+                console.error('Chat User API - Error response:', response);
+                console.error('Chat User API - Error meta:', meta);
+                console.error('Chat User API - Error arg:', arg);
+                return response;
+            },
+        }),
+
+        // Get current user's profile (to reliably obtain current user ID)
+        getCurrentUserProfile: builder.query({
+            query: () => ({
+                url: `/api/user/profile`,
+                method: "GET",
+            }),
+            transformResponse: (response) => {
+                console.log('Profile API - Data:', response.data);
+                return response.data;
+            },
+        }),
     }),
 });
 
@@ -138,4 +188,6 @@ export const {
     useGetUnreadMessageCountQuery,
     useDeleteMessageMutation,
     useLeaveChatRoomMutation,
+    useGetUserByIdQuery,
+    useGetCurrentUserProfileQuery,
 } = chatApi;

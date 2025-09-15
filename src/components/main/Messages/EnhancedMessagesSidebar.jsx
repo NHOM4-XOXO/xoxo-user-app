@@ -5,7 +5,12 @@ import Image from "next/image";
 import { Search, MoreHorizontal, Edit, Loader2 } from "lucide-react";
 import ScrollableContainer from "@/components/common/ScrollableContainer";
 import { useChatList } from "@/hooks/useChatList";
+import { useParticipantInfo } from "@/hooks/useParticipantInfo";
+import { useGetUserByIdQuery, useGetCurrentUserProfileQuery } from "@/features/chatApi";
 import FriendsListForChat from "./FriendsListForChat";
+import ChatRoomItem from "./ChatRoomItem";
+import ChatRoomWithUserInfo from "./ChatRoomWithUserInfo";
+import Cookies from "js-cookie";
 
 export default function EnhancedMessagesSidebar({
   selectedContact,
@@ -37,22 +42,89 @@ export default function EnhancedMessagesSidebar({
     chatRoom.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Get current user ID from token
+  const getCurrentUserId = () => {
+    try {
+      // Prefer cached/profile value
+      const cached = typeof window !== 'undefined' ? window.__currentUserId || localStorage.getItem('currentUserId') : null;
+      if (cached) return Number(cached);
+
+      const token = Cookies.get('token');
+      if (!token) return null;
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.userId || payload.id || null;
+    } catch (error) {
+      console.error('Failed to get current user id:', error);
+      return null;
+    }
+  };
+
+  // Fetch current profile once to cache reliable ID
+  const { data: profileData } = useGetCurrentUserProfileQuery();
+  if (profileData?.id && typeof window !== 'undefined') {
+    if (!window.__currentUserId) {
+      window.__currentUserId = profileData.id;
+      localStorage.setItem('currentUserId', String(profileData.id));
+    }
+  }
+
   // Convert chat room to contact format for compatibility
   const convertChatRoomToContact = (chatRoom) => {
-    // For direct chats, try to get the other participant's info
-    const otherParticipant = chatRoom.participants?.find(
-      (p) => p.id !== chatRoom.currentUserId
-    );
+    console.log('Converting chat room to contact:', chatRoom);
+    
+    const currentUserId = getCurrentUserId();
+    console.log('Current user ID from token:', currentUserId);
+    console.log('Chat room createdBy:', chatRoom.createdBy);
+    console.log('Chat room participantIds:', chatRoom.participantIds);
+    
+    // For direct chats, find the other participant ID from participantIds
+    let otherParticipantId = null;
+    if (chatRoom.participantIds && Array.isArray(chatRoom.participantIds)) {
+      otherParticipantId = chatRoom.participantIds.find(id => id !== currentUserId);
+    }
+    
+    console.log('Other participant ID:', otherParticipantId);
+    
+    // Determine display name based on participant analysis
+    let displayName = chatRoom.name; // Default fallback
+    
+    if (chatRoom.type === 'DIRECT' && otherParticipantId) {
+      // For direct chats, we need to determine the correct name
+      // The chatRoom.name should contain the other participant's name
+      // But we need to verify this is correct
+      
+      if (chatRoom.createdBy === currentUserId) {
+        // Current user created the chat
+        // chatRoom.name should be the other participant's name
+        displayName = chatRoom.name;
+        console.log('Current user is creator, chat room name should be other participant:', displayName);
+      } else {
+        // Other user created the chat
+        // chatRoom.name should be the creator's name (other participant)
+        displayName = chatRoom.name;
+        console.log('Other user is creator, chat room name should be creator:', displayName);
+      }
+      
+      // Additional validation: if chatRoom.name seems to be current user's name, 
+      // we might need to fetch the other participant's name
+      if (displayName && displayName.includes('Nguyễn Hoàng Tuấn')) {
+        console.log('⚠️ Chat room name appears to be current user name, might need to fetch other participant name');
+        // For now, keep the name but log the issue
+      }
+    }
+
+    console.log('Final display name:', displayName);
 
     return {
       id: chatRoom.id,
-      name: chatRoom.name,
-      avatar: otherParticipant?.avatarUrl || "/default-avatar.jpg",
-      isOnline: otherParticipant?.isOnline || false,
+      name: displayName,
+      avatar: "/default-avatar.jpg", // Default avatar for now
+      isOnline: false, // Default offline status
       lastSeen: chatRoom.lastMessageAt,
       lastMessage: chatRoom.lastMessage?.content || "",
       unreadCount: chatRoom.unreadCount || 0,
       chatRoom: chatRoom, // Include full chat room data
+      userId: otherParticipantId, // Include other participant ID for chat initialization
     };
   };
 
@@ -221,46 +293,16 @@ export default function EnhancedMessagesSidebar({
                 const contact = convertChatRoomToContact(chatRoom);
                 
                 return (
-                  <div
+                  <ChatRoomWithUserInfo
                     key={chatRoom.id}
-                    onClick={() => handleChatRoomClick(chatRoom)}
-                    className={`flex items-center p-3 rounded-lg cursor-pointer transition-colors ${
-                      selectedContact?.id === contact.id
-                        ? "bg-[#EBF5FF] dark:bg-[#24313E]"
-                        : "hover:bg-fb-light-tertiary dark:hover:bg-fb-dark-quaternary"
-                    }`}
-                  >
-                    <div className="relative">
-                      <Image
-                        src={contact.avatar}
-                        alt={contact.name}
-                        width={48}
-                        height={48}
-                        className="object-cover rounded-full"
-                      />
-                      {contact.isOnline && (
-                        <div className="absolute w-3 h-3 bg-green-500 border-2 border-white rounded-full -bottom-1 -right-1 dark:border-gray-800"></div>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0 ml-3">
-                      <div className="flex items-center justify-between">
-                        <h3 className="font-semibold truncate">{contact.name}</h3>
-                        <span className="text-xs text-gray-500">
-                          {formatLastMessageTime(contact.lastSeen)}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm text-gray-600 truncate dark:text-gray-400 flex-1">
-                          {contact.lastMessage || "Chưa có tin nhắn"}
-                        </p>
-                        {contact.unreadCount > 0 && (
-                          <div className="ml-2 px-2 py-1 bg-blue-600 text-white text-xs rounded-full min-w-[20px] text-center">
-                            {contact.unreadCount > 99 ? "99+" : contact.unreadCount}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                    chatRoom={chatRoom}
+                    isSelected={selectedContact?.id === contact.id}
+                    onSelect={(chatRoom) => {
+                      const contact = convertChatRoomToContact(chatRoom);
+                      onSelectContact(contact);
+                    }}
+                    onMarkAsRead={markChatAsRead}
+                  />
                 );
               })}
           </div>

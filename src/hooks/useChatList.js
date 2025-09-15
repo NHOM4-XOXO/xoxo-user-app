@@ -15,24 +15,68 @@ export const useChatList = () => {
         refetch: refetchChatRooms,
     } = useGetChatRoomsQuery({ page: 0, size: 50 });
 
+    // Get current user ID from profile API and cache it (fallback to JWT decode)
+    const getCurrentUserId = useCallback(() => {
+        try {
+            const cached = typeof window !== 'undefined' ? window.__currentUserId || localStorage.getItem('currentUserId') : null;
+            if (cached) return Number(cached);
+
+            const token = Cookies.get('token');
+            if (!token) {
+                console.log('No token found in cookies');
+                return null;
+            }
+
+            // Fallback decode if profile not yet fetched
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const fallbackId = payload.userId || payload.id;
+            return fallbackId ?? null;
+        } catch (error) {
+            console.error('Failed to get current user id:', error);
+            return null;
+        }
+    }, []);
+
     // Update local chat rooms when API data changes
     useEffect(() => {
         console.log('Chat rooms API response:', chatRoomsData);
-        if (chatRoomsData?.content) {
-            console.log('Chat rooms loaded from API:', chatRoomsData.content);
+        if (Array.isArray(chatRoomsData)) {
+            console.log('Chat rooms loaded from API (array):', chatRoomsData);
+            setChatRooms(chatRoomsData);
+        } else if (chatRoomsData?.content) {
+            console.log('Chat rooms loaded from API (content):', chatRoomsData.content);
             setChatRooms(chatRoomsData.content);
-        } else if (chatRoomsData) {
-            console.log('Chat rooms data structure:', chatRoomsData);
-            // Try different possible data structures
-            if (Array.isArray(chatRoomsData)) {
-                console.log('Chat rooms is array:', chatRoomsData);
-                setChatRooms(chatRoomsData);
-            } else if (chatRoomsData.data) {
-                console.log('Chat rooms in data field:', chatRoomsData.data);
-                setChatRooms(chatRoomsData.data);
-            }
+        } else if (chatRoomsData?.data) {
+            console.log('Chat rooms loaded from API (data):', chatRoomsData.data);
+            setChatRooms(chatRoomsData.data);
         }
     }, [chatRoomsData]);
+
+    // Handle real-time chat list updates
+    const handleChatListUpdate = useCallback((message) => {
+        const currentUserId = getCurrentUserId();
+        console.log('Handling chat list update:', message, 'Current user ID:', currentUserId);
+        
+        setChatRooms(prev => {
+            return prev.map(room => {
+                if (room.id === message.chatRoomId) {
+                    // Update last message info
+                    return {
+                        ...room,
+                        lastMessage: {
+                            content: message.content,
+                            sentAt: message.sentAt || new Date().toISOString(),
+                            senderId: message.senderId,
+                        },
+                        lastMessageAt: message.sentAt || new Date().toISOString(),
+                        unreadCount: message.senderId !== currentUserId ? 
+                            (room.unreadCount || 0) + 1 : room.unreadCount,
+                    };
+                }
+                return room;
+            });
+        });
+    }, [getCurrentUserId]);
 
     // Connect to WebSocket for real-time updates
     const connectWebSocket = useCallback(async () => {
@@ -50,30 +94,7 @@ export const useChatList = () => {
             console.error('Failed to connect to WebSocket for chat list:', error);
             setIsConnected(false);
         }
-    }, []);
-
-    // Handle real-time chat list updates
-    const handleChatListUpdate = useCallback((message) => {
-        setChatRooms(prev => {
-            return prev.map(room => {
-                if (room.id === message.chatRoomId) {
-                    // Update last message info
-                    return {
-                        ...room,
-                        lastMessage: {
-                            content: message.content,
-                            sentAt: message.sentAt || new Date().toISOString(),
-                            senderId: message.senderId,
-                        },
-                        lastMessageAt: message.sentAt || new Date().toISOString(),
-                        unreadCount: message.senderId !== getCurrentUserId() ? 
-                            (room.unreadCount || 0) + 1 : room.unreadCount,
-                    };
-                }
-                return room;
-            });
-        });
-    }, []);
+    }, [handleChatListUpdate]);
 
     // Add new chat room to list
     const addChatRoom = useCallback((newChatRoom) => {
@@ -108,21 +129,6 @@ export const useChatList = () => {
                 return room;
             });
         });
-    }, []);
-
-    // Get current user ID from JWT token
-    const getCurrentUserId = useCallback(() => {
-        try {
-            const token = Cookies.get('token');
-            if (!token) return null;
-            
-            // Decode JWT token to get user ID
-            const payload = JSON.parse(atob(token.split('.')[1]));
-            return payload.sub || payload.userId || null;
-        } catch (error) {
-            console.error('Failed to decode token:', error);
-            return null;
-        }
     }, []);
 
     // Connect to WebSocket on mount
