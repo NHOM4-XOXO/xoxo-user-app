@@ -2,7 +2,7 @@ name: FE User CI/CD
 
 on:
   push:
-    branches: [ main ]
+    branches: [ dev ]
     paths:
       - 'xoxo-user-app/**'
   workflow_dispatch:
