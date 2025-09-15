@@ -28,9 +28,13 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Create .env.local (from base64 secret)
-        if: ${{ secrets.FRONTEND_ENV_FILE_BASE64 != '' }}
         run: |
-          echo "$FRONTEND_ENV_FILE_BASE64" | base64 -d > .env.local
+          if [ -n "$FRONTEND_ENV_FILE_BASE64" ]; then
+            echo "Writing .env.local from secret"
+            echo "$FRONTEND_ENV_FILE_BASE64" | base64 -d > .env.local
+          else
+            echo "FRONTEND_ENV_FILE_BASE64 not set - skipping .env.local creation"
+          fi
         env:
           FRONTEND_ENV_FILE_BASE64: ${{ secrets.FRONTEND_ENV_FILE_BASE64 }}
 
