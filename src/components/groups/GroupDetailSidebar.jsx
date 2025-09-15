@@ -1,7 +1,6 @@
 "use client";
 
 import { HEADER_HEIGHT } from "@/constants";
-<<<<<<< HEAD
 let user = localStorage.getItem("auth");
 user = JSON.parse(user);
 if(user && user.profile){
@@ -11,8 +10,6 @@ if(user && user.profile){
   let userName = "User";
   let userAvatar = "/image/georgina.jpg";
 }
-=======
->>>>>>> e831905428471ab851098df54886f2b232d48738
 
 export default function GroupDetailSidebar({ group }) {
   const quickActions = [
@@ -101,11 +98,7 @@ export default function GroupDetailSidebar({ group }) {
             {
               name: "Trần Thị B",
               role: "Người kiểm duyệt",
-<<<<<<< HEAD
               avatar: userAvatar || "/image/georgina.jpg",
-=======
-              avatar: "/image/georgina.jpg",
->>>>>>> e831905428471ab851098df54886f2b232d48738
             },
           ].map((person, index) => (
             <div key={index} className="flex items-center space-x-3">
