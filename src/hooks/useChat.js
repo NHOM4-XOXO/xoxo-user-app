@@ -1,16 +1,16 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useGetOrCreateDirectChatMutation, useGetChatMessagesQuery, useSendMessageMutation } from '@/features/chatApi';
+import { useGetOrCreateDirectChatMutation, useGetChatMessagesQuery } from '@/features/chatApi';
 import websocketService from '@/services/websocketService';
 
-export const useChat = (otherUserId = null) => {
-    const [currentChatRoom, setCurrentChatRoom] = useState(null);
+export const useChat = (otherUserId = null, existingChatRoom = null) => {
+    const [currentChatRoom, setCurrentChatRoom] = useState(existingChatRoom);
     const [messages, setMessages] = useState([]);
     const [isConnected, setIsConnected] = useState(false);
     const [typingUsers, setTypingUsers] = useState([]);
+    const [isSendingMessage, setIsSendingMessage] = useState(false);
     const subscriptionRef = useRef(null);
 
     const [getOrCreateDirectChat, { isLoading: isCreatingChat }] = useGetOrCreateDirectChatMutation();
-    const [sendMessage, { isLoading: isSendingMessage }] = useSendMessageMutation();
     
     const {
         data: messagesData,
@@ -30,16 +30,48 @@ export const useChat = (otherUserId = null) => {
 
     // Initialize chat room
     const initializeChat = useCallback(async (userId) => {
+        if (!userId) {
+            console.warn('No userId provided to initializeChat');
+            return null;
+        }
+        
         try {
             console.log('Creating chat room for user:', userId);
             const result = await getOrCreateDirectChat(userId).unwrap();
-            console.log('Chat room created:', result);
-            setCurrentChatRoom(result);
-            return result;
+            console.log('Chat room created successfully:', result);
+            
+            // Handle different response structures
+            const chatRoom = result.data || result;
+            
+            if (chatRoom && chatRoom.id) {
+                setCurrentChatRoom(chatRoom);
+                return chatRoom;
+            } else {
+                console.error('Invalid chat room response:', result);
+                return null;
+            }
         } catch (error) {
             console.error('Failed to create/get chat room:', error);
-            console.error('Error details:', error.data || error.message);
-            // Don't throw error, just log it and continue
+            console.error('Error status:', error?.status);
+            console.error('Error data:', error?.data);
+            console.error('Error message:', error?.message);
+            console.error('Error type:', typeof error);
+            console.error('Error keys:', Object.keys(error || {}));
+            
+            // Try to extract meaningful error info
+            let errorMessage = 'Unknown error';
+            if (error?.data?.message) {
+                errorMessage = error.data.message;
+            } else if (error?.message) {
+                errorMessage = error.message;
+            } else if (error?.status) {
+                errorMessage = `HTTP ${error.status}`;
+            }
+            
+            console.error('Processed error message:', errorMessage);
+            
+            // Set a default error state
+            setCurrentChatRoom(null);
             return null;
         }
     }, [getOrCreateDirectChat]);
@@ -66,16 +98,28 @@ export const useChat = (otherUserId = null) => {
             }
 
             const subscription = await websocketService.subscribeToRoom(chatRoomId, (message) => {
+                console.log('Received real-time message:', message);
+                
                 setMessages(prev => {
-                    // Avoid duplicates
-                    if (prev.some(msg => msg.id === message.id)) {
+                    // Avoid duplicates by checking both id and content+timestamp
+                    const isDuplicate = prev.some(msg => 
+                        msg.id === message.id || 
+                        (msg.content === message.content && 
+                         Math.abs(new Date(msg.sentAt || msg.createdAt) - new Date(message.sentAt || message.createdAt)) < 1000)
+                    );
+                    
+                    if (isDuplicate) {
+                        console.log('Duplicate message detected, skipping');
                         return prev;
                     }
+                    
+                    console.log('Adding new real-time message to chat');
                     return [...prev, message];
                 });
             });
 
             subscriptionRef.current = subscription;
+            console.log('Successfully subscribed to room:', chatRoomId);
         } catch (error) {
             console.error('Failed to subscribe to room:', error);
         }
@@ -83,10 +127,13 @@ export const useChat = (otherUserId = null) => {
 
     // Send a message
     const handleSendMessage = useCallback(async (content, type = 'TEXT', mediaUrl = null, mediaType = null, replyToMessageId = null) => {
-        if (!currentChatRoom?.id || !content.trim()) return;
+        if (!currentChatRoom?.id || !content.trim() || isSendingMessage) return;
 
         try {
-            // Send via WebSocket for real-time
+            setIsSendingMessage(true);
+            console.log('Sending message via WebSocket:', { chatRoomId: currentChatRoom.id, content, type });
+            
+            // Send via WebSocket only - backend will handle Kafka → Consumer → Database
             await websocketService.sendMessage(
                 currentChatRoom.id,
                 content,
@@ -96,21 +143,15 @@ export const useChat = (otherUserId = null) => {
                 replyToMessageId
             );
 
-            // Also send via REST API for persistence
-            await sendMessage({
-                chatRoomId: currentChatRoom.id,
-                content,
-                type,
-                mediaUrl,
-                mediaType,
-                replyToMessageId,
-            }).unwrap();
+            console.log('Message sent via WebSocket (Kafka → Consumer → DB)');
 
         } catch (error) {
             console.error('Failed to send message:', error);
             throw error;
+        } finally {
+            setIsSendingMessage(false);
         }
-    }, [currentChatRoom?.id, sendMessage]);
+    }, [currentChatRoom?.id, isSendingMessage]);
 
     // Load messages when chat room changes
     useEffect(() => {
@@ -119,12 +160,16 @@ export const useChat = (otherUserId = null) => {
         }
     }, [messagesData]);
 
-    // Initialize chat when otherUserId is provided
+    // Initialize chat when otherUserId is provided or use existing chat room
     useEffect(() => {
-        if (otherUserId) {
+        if (existingChatRoom) {
+            console.log('useChat - Using existing chat room:', existingChatRoom);
+            setCurrentChatRoom(existingChatRoom);
+        } else if (otherUserId) {
+            console.log('useChat - Initializing chat with user ID:', otherUserId);
             initializeChat(otherUserId);
         }
-    }, [otherUserId, initializeChat]);
+    }, [otherUserId, existingChatRoom, initializeChat]);
 
     // Connect to WebSocket on mount
     useEffect(() => {

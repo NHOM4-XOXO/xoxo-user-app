@@ -7,23 +7,19 @@ import {
   Phone,
   Video,
   Info,
-  Smile,
   Paperclip,
   Send,
   ThumbsUp,
-  Download,
   Loader2,
 } from "lucide-react";
 import ScrollableContainer from "@/components/common/ScrollableContainer";
 import {
   ContentMultipleLines,
-  CountContentLines,
 } from "@/utils/ContentMultipleLines";
 import ImagePreviewModal from "@/components/common/ImagePreviewModal";
 import { useChat } from "@/hooks/useChat";
-// Debug components removed - now available in DebugPanel
 
-export default function EnhancedMessagesChat({
+export default function ProductionMessagesChat({
   contact,
   onBack,
   onToggleChatInfo,
@@ -36,7 +32,7 @@ export default function EnhancedMessagesChat({
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
-  // Use the chat hook with the contact's user ID (not chat room ID)
+  // Use the chat hook with the contact's user ID and existing chat room
   const {
     currentChatRoom,
     messages,
@@ -45,24 +41,7 @@ export default function EnhancedMessagesChat({
     isSendingMessage,
     isLoadingMessages,
     handleSendMessage,
-    initializeChat,
   } = useChat(contact?.userId || contact?.id, contact?.chatRoom);
-
-  // Initialize chat when contact changes
-  useEffect(() => {
-    if (contact?.chatRoom?.id) {
-      // If we already have a chat room, use it directly
-      console.log('EnhancedMessagesChat - Using existing chat room:', contact.chatRoom.id);
-      // No need to create, just load messages and connect to WebSocket
-    } else if (contact?.userId) {
-      console.log('EnhancedMessagesChat - Initializing chat with user ID:', contact.userId);
-      initializeChat(contact.userId);
-    } else if (contact?.id && !contact?.chatRoom) {
-      // Fallback: if no userId but has id and no chatRoom, assume id is user ID
-      console.log('EnhancedMessagesChat - Fallback: using contact.id as user ID:', contact.id);
-      initializeChat(contact.id);
-    }
-  }, [contact?.userId, contact?.id, contact?.chatRoom, initializeChat]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -77,7 +56,7 @@ export default function EnhancedMessagesChat({
       setMessage("");
     } catch (error) {
       console.error("Failed to send message:", error);
-      // You might want to show a toast notification here
+      // Could show a toast notification here
     }
   };
 
@@ -93,7 +72,6 @@ export default function EnhancedMessagesChat({
     if (!file) return;
 
     // TODO: Implement file upload
-    // For now, just show a placeholder
     console.log("File upload not implemented yet:", file.name);
     event.target.value = "";
   };
@@ -133,7 +111,7 @@ export default function EnhancedMessagesChat({
   }
 
   // Show error state if chat room creation failed
-  if (!currentChatRoom && !isCreatingChat) {
+  if (!currentChatRoom && !isCreatingChat && contact) {
     return (
       <div className="flex items-center justify-center flex-1 bg-fb-light-secondary dark:bg-fb-dark-secondary">
         <div className="text-center">
@@ -159,23 +137,23 @@ export default function EnhancedMessagesChat({
           )}
           <div className="relative">
             <Image
-              src={contact.avatar || "/default-avatar.jpg"}
-              alt={contact.name}
+              src={contact?.avatar || "/default-avatar.jpg"}
+              alt={contact?.name || "User"}
               width={40}
               height={40}
               className="object-cover rounded-full"
             />
-            {contact.isOnline && (
+            {contact?.isOnline && (
               <div className="absolute w-3 h-3 bg-green-500 border-2 border-white rounded-full -bottom-1 -right-1 dark:border-gray-800"></div>
             )}
           </div>
           <div>
             <h3 className="font-semibold text-black dark:text-white">
-              {contact.name}
+              {contact?.name || "Unknown User"}
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">
               {isConnected ? (
-                contact.isOnline ? "Đang hoạt động" : "Không hoạt động"
+                contact?.isOnline ? "Đang hoạt động" : "Không hoạt động"
               ) : (
                 "Đang kết nối..."
               )}
@@ -233,8 +211,8 @@ export default function EnhancedMessagesChat({
                     <div className="w-8 mr-2">
                       {showAvatar && (
                         <Image
-                          src={contact.avatar || "/default-avatar.jpg"}
-                          alt={contact.name}
+                          src={contact?.avatar || "/default-avatar.jpg"}
+                          alt={contact?.name || "User"}
                           width={32}
                           height={32}
                           className="object-cover rounded-full"
@@ -247,7 +225,7 @@ export default function EnhancedMessagesChat({
                     {/* Sender name for received messages */}
                     {showName && !isFromMe && (
                       <p className="mb-1 ml-3 text-xs text-gray-500">
-                        {msg.senderName || contact.name}
+                        {msg.senderName || contact?.name}
                       </p>
                     )}
 
@@ -325,8 +303,6 @@ export default function EnhancedMessagesChat({
           </div>
         )}
       </ScrollableContainer>
-
-      {/* Debug components moved to DebugPanel */}
 
       {/* Input Area */}
       <div className="p-4 border-t border-gray-300 bg-fb-light-primary dark:bg-fb-dark-secondary dark:border-fb-dark-tertiary">

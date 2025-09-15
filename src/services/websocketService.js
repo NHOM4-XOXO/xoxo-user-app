@@ -140,9 +140,11 @@ class WebSocketService {
             await this.connect();
         }
 
-        const subscription = this.client.subscribe(`/topic/room/${chatRoomId}`, (message) => {
+        // Use the correct topic path that matches backend
+        const subscription = this.client.subscribe(`/topic/chat/${chatRoomId}`, (message) => {
             try {
                 const parsedMessage = JSON.parse(message.body);
+                console.log('Received message in room', chatRoomId, ':', parsedMessage);
                 onMessage(parsedMessage);
             } catch (error) {
                 console.error('Error parsing message:', error);
@@ -151,6 +153,7 @@ class WebSocketService {
 
         // Store the handler for cleanup
         this.messageHandlers.set(chatRoomId, subscription);
+        console.log(`Subscribed to room /topic/chat/${chatRoomId}`);
         return subscription;
     }
 

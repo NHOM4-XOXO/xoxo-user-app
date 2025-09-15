@@ -33,15 +33,26 @@ export default function FriendsListForChat({
   const handleStartChat = async (friend) => {
     try {
       console.log('Starting chat with friend:', friend);
+      
+      // Validate friend data
+      if (!friend || !friend.id) {
+        throw new Error('Invalid friend data');
+      }
+      
       // Create/get direct chat room
       const chatRoom = await getOrCreateDirectChat(friend.id).unwrap();
       console.log('Chat room response:', chatRoom);
       
+      // Validate chat room response
+      if (!chatRoom || !chatRoom.id) {
+        throw new Error('Invalid chat room response');
+      }
+      
       // Convert to contact format for compatibility
       const contact = {
         id: chatRoom.id,
-        name: `${friend.firstName} ${friend.lastName}`,
-        avatar: friend.avatarUrl || "/default-avatar.jpg",
+        name: chatRoom.name || `${friend.firstName} ${friend.lastName}`,
+        avatar: chatRoom.avatarUrl || friend.avatarUrl || "/default-avatar.jpg",
         isOnline: friend.isOnline || false,
         userId: friend.id, // Keep original user ID
         chatRoom: chatRoom,
@@ -52,8 +63,21 @@ export default function FriendsListForChat({
       onClose();
     } catch (error) {
       console.error("Failed to create chat:", error);
-      console.error("Error details:", error.data || error.message);
-      alert(`Không thể tạo cuộc trò chuyện với ${friend.firstName}. Vui lòng thử lại.`);
+      console.error("Error details:", error?.data || error?.message);
+      
+      let errorMessage = `Không thể tạo cuộc trò chuyện với ${friend.firstName}.`;
+      
+      if (error?.status === 500) {
+        errorMessage += ' Lỗi server. Vui lòng thử lại sau.';
+      } else if (error?.status === 404) {
+        errorMessage += ' Người dùng không tồn tại.';
+      } else if (error?.status === 401) {
+        errorMessage += ' Vui lòng đăng nhập lại.';
+      } else {
+        errorMessage += ' Vui lòng thử lại.';
+      }
+      
+      alert(errorMessage);
     }
   };
 

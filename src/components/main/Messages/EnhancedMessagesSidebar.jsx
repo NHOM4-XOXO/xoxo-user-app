@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Search, MoreHorizontal, Edit, Loader2 } from "lucide-react";
 import ScrollableContainer from "@/components/common/ScrollableContainer";
-import { useGetChatRoomsQuery } from "@/features/chatApi";
+import { useChatList } from "@/hooks/useChatList";
 import FriendsListForChat from "./FriendsListForChat";
 
 export default function EnhancedMessagesSidebar({
@@ -15,15 +15,15 @@ export default function EnhancedMessagesSidebar({
   const [activeTab, setActiveTab] = useState("all");
   const [showFriendsList, setShowFriendsList] = useState(false);
 
-  // Fetch chat rooms
+  // Use chat list hook for real-time updates
   const {
-    data: chatRoomsData,
-    isLoading: isLoadingChatRooms,
-    error: chatRoomsError,
-    refetch: refetchChatRooms,
-  } = useGetChatRoomsQuery({ page: 0, size: 50 });
-
-  const chatRooms = chatRoomsData?.content || [];
+    chatRooms,
+    isLoadingChatRooms,
+    chatRoomsError,
+    refetchChatRooms,
+    addChatRoom,
+    markChatAsRead,
+  } = useChatList();
 
   // Filter chat rooms based on search term
   const filteredChatRooms = chatRooms.filter((chatRoom) =>
@@ -49,10 +49,7 @@ export default function EnhancedMessagesSidebar({
     };
   };
 
-  const handleChatRoomClick = (chatRoom) => {
-    const contact = convertChatRoomToContact(chatRoom);
-    onSelectContact(contact);
-  };
+  // Remove the old handleChatRoomClick since we have a new one above
 
   const handleNewChatClick = () => {
     setShowFriendsList(true);
@@ -60,8 +57,19 @@ export default function EnhancedMessagesSidebar({
 
   const handleChatCreated = (contact) => {
     // When a new chat is created from friends list
+    if (contact.chatRoom) {
+      addChatRoom(contact.chatRoom);
+    }
     onSelectContact(contact);
     refetchChatRooms(); // Refresh chat rooms list
+  };
+
+  const handleChatRoomClick = (chatRoom) => {
+    // Mark as read when opening chat
+    markChatAsRead(chatRoom.id);
+    
+    const contact = convertChatRoomToContact(chatRoom);
+    onSelectContact(contact);
   };
 
   const formatLastMessageTime = (timestamp) => {

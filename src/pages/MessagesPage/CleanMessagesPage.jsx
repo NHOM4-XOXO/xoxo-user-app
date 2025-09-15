@@ -9,9 +9,8 @@ import { HEADER_HEIGHT } from "@/constants";
 import { checkDeviceByWidth } from "@/utils/checkDeviceByWidth";
 import { useGetOrCreateDirectChatMutation } from "@/features/chatApi";
 import DebugPanel from "@/components/debug/DebugPanel";
-import ErrorBoundary from "@/components/common/ErrorBoundary";
 
-export default function EnhancedMessagesPage() {
+export default function CleanMessagesPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [selectedContact, setSelectedContact] = useState(null);
@@ -34,17 +33,14 @@ export default function EnhancedMessagesPage() {
   // Handle URL params for selected contact
   useEffect(() => {
     const contactId = searchParams.get("contact");
-    const userId = searchParams.get("userId"); // For direct chat with user ID
+    const userId = searchParams.get("userId");
     
     if (contactId && selectedContact?.id !== parseInt(contactId)) {
-      // If we have a contactId, restore the selected contact
-      // Note: In a real app, you might need to fetch contact details here
       setSelectedContact({
         id: parseInt(contactId),
-        name: "Loading...", // This should be replaced with actual contact data
+        name: "Loading...",
       });
     } else if (userId && !contactId) {
-      // If we have a userId but no contactId, create/get direct chat
       handleCreateDirectChat(parseInt(userId));
     }
   }, [searchParams]);
@@ -53,26 +49,24 @@ export default function EnhancedMessagesPage() {
     try {
       const result = await getOrCreateDirectChat(userId).unwrap();
       
-      // Create a contact object from the chat room result
       const contact = {
         id: result.id,
         name: result.name,
         avatar: result.participants?.find(p => p.id !== result.currentUserId)?.avatarUrl,
-        isOnline: false, // You might want to fetch this separately
+        isOnline: false,
+        userId: userId, // Keep the original user ID
         chatRoom: result,
       };
       
       setSelectedContact(contact);
       setShowChatInfo(false);
 
-      // Update URL to reflect the selected chat
       const params = new URLSearchParams(searchParams);
       params.delete("userId");
       params.set("contact", contact.id.toString());
       router.push(`/messages?${params.toString()}`, { scroll: false });
     } catch (error) {
       console.error("Failed to create direct chat:", error);
-      // You might want to show a toast notification here
     }
   };
 
@@ -80,7 +74,6 @@ export default function EnhancedMessagesPage() {
     setSelectedContact(contact);
     setShowChatInfo(false);
 
-    // Update URL
     const params = new URLSearchParams(searchParams);
     params.delete("userId");
     params.set("contact", contact.id.toString());
@@ -97,14 +90,11 @@ export default function EnhancedMessagesPage() {
     setShowChatInfo(!showChatInfo);
   };
 
-  // No longer needed - handled by FriendsListForChat component
-
   return (
-    <ErrorBoundary>
-      <div
-        className="flex text-black bg-fb-light-secondary dark:bg-fb-dark-primary dark:text-white"
-        style={{ height: `calc(100vh - ${HEADER_HEIGHT}px)` }}
-      >
+    <div
+      className="flex text-black bg-fb-light-secondary dark:bg-fb-dark-primary dark:text-white"
+      style={{ height: `calc(100vh - ${HEADER_HEIGHT}px)` }}
+    >
       {/* Left Sidebar - Messages List */}
       <div
         className={`
@@ -153,11 +143,7 @@ export default function EnhancedMessagesPage() {
                 Chọn một cuộc trò chuyện
               </h3>
               <p className="text-gray-600 dark:text-gray-400 mb-4">
-                Chọn từ các cuộc trò chuyện hiện có hoặc bắt đầu cuộc trò chuyện
-                mới.
-              </p>
-              <p className="text-sm text-gray-500 mb-4">
-                Nhấn vào nút "Tạo mới" ở góc trên để bắt đầu cuộc trò chuyện.
+                Chọn từ các cuộc trò chuyện hiện có hoặc bắt đầu cuộc trò chuyện mới.
               </p>
             </div>
           </div>
@@ -173,10 +159,9 @@ export default function EnhancedMessagesPage() {
           />
         </div>
       )}
-      </div>
 
-      {/* Debug Panel - Fixed position, toggleable */}
+      {/* Debug Panel - Fixed position, only shows when needed */}
       <DebugPanel />
-    </ErrorBoundary>
+    </div>
   );
 }

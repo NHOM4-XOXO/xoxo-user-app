@@ -9,7 +9,16 @@ const prepareHeaders = (headers) => {
 
 const baseQuery = fetchBaseQuery({
     baseUrl: process.env.NEXT_PUBLIC_API_URL || "https://xoxo.id.vn",
-    prepareHeaders,
+    prepareHeaders: (headers) => {
+        const token = Cookies.get("token");
+        console.log("Chat API - Token found:", !!token);
+        if (token) {
+            headers.set("Authorization", `Bearer ${token}`);
+            console.log("Chat API - Authorization header set");
+        }
+        headers.set("Content-Type", "application/json");
+        return headers;
+    },
     credentials: "include",
 });
 
@@ -20,14 +29,24 @@ export const chatApi = createApi({
     endpoints: (builder) => ({
         // Get or create direct chat with another user
         getOrCreateDirectChat: builder.mutation({
-            query: (otherUserId) => ({
-                url: `/api/v1/chat/direct/${otherUserId}`,
-                method: "POST",
-            }),
+            query: (otherUserId) => {
+                console.log('Chat API - Creating direct chat with user:', otherUserId);
+                return {
+                    url: `/api/v1/chat/direct/${otherUserId}`,
+                    method: "POST",
+                };
+            },
             invalidatesTags: ["ChatRoom"],
             transformResponse: (response) => {
-                console.log('API Response:', response);
+                console.log('Chat API - Full response:', response);
+                // Return the data field if it exists, otherwise return the whole response
                 return response.data || response;
+            },
+            transformErrorResponse: (response, meta, arg) => {
+                console.error('Chat API - Error response:', response);
+                console.error('Chat API - Error meta:', meta);
+                console.error('Chat API - Error arg:', arg);
+                return response;
             },
         }),
 
@@ -53,26 +72,8 @@ export const chatApi = createApi({
             transformResponse: (response) => response.data,
         }),
 
-        // Send a message
-        sendMessage: builder.mutation({
-            query: ({ chatRoomId, content, type = "TEXT", mediaUrl = null, mediaType = null, replyToMessageId = null }) => ({
-                url: `/api/v1/chat/messages`,
-                method: "POST",
-                body: {
-                    chatRoomId,
-                    content,
-                    type,
-                    mediaUrl,
-                    mediaType,
-                    replyToMessageId,
-                },
-            }),
-            invalidatesTags: (result, error, { chatRoomId }) => [
-                { type: "ChatMessage", id: chatRoomId },
-                "ChatRoom",
-            ],
-            transformResponse: (response) => response.data,
-        }),
+        // Send message is handled via WebSocket only (Kafka → Consumer → DB)
+        // No REST API endpoint for sending messages
 
         // Mark message as read
         markMessageAsRead: builder.mutation({
