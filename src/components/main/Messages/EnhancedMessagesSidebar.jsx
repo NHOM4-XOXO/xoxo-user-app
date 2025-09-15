@@ -25,6 +25,13 @@ export default function EnhancedMessagesSidebar({
     markChatAsRead,
   } = useChatList();
 
+  // Debug logging
+  useEffect(() => {
+    console.log('EnhancedMessagesSidebar - chatRooms:', chatRooms);
+    console.log('EnhancedMessagesSidebar - isLoadingChatRooms:', isLoadingChatRooms);
+    console.log('EnhancedMessagesSidebar - chatRoomsError:', chatRoomsError);
+  }, [chatRooms, isLoadingChatRooms, chatRoomsError]);
+
   // Filter chat rooms based on search term
   const filteredChatRooms = chatRooms.filter((chatRoom) =>
     chatRoom.name.toLowerCase().includes(searchTerm.toLowerCase())

@@ -10,6 +10,7 @@ import AuthTest from "./AuthTest";
 import SimpleApiTest from "./SimpleApiTest";
 import ChatDebug from "./ChatDebug";
 import WebSocketOnlyTest from "./WebSocketOnlyTest";
+import ChatRoomsTest from "./ChatRoomsTest";
 
 export default function DebugPanel() {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,6 +19,7 @@ export default function DebugPanel() {
   const debugComponents = {
     flow: { name: "Complete Flow", component: CompleteFlowTest },
     websocket: { name: "WebSocket Only", component: WebSocketOnlyTest },
+    chatrooms: { name: "Chat Rooms", component: ChatRoomsTest },
     env: { name: "Environment", component: EnvTest },
     users: { name: "User ID Test", component: UserIdTest },
     api: { name: "API Debug", component: ApiDebugTest },

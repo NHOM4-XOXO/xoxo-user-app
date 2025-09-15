@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useGetChatRoomsQuery } from '@/features/chatApi';
 import websocketService from '@/services/websocketService';
+import Cookies from 'js-cookie';
 
 export const useChatList = () => {
     const [chatRooms, setChatRooms] = useState([]);
@@ -16,9 +17,20 @@ export const useChatList = () => {
 
     // Update local chat rooms when API data changes
     useEffect(() => {
+        console.log('Chat rooms API response:', chatRoomsData);
         if (chatRoomsData?.content) {
             console.log('Chat rooms loaded from API:', chatRoomsData.content);
             setChatRooms(chatRoomsData.content);
+        } else if (chatRoomsData) {
+            console.log('Chat rooms data structure:', chatRoomsData);
+            // Try different possible data structures
+            if (Array.isArray(chatRoomsData)) {
+                console.log('Chat rooms is array:', chatRoomsData);
+                setChatRooms(chatRoomsData);
+            } else if (chatRoomsData.data) {
+                console.log('Chat rooms in data field:', chatRoomsData.data);
+                setChatRooms(chatRoomsData.data);
+            }
         }
     }, [chatRoomsData]);
 
@@ -98,11 +110,19 @@ export const useChatList = () => {
         });
     }, []);
 
-    // Get current user ID (you might need to adjust this based on your auth system)
+    // Get current user ID from JWT token
     const getCurrentUserId = useCallback(() => {
-        // This should return the current user's ID
-        // You might get this from auth context or localStorage
-        return localStorage.getItem('currentUserId') || null;
+        try {
+            const token = Cookies.get('token');
+            if (!token) return null;
+            
+            // Decode JWT token to get user ID
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            return payload.sub || payload.userId || null;
+        } catch (error) {
+            console.error('Failed to decode token:', error);
+            return null;
+        }
     }, []);
 
     // Connect to WebSocket on mount
