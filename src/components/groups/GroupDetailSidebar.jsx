@@ -1,6 +1,15 @@
 "use client";
 
 import { HEADER_HEIGHT } from "@/constants";
+let user = localStorage.getItem("auth");
+user = JSON.parse(user);
+if(user && user.profile){
+  var userName = user.profile.firstName + " " + user.profile.lastName;  
+  var userAvatar = user.profile.avatarUrl;
+} else {
+  let userName = "User";
+  let userAvatar = "/image/georgina.jpg";
+}
 
 export default function GroupDetailSidebar({ group }) {
   const quickActions = [
@@ -89,7 +98,7 @@ export default function GroupDetailSidebar({ group }) {
             {
               name: "Trần Thị B",
               role: "Người kiểm duyệt",
-              avatar: "/image/georgina.jpg",
+              avatar: userAvatar || "/image/georgina.jpg",
             },
           ].map((person, index) => (
             <div key={index} className="flex items-center space-x-3">

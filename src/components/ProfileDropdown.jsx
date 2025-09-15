@@ -6,6 +6,9 @@ import Link from "next/link";
 
 export default function ProfileDropdown() {
   const [isOpen, setIsOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const [userName, setUserName] = useState("User");
+  const [userAvatar, setUserAvatar] = useState("/image/georgina.jpg");
   const menuRef = useRef(null);
 
   const handleClickOutside = (e) => {
@@ -13,7 +16,24 @@ export default function ProfileDropdown() {
       setIsOpen(false);
     }
   };
+  useEffect(() => {
+    try {
+      const authData = localStorage.getItem("auth");
+      if (authData) {
+        const parsedUser = JSON.parse(authData);
+        setUser(parsedUser);
 
+        if (parsedUser && parsedUser.profile) {
+          setUserName(parsedUser.profile.firstName + " " + parsedUser.profile.lastName);
+          setUserAvatar(parsedUser.profile.avatarUrl || "/image/georgina.jpg");
+        }
+      }
+    } catch (error) {
+      console.error("Error loading user data:", error);
+      setUserName("User");
+      setUserAvatar("/image/georgina.jpg");
+    }
+  }, []);
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -26,7 +46,7 @@ export default function ProfileDropdown() {
         onClick={() => setIsOpen(!isOpen)}
       >
         <Image
-          src="/image/georgina.jpg"
+          src={userAvatar || "/image/georgina.jpg"}
           alt="Avatar"
           width={32}
           height={32}

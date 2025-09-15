@@ -46,9 +46,32 @@ export default function Sidebar() {
   const [showAll, setShowAll] = useState(false);
   const [showAllShortCut, setShowAllShortCut] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const [userName, setUserName] = useState("User");
+  const [userAvatar, setUserAvatar] = useState("/image/georgina.jpg");
 
   const visibleItems = showAll ? items : items.slice(0, 4);
   const visibleShortcut = showAllShortCut ? shortcuts : shortcuts.slice(0, 4);
+
+  // Load user data from localStorage on client-side only
+  useEffect(() => {
+    try {
+      const authData = localStorage.getItem("auth");
+      if (authData) {
+        const parsedUser = JSON.parse(authData);
+        setUser(parsedUser);
+        
+        if (parsedUser && parsedUser.profile) {
+          setUserName(parsedUser.profile.firstName + " " + parsedUser.profile.lastName);
+          setUserAvatar(parsedUser.profile.avatarUrl || "/image/georgina.jpg");
+        }
+      }
+    } catch (error) {
+      console.error("Error loading user data:", error);
+      setUserName("User");
+      setUserAvatar("/image/georgina.jpg");
+    }
+  }, []);
 
   useEffect(() => {
     const handleToggleSidebar = (event) => setIsOpen(event.detail);
@@ -102,14 +125,14 @@ export default function Sidebar() {
         <div className="mb-4">
           <div className="flex items-center space-x-3 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg cursor-pointer">
             <Image
-              src="/image/georgina.jpg"
+              src={userAvatar}
               alt="User Avatar"
               width={40}
               height={40}
               className="rounded-full w-10 h-10 object-cover"
             />
             <span className="font-medium text-black dark:text-gray-100">
-              Georgina Rodriguez
+              {userName}
             </span>
           </div>
         </div>

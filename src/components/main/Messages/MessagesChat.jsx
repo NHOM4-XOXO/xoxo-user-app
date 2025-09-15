@@ -247,7 +247,9 @@ export default function MessagesChat({
             ) : (
               <div className="break-words">
                 {msg.content && (
-                  <p className="text-sm">{ContentMultipleLines(msg.content)}</p>
+                  <p className="text-sm">
+                    <ContentMultipleLines content={msg.content} />
+                  </p>
                 )}
 
                 {msg.file && (
