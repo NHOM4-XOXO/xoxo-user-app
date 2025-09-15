@@ -2,6 +2,15 @@ import axios from "axios";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL + "/api";
 
+// Function để normalize text tiếng Việt (bỏ dấu)
+const removeVietnameseTones = (text) => {
+  return text
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // Bỏ dấu
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D");
+};
+
 // Tạo axios instance với base config
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -48,13 +57,35 @@ function getAuthToken() {
 // API function để search users/posts/groups
 export const searchUsers = async ({ keyword, page = 0, size = 20 }) => {
   try {
-    const response = await api.get("/user/search", {
+    console.log("🔍 Original keyword:", keyword);
+
+    // Thử search với keyword gốc trước
+    let response = await api.get("/user/search", {
       params: {
-        keyword: encodeURIComponent(keyword),
+        keyword: keyword,
         page,
         size,
       },
     });
+
+    // Nếu không có kết quả và keyword có dấu, thử search với keyword đã normalize
+    if (
+      response.data.data.totalResults === 0 &&
+      keyword !== removeVietnameseTones(keyword)
+    ) {
+      const normalizedKeyword = removeVietnameseTones(keyword);
+      console.log("🔍 Trying normalized keyword:", normalizedKeyword);
+
+      response = await api.get("/user/search", {
+        params: {
+          keyword: normalizedKeyword,
+          page,
+          size,
+        },
+      });
+    }
+
+    console.log("🔍 Search response:", response.data);
     return response.data;
   } catch (error) {
     console.error("Search API Error:", error);

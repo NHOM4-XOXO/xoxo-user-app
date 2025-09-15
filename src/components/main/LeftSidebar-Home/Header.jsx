@@ -80,10 +80,10 @@ export default function Header({ onContactClick }) {
           showResults: false,
           loading: false
         });
-        return; // Search ngay từ 1 ký tự
+        return; 
       }
 
-      // Reset results trước khi search mới
+      
       setState({ 
         loading: true, 
         showResults: true,
