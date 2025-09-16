@@ -27,8 +27,6 @@ import useMergeState from "../../../hooks/useMergeState";
 export default function Header({ onContactClick }) {
   const router = useRouter();
 
-
-
   const [state, setState] = useMergeState({
     showMessages: false,
     showNotifications: false,
@@ -40,7 +38,7 @@ export default function Header({ onContactClick }) {
       users: [],
       posts: [],
       groups: [],
-      totalResults: 0
+      totalResults: 0,
     },
     loading: false,
     showResults: false,
@@ -66,28 +64,28 @@ export default function Header({ onContactClick }) {
   useEffect(() => {
     const performSearch = async () => {
       if (!searchTerm.trim()) {
-        setState({ 
+        setState({
           results: { users: [], posts: [], groups: [], totalResults: 0 },
           showResults: false,
-          loading: false
+          loading: false,
         });
         return;
       }
 
       if (searchTerm.trim().length < 1) {
-        setState({ 
+        setState({
           results: { users: [], posts: [], groups: [], totalResults: 0 },
           showResults: false,
-          loading: false
+          loading: false,
         });
         return; // Search ngay từ 1 ký tự
       }
 
       // Reset results trước khi search mới
-      setState({ 
-        loading: true, 
+      setState({
+        loading: true,
         showResults: true,
-        results: { users: [], posts: [], groups: [], totalResults: 0 } // Clear old results
+        results: { users: [], posts: [], groups: [], totalResults: 0 }, // Clear old results
       });
 
       try {
@@ -134,10 +132,10 @@ export default function Header({ onContactClick }) {
         searchWrapperRef.current &&
         !searchWrapperRef.current.contains(e.target)
       ) {
-        setState({ 
-          searchTerm: "", 
+        setState({
+          searchTerm: "",
           results: { users: [], posts: [], groups: [], totalResults: 0 },
-          showResults: false 
+          showResults: false,
         });
       }
     };
@@ -176,10 +174,10 @@ export default function Header({ onContactClick }) {
     if (searchTerm.trim()) {
       // Chuyển đến trang search với keyword
       router.push(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
-      setState({ 
-        searchTerm: "", 
+      setState({
+        searchTerm: "",
         results: { users: [], posts: [], groups: [], totalResults: 0 },
-        showResults: false 
+        showResults: false,
       });
     }
   };
@@ -189,10 +187,10 @@ export default function Header({ onContactClick }) {
     if (searchTerm.trim()) {
       // Chuyển đến trang search với keyword mới để render lại kết quả
       router.push(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
-      setState({ 
-        searchTerm: "", 
+      setState({
+        searchTerm: "",
         results: { users: [], posts: [], groups: [], totalResults: 0 },
-        showResults: false 
+        showResults: false,
       });
     }
   };
@@ -203,10 +201,10 @@ export default function Header({ onContactClick }) {
       handleForceSearch();
     }
     if (e.key === "Escape") {
-      setState({ 
-        searchTerm: "", 
+      setState({
+        searchTerm: "",
         results: { users: [], posts: [], groups: [], totalResults: 0 },
-        showResults: false 
+        showResults: false,
       });
     }
   };
@@ -214,20 +212,20 @@ export default function Header({ onContactClick }) {
   const handleUserClick = (user) => {
     // Chuyển đến profile của user
     router.push(`/profile/${user.id}`);
-    setState({ 
-      searchTerm: "", 
+    setState({
+      searchTerm: "",
       results: { users: [], posts: [], groups: [], totalResults: 0 },
-      showResults: false 
+      showResults: false,
     });
   };
 
   const handleViewAllResults = () => {
     if (searchTerm.trim()) {
       router.push(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
-      setState({ 
-        searchTerm: "", 
+      setState({
+        searchTerm: "",
         results: { users: [], posts: [], groups: [], totalResults: 0 },
-        showResults: false 
+        showResults: false,
       });
     }
   };
@@ -243,7 +241,7 @@ export default function Header({ onContactClick }) {
         <Link href="/" className="flex items-center">
           <div className="w-14 h-14 bg-amber-50 flex items-center justify-center mr-4">
             <img
-              src="/logo_xoxo_500px-removebg-preview.png"
+              src="/XoXo-Lg.png"
               alt="Logo"
               className="h-full w-full bg-white dark:bg-fb-dark-secondary"
             />
@@ -357,13 +355,15 @@ export default function Header({ onContactClick }) {
                   )}
 
                   {/* No Results */}
-                  {!loading && results.totalResults === 0 && searchTerm.trim().length >= 1 && (
-                    <div className="py-4 text-center">
-                      <p className="text-gray-500 text-sm">
-                        Không tìm thấy kết quả cho "{searchTerm}"
-                      </p>
-                    </div>
-                  )}
+                  {!loading &&
+                    results.totalResults === 0 &&
+                    searchTerm.trim().length >= 1 && (
+                      <div className="py-4 text-center">
+                        <p className="text-gray-500 text-sm">
+                          Không tìm thấy kết quả cho "{searchTerm}"
+                        </p>
+                      </div>
+                    )}
                 </>
               )}
             </div>
@@ -410,7 +410,7 @@ export default function Header({ onContactClick }) {
 
       <div className="flex space-x-1 sm:space-x-2 items-center relative">
         <ThemeToggle />
-        
+
         {/* Reload Button */}
         <button
           onClick={handleReload}
