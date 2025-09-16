@@ -191,9 +191,8 @@ const MusicPlayer = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fullPlaylist.map((s) => s.src || "").join("|")]);
 
-  // ===== Audio element bindings (cho file audio) =====
   useEffect(() => {
-    if (isYT) return; // YouTube dùng effect riêng
+    if (isYT) return; 
     const audio = audioRef.current;
     if (!audio) return;
 
