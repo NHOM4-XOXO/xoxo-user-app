@@ -2,47 +2,56 @@
 
 import { useMemo, useState, useEffect } from "react";
 import PostModal from "./PostModal";
+import ShareModal from "./ShareModal";
 import MainPost from "./MainPost";
 import { MessageCircle, Share2, ThumbsUp } from "lucide-react";
 import ReactionPopup from "./ReactionPopup";
-import { useAddReactionMutation } from "@/features/postReactionApi";
 import {
   useGetMyReactionQuery,
   useDeleteReactionPostMutation,
+  useGetReactionStatisticsQuery,
+  useAddReactionMutation
 } from "@/features/postApi";
 
-const Post = ({ data, isLoading }) => {
+const Post = ({ data }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  // ✅ destructure an toàn với default {}
-  const { id, commentCount = 0 } = data?.post ?? {};
-
-  // ✅ nếu commentCount chưa có thì về 0
-  const [count, setCount] = useState(commentCount);
-
+  const { id, commentCount } = data?.post || {};
+  const [count, setCount] = useState(commentCount || 0);
   const [showPopup, setShowPopup] = useState(false);
   const [selectedReaction, setSelectedReaction] = useState({
     icon: <ThumbsUp />,
     name: "Thích",
-    colorName: "",
   });
   const [isLiked, setIsLiked] = useState(false);
 
-  // ✅ tránh gọi API khi id chưa sẵn sàng
-  const { data: myReaction } = useGetMyReactionQuery(id, { skip: !id });
+  // RTK query
+  const { data: myReaction, isLoading: isMyReactionLoading } =
+    useGetMyReactionQuery(id, { skip: !id });
+  const { data: reactionStats, isLoading: isReactionStatsLoading } =
+    useGetReactionStatisticsQuery(id, { skip: !id });
+  const isLoading = isMyReactionLoading || isReactionStatsLoading;
 
   const [addReactToPost] = useAddReactionMutation();
   const [deleteReactionPost] = useDeleteReactionPostMutation();
+  const [isShareOpen, setIsShareOpen] = useState(false);
 
+  // lấy user hiện tại từ localStorage
+  const profile = JSON.parse(localStorage.getItem("auth") || "{}");
+  const currentUserId = profile?.profile?.id;
+
+  // mapping reaction từ API
   useEffect(() => {
-    if (!myReaction) return;
+    if (!myReaction) {
+      setSelectedReaction({ name: "Thích", icon: <ThumbsUp />, colorName: "" });
+      setIsLiked(false);
+      return;
+    }
 
-    // map reaction từ API về UI
     switch (myReaction.reactionType) {
       case "LIKE":
         setSelectedReaction({
           name: "Thích",
-          icon: <ThumbsUp />,
+          icon: myReaction.emoji || <ThumbsUp />,
           colorName: "text-blue-600",
         });
         setIsLiked(true);
@@ -50,7 +59,7 @@ const Post = ({ data, isLoading }) => {
       case "LOVE":
         setSelectedReaction({
           name: "Yêu thích",
-          icon: myReaction.emoji, // giả sử backend trả về emoji string
+          icon: myReaction.emoji,
           colorName: "text-red-500",
         });
         setIsLiked(true);
@@ -71,7 +80,7 @@ const Post = ({ data, isLoading }) => {
         });
         setIsLiked(true);
         break;
-      case "SAD": // ✅ case trước bị lặp "HAHA"
+      case "SAD":
         setSelectedReaction({
           name: "Buồn",
           icon: myReaction.emoji,
@@ -79,7 +88,7 @@ const Post = ({ data, isLoading }) => {
         });
         setIsLiked(true);
         break;
-      case "ANGRY": // ✅ case trước bị lặp "HAHA"
+      case "ANGRY":
         setSelectedReaction({
           name: "Phẫn nộ",
           icon: myReaction.emoji,
@@ -96,30 +105,47 @@ const Post = ({ data, isLoading }) => {
         setIsLiked(false);
     }
   }, [myReaction]);
-
   const renderData = useMemo(() => {
     return data
-      ? { ...data, commentCount: count } 
+      ? { ...data, commentCount: count }
       : { post: undefined, commentCount: count };
   }, [data, count]);
 
+  // nếu chưa có id => không render
+  if (!id) return null;
+
+  // skeleton trong lúc loading
   if (isLoading) {
     return (
-      <div className="rounded-lg bg-white dark:bg-fb-dark-secondary p-4 space-y-3 shadow-sm">
-        <MainPost data={renderData} isLoading />
+      <div className="bg-fb-light dark:bg-fb-dark rounded-xl shadow p-4 mb-4 animate-pulse">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-700"></div>
+          <div className="flex-1">
+            <div className="w-32 h-3 rounded bg-gray-300 dark:bg-gray-700 mb-2"></div>
+            <div className="w-20 h-2 rounded bg-gray-300 dark:bg-gray-700"></div>
+          </div>
+        </div>
+        <div className="space-y-2 mb-4">
+          <div className="w-full h-3 rounded bg-gray-300 dark:bg-gray-700"></div>
+          <div className="w-5/6 h-3 rounded bg-gray-300 dark:bg-gray-700"></div>
+          <div className="w-4/6 h-3 rounded bg-gray-300 dark:bg-gray-700"></div>
+        </div>
+        <div className="w-full h-52 rounded-lg bg-gray-300 dark:bg-gray-700"></div>
       </div>
     );
   }
 
-  // ✅ nếu chưa có id (data chưa tới) thì không render gì cả (hoặc bạn có thể trả về skeleton)
-  if (!id) {
-    return null;
-  }
+  
 
   return (
     <div className="rounded-lg bg-white dark:bg-fb-dark-secondary p-4 space-y-3 shadow-sm">
       {/* Main post */}
-      <MainPost key={id} data={renderData} />
+      <MainPost
+        key={id}
+        data={renderData}
+        reactionStats={reactionStats}
+        currentUserId={currentUserId}
+      />
 
       {/* Actions */}
       <div className="flex justify-between text-sm text-gray-600 dark:text-gray-300">
@@ -130,12 +156,10 @@ const Post = ({ data, isLoading }) => {
           onMouseLeave={() => setShowPopup(false)}
         >
           <button
-            className={`w-full hover:bg-gray-100 dark:hover:bg-fb-dark-tertiary flex items-center justify-center gap-2 rounded-md py-2 cursor-pointer text-xl ${
-              selectedReaction?.colorName || ""
-            }`}
+            className={`w-full hover:bg-gray-100 dark:hover:bg-fb-dark-tertiary flex items-center justify-center gap-2 rounded-md py-2 cursor-pointer text-xl ${selectedReaction?.colorName || ""
+              }`}
             onClick={async () => {
-              if (!id) return; // ✅ guard
-
+              if (!id) return;
               if (isLiked) {
                 setSelectedReaction({
                   icon: <ThumbsUp />,
@@ -171,15 +195,14 @@ const Post = ({ data, isLoading }) => {
           </button>
 
           <div
-            className={`absolute -top-12 left-1/2 -translate-x-1/2 z-50 transition ease-in-out duration-500 ${
-              showPopup
+            className={`absolute -top-12 left-1/2 -translate-x-1/2 z-50 transition ease-in-out duration-500 ${showPopup
                 ? "flex opacity-100 scale-100"
                 : "opacity-0 scale-95 pointer-events-none"
-            }`}
+              }`}
           >
             <ReactionPopup
               onSelect={async (reaction) => {
-                if (!id) return; 
+                if (!id) return;
                 setSelectedReaction(reaction);
                 setShowPopup(false);
                 setIsLiked(true);
@@ -205,12 +228,15 @@ const Post = ({ data, isLoading }) => {
         </button>
 
         {/* Share */}
-        <button className="w-1/3 hover:bg-gray-100 dark:hover:bg-fb-dark-tertiary flex items-center justify-center gap-2 py-2 rounded-md cursor-pointer">
+        <button
+          onClick={() => setIsShareOpen(true)}
+          className="w-1/3 hover:bg-gray-100 dark:hover:bg-fb-dark-tertiary flex items-center justify-center gap-2 py-2 rounded-md cursor-pointer"
+        >
           <Share2 size={18} /> Chia sẻ
         </button>
       </div>
 
-      {/* Modal */}
+      {/* Comment Modal */}
       {isModalOpen && (
         <PostModal
           post={renderData}
@@ -218,6 +244,16 @@ const Post = ({ data, isLoading }) => {
           isModalOpen={isModalOpen}
           setIsModalOpen={setIsModalOpen}
           onCommentSuccess={() => setCount((prev) => prev + 1)}
+          reactionStats={reactionStats}
+        />
+      )}
+
+      {/* Share Modal */}
+      {isShareOpen && (
+        <ShareModal
+          isOpen={isShareOpen}
+          onClose={() => setIsShareOpen(false)}
+          post={data}
         />
       )}
     </div>

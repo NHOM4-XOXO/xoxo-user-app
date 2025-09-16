@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useUploadMediaMutation, useUploadMultipleMediaMutation } from "@/features/mediaApi";
 import { useCreatePostMutation } from "@/features/postApi";
+import { useSelector } from "react-redux";
 
 const PostCreationModal = ({
   isOpen,
@@ -33,6 +34,8 @@ const PostCreationModal = ({
   const [uploadMedia] = useUploadMediaMutation();
   const [uploadMultipleMedia] = useUploadMultipleMediaMutation();
   const [createPost] = useCreatePostMutation();
+  const { profile } = useSelector((state) => state.auth);
+  const displayName = `${profile?.firstName || ""} ${profile?.lastName || ""}`.trim() || profile?.username || "Người dùng";
 
   const privacyOptions = [
     { value: "public", label: "Công khai", icon: <Globe className="w-5 h-5" /> },
@@ -141,13 +144,13 @@ const PostCreationModal = ({
         <div className="p-4 border-b border-gray-300 dark:border-gray-700">
           <div className="flex items-center space-x-3">
             <img
-              src="/default-avatar.jpg"
+              src={profile?.avatarUrl || "/default-avatar.jpg"}
               alt="User Avatar"
               className="w-10 h-10 rounded-full object-cover"
             />
             <div>
               <h3 className="text-black dark:text-white font-medium">
-                Minh Thắng
+                {displayName}
               </h3>
               <div className="relative">
                 <button
@@ -186,7 +189,7 @@ const PostCreationModal = ({
           <textarea
             value={postContent}
             onChange={(e) => setPostContent(e.target.value)}
-            placeholder="Minh ơi, bạn đang nghĩ gì thế?"
+            placeholder={`${profile?.lastName} ơi, bạn đang nghĩ gì thế?`}
             className="w-full bg-transparent text-black dark:text-white text-lg resize-none outline-none min-h-[120px]"
           />
 

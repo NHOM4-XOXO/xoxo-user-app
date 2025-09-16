@@ -3,10 +3,9 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { AlertCircle, Eye, EyeOff, CheckCircle } from "lucide-react";
+import { AlertCircle, Eye, EyeOff, CheckCircle, XCircle } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { useRegisterMutation } from "@/features/auth/authApi";
-import { setCredentials } from "@/features/auth/authSlice";
 
 const schema = yup.object().shape({
   firstName: yup.string().required("Vui lòng nhập tên."),
@@ -42,23 +41,21 @@ export default function SignupModal({ isOpen, onClose }) {
   });
 
   const [showPassword, setShowPassword] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
   const [successModalOpen, setSuccessModalOpen] = useState(false);
+  const [errorModalOpen, setErrorModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const onSubmit = async (data) => {
     try {
       const res = await registerUser(data).unwrap();
 
-      // ✅ Đăng ký thành công
-      setSubmitSuccess(true);
+      // Đăng ký thành công
       reset();
-
-      // Hiện modal thay vì alert
       setSuccessModalOpen(true);
     } catch (error) {
       console.error("Lỗi khi đăng ký:", error);
-      alert(error?.data?.message || "Có lỗi xảy ra khi đăng ký!");
+      setErrorMessage(error?.data?.message || "Có lỗi xảy ra khi đăng ký!");
+      setErrorModalOpen(true);
     }
   };
 
@@ -72,7 +69,7 @@ export default function SignupModal({ isOpen, onClose }) {
           <div className="p-6">
             <div className="flex justify-between items-center mb-4">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 ">Đăng ký</h2>
+                <h2 className="text-2xl font-bold text-gray-900">Đăng ký</h2>
                 <p className="text-gray-600">Nhanh chóng và dễ dàng.</p>
               </div>
               <button
@@ -84,7 +81,7 @@ export default function SignupModal({ isOpen, onClose }) {
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              {/* Họ */}
+              {/* Họ + Tên */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="relative">
                   <input
@@ -165,17 +162,17 @@ export default function SignupModal({ isOpen, onClose }) {
 
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isLoading}
                 className="w-full py-2 px-4 rounded-md font-semibold transition duration-200 bg-green-500 text-white hover:bg-green-600"
               >
-                Đăng ký
+                {isLoading ? "Đang xử lý..." : "Đăng ký"}
               </button>
             </form>
           </div>
         </div>
       </div>
 
-      {/* ✅ Success Modal */}
+      {/* Success Modal */}
       {successModalOpen && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 shadow-lg text-center max-w-sm w-full">
@@ -194,6 +191,25 @@ export default function SignupModal({ isOpen, onClose }) {
               className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
             >
               OK
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Error Modal */}
+      {errorModalOpen && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 shadow-lg text-center max-w-sm w-full">
+            <XCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Đăng ký thất bại!
+            </h3>
+            <p className="text-gray-600 mb-4">{errorMessage}</p>
+            <button
+              onClick={() => setErrorModalOpen(false)}
+              className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+            >
+              Thử lại
             </button>
           </div>
         </div>

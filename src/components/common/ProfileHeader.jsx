@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { Modal } from "antd";
 import { Camera } from "lucide-react";
+import toast from "react-hot-toast";
 import ProfileTabs from "@/components/common/ProfileTabs";
 import {
     useGetMyProfileQuery,
@@ -17,11 +18,11 @@ const tabs = [
     { label: "Video", path: "profile-videos" },
 ];
 
-function ProfileHeader({ setIsLoading, setNotifyModal }) {
+function ProfileHeader({ setIsLoading }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const { data: profileRes, isFetching, error, refetch } = useGetMyProfileQuery();
-    const profile = profileRes;
+    const { data: profile, isFetching, error, refetch } = useGetMyProfileQuery();
+
 
     const [updateAvatar] = useUpdateAvatarMutation();
     const [updateCover] = useUpdateCoverMutation();
@@ -41,16 +42,17 @@ function ProfileHeader({ setIsLoading, setNotifyModal }) {
         const formData = new FormData();
         formData.append("file", file);
 
+        const toastId = toast.loading("Đang cập nhật avatar...");
+
         try {
             setAvatarLoading(true);
             await updateAvatar(formData).unwrap();
-            setNotifyModal && setNotifyModal({ open: true, title: "Cập nhật avatar thành công!", type: "success" });
+            toast.success("Cập nhật avatar thành công!", { id: toastId });
             refetch();
         } catch {
-            setNotifyModal && setNotifyModal({ open: true, title: "Cập nhật avatar thất bại!", type: "error" });
+            toast.error("Cập nhật avatar thất bại!", { id: toastId });
         } finally {
             setAvatarLoading(false);
-            setTimeout(() => setNotifyModal && setNotifyModal(prev => ({ ...prev, open: false })), 2000);
         }
     };
 
@@ -61,16 +63,17 @@ function ProfileHeader({ setIsLoading, setNotifyModal }) {
         const formData = new FormData();
         formData.append("file", file);
 
+        const toastId = toast.loading("Đang cập nhật cover...");
+
         try {
             setCoverLoading(true);
             await updateCover(formData).unwrap();
-            setNotifyModal && setNotifyModal({ open: true, title: "Cập nhật cover thành công!", type: "success" });
+            toast.success("Cập nhật cover thành công!", { id: toastId });
             refetch();
         } catch {
-            setNotifyModal && setNotifyModal({ open: true, title: "Cập nhật cover thất bại!", type: "error" });
+            toast.error("Cập nhật cover thất bại!", { id: toastId });
         } finally {
             setCoverLoading(false);
-            setTimeout(() => setNotifyModal && setNotifyModal(prev => ({ ...prev, open: false })), 2000);
         }
     };
 

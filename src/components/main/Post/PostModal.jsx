@@ -18,10 +18,10 @@ const filterOptions = [
     { key: "all", label: <div><p className="font-semibold">Tất cả bình luận</p><p className="text-xs text-gray-500 dark:text-gray-400">Hiển thị tất cả bình luận, bao gồm cả nội dung có thể là spam.</p></div> },
 ];
 
-function PostModal({ post, isModalOpen, setIsModalOpen, onCommentSuccess }) {
+function PostModal({ post, isModalOpen, setIsModalOpen, onCommentSuccess, reactionStats }) {
     const [comment, setComment] = useState("");
     const [commentFilter, setCommentFilter] = useState("Phù hợp nhất");
-    const [commentPost, { isLoading }] = useCommentPostMutation();
+    const [commentPost] = useCommentPostMutation();
     const [selectedFiles, setSelectedFiles] = useState([]);
     const emojiPickerRef = useRef(null);
     const emojiButtonRef = useRef(null);
@@ -29,8 +29,8 @@ function PostModal({ post, isModalOpen, setIsModalOpen, onCommentSuccess }) {
     const profile = useSelector((state) => state.auth.profile);
     const avatarUrl = profile?.avatarUrl
 
-    const { data: comments } = useGetPostCommentsQuery(id, {
-        skip: !id,
+    const { data: comments, isLoading, isFetching } = useGetPostCommentsQuery(id, {
+        skip: !id || post?.post.commentCount === 0, // chỉ gọi khi có id và có comment
     });
 
     const { resolvedTheme } = useTheme();
@@ -92,35 +92,52 @@ function PostModal({ post, isModalOpen, setIsModalOpen, onCommentSuccess }) {
 
         >
             {/* Post chính */}
-            <MainPost data={post} />
+            <MainPost data={post} reactionStats={reactionStats} />
 
-            <hr className="border-gray-300 dark:border-fb-dark-tertiary my-3" />
 
             {/* Bình luận */}
-            <div className="space-y-5">
-                {comments && comments.length > 0 ? (
-                    <>
-                        <Dropdown
-                            menu={{ items: filterOptions, onClick: handleFilterChange }}
-                            trigger={["click"]}
-                            placement="bottomRight"
-                            arrow={{ pointAtCenter: true }}
-                            overlayStyle={{ maxWidth: 400 }}
-                            overlayClassName={isDark ? "custom-dropdown" : ""}
-                        >
-                            <button className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline flex items-center">
-                                {commentFilter} <DownOutlined className="ml-1 text-xs" />
-                            </button>
-                        </Dropdown>
+            {isLoading || isFetching ? (
+                <div className="space-y-3">
+                    {[...Array(3)].map((_, i) => (
+                        <div key={i} className="flex gap-2 animate-pulse">
+                            {/* Avatar skeleton */}
+                            <div className="w-9 h-9 bg-gray-300 dark:bg-gray-700 rounded-full"></div>
 
-                        {comments.map((c) => (
-                            <PostComment key={c.id} comment={c} />
-                        ))}
-                    </>
-                ) : (
-                    <p className="text-sm text-gray-500 dark:text-gray-400 italic">Chưa có bình luận nào.</p>
-                )}
-            </div>
+                            {/* Text skeleton */}
+                            <div className="flex-1 space-y-2">
+                                <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-1/2"></div>
+                                <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-3/4"></div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            ) : comments && comments.length > 0 ? (
+                <>
+                    {/* Dropdown filter */}
+                    <Dropdown
+                        menu={{ items: filterOptions, onClick: handleFilterChange }}
+                        trigger={["click"]}
+                        placement="bottomRight"
+                        arrow={{ pointAtCenter: true }}
+                        overlayStyle={{ maxWidth: 400 }}
+                        overlayClassName={isDark ? "custom-dropdown" : ""}
+                    >
+                        <button className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline flex items-center">
+                            {commentFilter} <DownOutlined className="ml-1 text-xs" />
+                        </button>
+                    </Dropdown>
+
+                    {/* Danh sách bình luận */}
+                    {comments.map((c) => (
+                        <PostComment key={c.id} comment={c} />
+                    ))}
+                </>
+            ) : (
+                <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+                    Chưa có bình luận nào.
+                </p>
+            )}
+
 
             {/* Nhập bình luận */}
             <div className="absolute bottom-0 left-0 w-full bg-white dark:bg-fb-dark-secondary p-3 border-t border-gray-200 dark:border-gray-600">

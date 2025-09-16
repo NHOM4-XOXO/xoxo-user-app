@@ -3,15 +3,19 @@
 import { useState } from "react";
 import { ArrowLeft, Camera, Globe, Lock, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useGroups } from "@/contexts/GroupsContext";
+import { message } from "antd";
+import { useCreateGroupMutation } from '@/features/groupManageMentApi';
+import toast from "react-hot-toast";
+
 
 export default function CreateGroupPage() {
   const router = useRouter();
-  const { addGroup } = useGroups();
+  const [createGroup, { isLoading }] = useCreateGroupMutation();
+
   const [formData, setFormData] = useState({
     groupName: "",
     description: "",
-    privacy: "public",
+    privacy: "PRIVATE", // API yêu cầu viết hoa
     inviteFriends: false,
     coverImage: null,
   });
@@ -31,25 +35,34 @@ export default function CreateGroupPage() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const newGroup = {
-      name: formData.groupName,
-      description: formData.description,
-      privacy: formData.privacy,
-      image: formData.coverImage
-        ? URL.createObjectURL(formData.coverImage)
-        : "https://picsum.photos/id/237/200/300",
-    };
+    try {
+      const body = {
+        title: formData.groupName,
+        description: formData.description,
+        coverUrl: formData.coverImage
+          ? URL.createObjectURL(formData.coverImage)
+          : "/default-avatar.png",
+        privacy: formData.privacy.toUpperCase(),
+        rules: "string",
+        tags: "string",
+        location: "string",
+        website: "string",
+      };
 
-    const newGroupId = addGroup(newGroup);
+      const res = await createGroup(body).unwrap();
 
-    console.log("Group created successfully:", newGroup);
-
-    alert(`Tạo nhóm "${formData.groupName}" thành công!`);
-
-    router.push(`/groups/${newGroupId}`);
+      toast.success(`Tạo nhóm "${formData.groupName}" thành công! 🎉`);
+      router.push(`/groups/${res.data.id}`);
+      setTimeout(() => {
+      router.push(`/groups/${res.data.id}`);
+    }, 2000);
+    } catch (err) {
+      console.error("Create group failed:", err);
+      toast.error("Tạo nhóm thất bại. Vui lòng thử lại!");
+    }
   };
 
   const handleCancel = () => {
@@ -72,8 +85,8 @@ export default function CreateGroupPage() {
             </div>
           </div>
 
-      
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
+            {/* Cover image */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-3">
                 Ảnh bìa nhóm
@@ -105,7 +118,7 @@ export default function CreateGroupPage() {
               </div>
             </div>
 
-      
+            {/* Group name */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Tên nhóm <span className="text-red-500">*</span>
@@ -121,6 +134,7 @@ export default function CreateGroupPage() {
               />
             </div>
 
+            {/* Description */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Mô tả nhóm (tùy chọn)
@@ -135,19 +149,18 @@ export default function CreateGroupPage() {
               />
             </div>
 
-            {/* Privacy Settings */}
+            {/* Privacy */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-3">
                 Quyền riêng tư
               </label>
               <div className="space-y-3">
-                {/* Public */}
                 <label className="flex items-start space-x-3 p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
                   <input
                     type="radio"
                     name="privacy"
-                    value="public"
-                    checked={formData.privacy === "public"}
+                    value="PUBLIC"
+                    checked={formData.privacy === "PUBLIC"}
                     onChange={handleInputChange}
                     className="mt-1"
                   />
@@ -165,13 +178,12 @@ export default function CreateGroupPage() {
                   </div>
                 </label>
 
-      
                 <label className="flex items-start space-x-3 p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
                   <input
                     type="radio"
                     name="privacy"
-                    value="private"
-                    checked={formData.privacy === "private"}
+                    value="PRIVATE"
+                    checked={formData.privacy === "PRIVATE"}
                     onChange={handleInputChange}
                     className="mt-1"
                   />
@@ -191,6 +203,7 @@ export default function CreateGroupPage() {
               </div>
             </div>
 
+            {/* Invite friends */}
             <div className="flex items-start space-x-3 p-4 border border-gray-200 rounded-lg">
               <input
                 type="checkbox"
@@ -214,6 +227,7 @@ export default function CreateGroupPage() {
               </div>
             </div>
 
+            {/* Buttons */}
             <div className="flex space-x-4 pt-6">
               <button
                 type="button"
@@ -224,10 +238,10 @@ export default function CreateGroupPage() {
               </button>
               <button
                 type="submit"
-                disabled={!formData.groupName.trim()}
+                disabled={!formData.groupName.trim() || isLoading}
                 className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium transition-colors cursor-pointer"
               >
-                Tạo nhóm
+                {isLoading ? "Đang tạo..." : "Tạo nhóm"}
               </button>
             </div>
           </form>

@@ -1,26 +1,31 @@
 "use client";
 
-import { useState } from "react";
-import Post from "../main/Post/PostItem";
-import { allPosts } from "@/data/posts";
-
+import { useGetAllGroupQuery } from "@/features/groupManageMentApi";
+import { Skeleton } from "antd"; // nếu muốn loading đẹp
+import GroupCard from "./GroupCard";
 
 export default function GroupsFeed() {
-  const [postContent, setPostContent] = useState("");
+  const { data: groups, isLoading, isError } = useGetAllGroupQuery();
+
+  if (isLoading) {
+    return (
+      <div className="p-6 space-y-4">
+        <Skeleton active avatar paragraph={{ rows: 2 }} />
+        <Skeleton active avatar paragraph={{ rows: 2 }} />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return <p className="text-red-500">Lỗi tải danh sách nhóm</p>;
+  }
+
 
   return (
-    <div className="space-y-6 p-12 -mt-10">
-      <div className="flex items-center space-x-2">
-        <span className="text-sm text-gray-500">
-          <strong>Hoạt động gần đây</strong>
-        </span>
-      </div>
-      {/* Posts */}
-      <div className="space-y-4">
-        {allPosts.map((item, index) => (
-          <Post key={index} data={item} />
-        ))}
-      </div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-6">
+      {groups.map((group) => (
+        <GroupCard key={group.id} group={group} />
+      ))}
     </div>
   );
 }

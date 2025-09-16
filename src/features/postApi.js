@@ -81,6 +81,11 @@ export const postApi = createApi({
             transformResponse: (response) => response.data,
             providesTags: (r, e, id) => [{ type: "Like", id }],
         }),
+        getReactionStatistics: builder.query({
+            query: (postId) => `/${postId}/reaction-stats`,
+            transformResponse: (response) => response.data,
+            providesTags: (r, e, id) => [{ type: "Like", id }],
+        }),
 
 
         /* -------------------- POST -------------------- */
@@ -103,9 +108,10 @@ export const postApi = createApi({
             ],
         }),
         sharePost: builder.mutation({
-            query: (postId) => ({
+            query: ({ postId, content }) => ({
                 url: `/${postId}/share`,
                 method: "POST",
+                params: { content }, // query param
             }),
             invalidatesTags: (r, e, id) => [
                 { type: "Share", id },
@@ -138,6 +144,16 @@ export const postApi = createApi({
             }),
             invalidatesTags: (r, e, { postId }) => [
                 { type: "Media", id: postId },
+                { type: "Post", id: postId },
+            ],
+        }),
+        addReaction: builder.mutation({
+            query: ({ postId, reactionType }) => ({
+                url: `/${postId}/react/${reactionType}`,
+                method: "POST",
+            }),
+            invalidatesTags: (r, e, { postId }) => [
+                { type: "Like", id: postId },
                 { type: "Post", id: postId },
             ],
         }),
@@ -195,6 +211,7 @@ export const {
     useGetPostsOfMeQuery,
     useGetMyReactionQuery,
     useGetPostReactionsQuery,
+    useGetReactionStatisticsQuery,
 
     useCreatePostMutation,
     useLikePostMutation,
@@ -205,4 +222,5 @@ export const {
     useDeletePostMutation,
     useDeletePostMediaMutation,
     useDeleteReactionPostMutation,
+    useAddReactionMutation,
 } = postApi;
