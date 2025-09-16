@@ -57,6 +57,8 @@ export default function ProfileDropdown() {
           src={userAvatar || "/image/georgina.jpg"}
           alt="Avatar"
           className="w-6 h-6 sm:w-9 sm:h-9 rounded-full object-cover"
+          width={32}
+          height={32}
         />
       </button>
 
