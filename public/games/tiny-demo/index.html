@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tiny Demo</title>
+    <style>
+    html,body { margin:0; height:100%; background:#111; color:#fff; font-family:system-ui; }
+    .box { display:flex; height:100%; align-items:center; justify-content:center; flex-direction:column; gap:12px; }
+    button { padding:10px 16px; border-radius:10px; border:0; }
+  </style>
+    <base href="../../data/games.json">
+  </head>
+  <body>
+    <div class="box">
+      <div>Nhấn để gửi điểm demo (random)</div>
+      <button onclick="reportScore(Math.floor(Math.random()*5000))">Report score</button>
+    </div>
+    <script>
+    window.parent && window.parent.postMessage({ type: "xoxo:ready" }, "*");
+    window.addEventListener("message", (e) => {
+      if (e.data?.type === "xoxo:init") {
+      }
+    });
+    function reportScore(value) {
+      window.parent && window.parent.postMessage({ type: "xoxo:score", payload: { value } }, "*");
+    }
+  </script>
+  </body>
+</html>

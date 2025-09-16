@@ -22,7 +22,7 @@ const items = [
   { icon: <FaVideo />, label: "Video", href: "/videos" },
   // { icon: <IoTimer />, label: "Kỷ niệm", href: "/" },
   { icon: <FaRegSave />, label: "Đã lưu", href: "/saved" },
-  { icon: <FaPlaceOfWorship />, label: "Marketplace", href: "marketplaces" },
+  { icon: <FaPlaceOfWorship />, label: "Marketplace", href: "marketplace" },
   { icon: <FaGamepad />, label: "Chơi game", href: "/games" },
   { icon: <BsMusicPlayerFill />, label: "Thư giãn", href: "/musics" },
   { icon: <FaRegMessage />, label: "Messages", href: "/messages" },

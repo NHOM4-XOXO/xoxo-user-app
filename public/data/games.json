@@ -1,0 +1,18 @@
+[
+  {
+    "id": "g001",
+    "slug": "2048",
+    "title": "2048",
+    "desc": "Game ghép số kinh điển.",
+    "cover": "../image/2048.jpg",
+    "url": "https://play2048.co/"
+  },
+  {
+    "id": "g002",
+    "slug": "minesweeper",
+    "title": "Minesweeper",
+    "desc": "Dò mìn cổ điển.",
+    "cover": "../image/MineSweeper.png",
+    "url": "https://minesweeperonline.com/"
+  }
+]
