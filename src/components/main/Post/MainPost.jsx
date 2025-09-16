@@ -1,40 +1,40 @@
-"use client";
-
 import { useState } from "react";
 import { Dropdown } from "antd";
 import { useTheme } from "next-themes";
-import { ThumbsUp, Heart, MoreHorizontal, Users, Smile, Edit, Trash2 } from "lucide-react";
+import { MoreHorizontal, Users, Edit, Trash2, Flag, EyeOff } from "lucide-react";
 import PostMediaGrid from "./PostMediaGrid";
-import { useGetPostReactionsQuery } from "@/features/postApi";
+import PostFooter from "./PostFooter";
 
-const menuItems = {
-    items: [
-        { key: "edit", icon: <Edit size={16} />, label: <p className="text-sm font-semibold">Chỉnh sửa bài viết</p> },
-        { key: "delete", icon: <Trash2 size={16} />, label: <p className="text-sm font-semibold text-red-500">Xóa bài viết</p> },
-    ],
-};
-
-const MainPost = ({ data }) => {
-
+const MainPost = ({ data, reactionStats, currentUserId }) => {
     const [showFullCaption, setShowFullCaption] = useState(false);
     const { resolvedTheme } = useTheme();
     const isDark = resolvedTheme === "dark";
-    const { data: postReactions } = useGetPostReactionsQuery(data?.post.id);
 
-
-
-    // Nếu data chưa có, trả về null
     if (!data) return null;
 
     const { post, media = [] } = data;
 
-
     const author = {
+        id: post?.authorId,
         name: `${post?.authorFirstName || ""} ${post?.authorLastName || ""}`.trim() || "Người dùng",
         avatar: post?.authorAvatarUrl,
     };
 
     const toggleCaption = () => setShowFullCaption(!showFullCaption);
+
+    // Xác định menu dựa vào bài viết của mình hay người khác
+    const menuItems = {
+        items:
+            currentUserId === author.id
+                ? [
+                    { key: "edit", icon: <Edit size={16} />, label: <p className="text-sm font-semibold">Chỉnh sửa bài viết</p> },
+                    { key: "delete", icon: <Trash2 size={16} />, label: <p className="text-sm font-semibold text-red-500">Xóa bài viết</p> },
+                ]
+                : [
+                    { key: "report", icon: <Flag size={16} />, label: <p className="text-sm font-semibold text-red-500">Báo cáo bài viết</p> },
+                    { key: "hide", icon: <EyeOff size={16} />, label: <p className="text-sm font-semibold">Ẩn bài viết</p> },
+                ],
+    };
 
     return (
         <>
@@ -47,7 +47,7 @@ const MainPost = ({ data }) => {
                         alt="Avatar"
                     />
                     <div>
-                        <h1 className="font-bold text-sm dark:text-white">{author.name}</h1>
+                        <h1 className="font-bold text-sm dark:text-white cursor-pointer hover:underline">{author.name}</h1>
                         <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
                             {post?.createdAt ? new Date(post.createdAt).toLocaleString() : ""}
                             <Users className="w-3 h-3" />
@@ -81,15 +81,7 @@ const MainPost = ({ data }) => {
             {media.length > 0 && <PostMediaGrid media={media} postId={post?.id} />}
 
             {/* Reactions */}
-            <div className="flex justify-between items-center text-sm text-gray-600 dark:text-gray-400 px-2 pt-2">
-                <div className="flex items-center gap-1">
-                    <ThumbsUp size={18} className="text-blue-600" />
-                    <Heart size={18} className="text-red-600" />
-                    <Smile size={18} className="text-yellow-500" />
-                    <span className="text-sm hover:underline">{postReactions?.content?.length || 0}</span>
-                </div>
-                <span className="text-sm hover:underline">{`${post?.commentCount || 0} Bình luận`}</span>
-            </div>
+            <PostFooter post={post} reactionStats={reactionStats} />
         </>
     );
 };

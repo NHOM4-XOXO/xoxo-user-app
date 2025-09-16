@@ -3,6 +3,7 @@ import "./globals.css";
 import ClientLayout from "@/layout/ClientLayout";
 import ThemeProvider from "@/components/ThemeProvider";
 import StoreProvider from "@/store/StoreProvider";
+import { Toaster } from "react-hot-toast";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -28,6 +29,7 @@ export default function RootLayout({ children }) {
         <StoreProvider>
           <ThemeProvider>
             <ClientLayout>{children}</ClientLayout>
+            <Toaster position="top-right" reverseOrder={false} />
           </ThemeProvider>
         </StoreProvider>
       </body>

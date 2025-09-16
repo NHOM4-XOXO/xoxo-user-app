@@ -11,6 +11,14 @@ export default function ProfileDropdown() {
   const [userAvatar, setUserAvatar] = useState("/image/georgina.jpg");
   const menuRef = useRef(null);
 
+  // const storedProfile = localStorage.getItem("auth");
+
+  // let avatarUrl = null;
+  // if (storedProfile) {
+  //   const profileObj = JSON.parse(storedProfile);
+  //   avatarUrl = profileObj?.profile.avatarUrl; // Lấy ra link avatar
+  // }
+
   const handleClickOutside = (e) => {
     if (menuRef.current && !menuRef.current.contains(e.target)) {
       setIsOpen(false);
@@ -48,9 +56,7 @@ export default function ProfileDropdown() {
         <Image
           src={userAvatar || "/image/georgina.jpg"}
           alt="Avatar"
-          width={32}
-          height={32}
-          className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover"
+          className="w-6 h-6 sm:w-9 sm:h-9 rounded-full object-cover"
         />
       </button>
 

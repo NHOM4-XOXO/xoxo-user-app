@@ -16,7 +16,7 @@ export default function Home() {
   const token = Cookies.get("token");
 
   // Lấy profile từ API
-  const { data: profile, isSuccess, isLoading, error } = useGetMyProfileQuery();
+  const { data: profile, isSuccess } = useGetMyProfileQuery();
 
   useEffect(() => {
     if (token) {
