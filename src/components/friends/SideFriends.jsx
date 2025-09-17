@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation";
 
 import SidebarShell from "@/components/ui/SidebarShell";
 import SidebarSection from "@/components/ui/SidebarSection";
+import SidebarFooter from "../common/SidebarFooter";
 
 const items = [
   { href: "/friends", icon: <FaUserFriends />, label: "Trang chủ" },
@@ -74,13 +75,7 @@ export default function SidebarFriend() {
           </ul>
         </div>
 
-        {/* Footer chuẩn (không cuộn, dính đáy) */}
-        <SidebarSection withTopBorder className="pt-4">
-          <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1 px-3">
-            <p>Quyền riêng tư · Điều khoản · Quảng cáo · Lựa chọn quảng cáo</p>
-            <p>XOXO © 2025</p>
-          </div>
-        </SidebarSection>
+        <SidebarFooter />
       </SidebarShell>
     </>
   );

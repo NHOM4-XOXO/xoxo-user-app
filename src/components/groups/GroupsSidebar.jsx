@@ -9,6 +9,7 @@ import SidebarSection from "@/components/ui/SidebarSection";
 import SidebarListItem from "@/components/ui/SidebarListItem";
 import { TbDeviceImacSearch } from "react-icons/tb";
 import { HiMiniUserGroup } from "react-icons/hi2";
+import SidebarFooter from "../common/SidebarFooter";
 
 export default function GroupsSidebar() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -140,13 +141,7 @@ export default function GroupsSidebar() {
           </SidebarSection>
         </div>
 
-        {/* Footer (không cuộn, dính đáy) */}
-        <SidebarSection withTopBorder>
-          <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1 px-3">
-            <p>Quyền riêng tư · Điều khoản · Quảng cáo · Lựa chọn quảng cáo</p>
-            <p>XOXO © 2025</p>
-          </div>
-        </SidebarSection>
+        <SidebarFooter />
       </SidebarShell>
     </>
   );

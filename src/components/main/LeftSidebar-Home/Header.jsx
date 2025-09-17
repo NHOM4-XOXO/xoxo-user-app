@@ -116,12 +116,11 @@ export default function Header({ onContactClick }) {
         setState({
           results: { users: [], posts: [], groups: [], totalResults: 0 },
           loading: false,
-          showResults: true, // Vẫn hiển thị để show "không tìm thấy"
+          showResults: true,
         });
       }
     };
 
-    // Debounce search - giảm thời gian xuống 200ms để responsive hơn
     const timeoutId = setTimeout(performSearch, 200);
     return () => clearTimeout(timeoutId);
   }, [searchTerm]);
