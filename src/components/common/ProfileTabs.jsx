@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export default function ProfileTabs({ tabs }) {
+export default function ProfileTabs({ userName, tabs }) {
     const pathname = usePathname();
 
     return (
@@ -16,7 +16,7 @@ export default function ProfileTabs({ tabs }) {
                 return (
                     <li key={i}>
                         <Link
-                            href={`/profile/${tab.path}`}
+                            href={`/profile/${userName}/${tab.path}`}
                             className={`relative transition-colors duration-200 py-2 px-3 rounded-sm ${isActive
                                 ? "text-blue-600 dark:text-blue-400 font-medium after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:border-b-2 after:border-blue-600 dark:after:border-blue-400"
                                 : "hover:bg-fb-light-tertiary dark:hover:bg-fb-dark-tertiary"

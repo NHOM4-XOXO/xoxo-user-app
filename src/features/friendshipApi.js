@@ -40,6 +40,11 @@ export const friendshipApi = createApi({
             transformResponse: transform,
             providesTags: ["Friendship"],
         }),
+        getFriendsByIduser: builder.query({
+            query: (userId) => `/friends/${userId}`,
+            transformResponse: transform,
+            providesTags: ["Friendship"],
+        }),
 
         /* -------------------- MUTATION -------------------- */
         sendRequest: builder.mutation({
@@ -51,21 +56,21 @@ export const friendshipApi = createApi({
             invalidatesTags: ["Friendship"],
         }),
         rejectRequest: builder.mutation({
-            query: (data) => ({
-                url: "/reject",
+            query: (friendshipId) => ({
+                url: `/reject?friendshipId=${friendshipId}`,
                 method: "POST",
-                body: data, // { requestId }
             }),
             invalidatesTags: ["Friendship"],
         }),
+
         acceptRequest: builder.mutation({
-            query: (data) => ({
-                url: "/accept",
+            query: (friendshipId) => ({
+                url: `/accept?friendshipId=${friendshipId}`,
                 method: "POST",
-                body: data, // { requestId }
             }),
             invalidatesTags: ["Friendship"],
         }),
+
     }),
 });
 
@@ -74,6 +79,7 @@ export const {
     useGetSentPendingQuery,
     useGetReceivedPendingQuery,
     useGetFriendsQuery,
+    useGetFriendsByIduserQuery,
 
     useSendRequestMutation,
     useRejectRequestMutation,

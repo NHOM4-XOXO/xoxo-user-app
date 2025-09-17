@@ -135,7 +135,6 @@ const Post = ({ data }) => {
     );
   }
 
-  
 
   return (
     <div className="rounded-lg bg-white dark:bg-fb-dark-secondary p-4 space-y-3 shadow-sm">
@@ -196,8 +195,8 @@ const Post = ({ data }) => {
 
           <div
             className={`absolute -top-12 left-1/2 -translate-x-1/2 z-50 transition ease-in-out duration-500 ${showPopup
-                ? "flex opacity-100 scale-100"
-                : "opacity-0 scale-95 pointer-events-none"
+              ? "flex opacity-100 scale-100"
+              : "opacity-0 scale-95 pointer-events-none"
               }`}
           >
             <ReactionPopup

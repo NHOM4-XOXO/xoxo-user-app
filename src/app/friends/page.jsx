@@ -1,8 +1,10 @@
+"use client";
 import SidebarFriend from "@/components/friends/SideFriends";
 import FriendRequestCard from "../../components/friends/FriendRequestCard";
-import sampleFriends from "@/data/sampleFriends";
+import { useGetReceivedPendingQuery } from "@/features/friendshipApi";
 
 export default function FriendsPage() {
+  const { data: friends = [], isLoading } = useGetReceivedPendingQuery();
   return (
     <div className="flex bg-fb-light-secondary min-h-screen dark:text-white dark:bg-black">
       <SidebarFriend />
@@ -18,11 +20,10 @@ export default function FriendsPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {sampleFriends.map((user, idx) => (
+          {friends.map((item) => (
             <FriendRequestCard
-              key={idx}
-              avatar={user.avatar}
-              name={user.name}
+              key={item.id}
+              friend={item}
             />
           ))}
         </div>
