@@ -1,65 +1,65 @@
-name: FE User CI/CD
+# name: FE User CI/CD
 
-on:
-  push:
-    branches: [ dev ]
-  workflow_dispatch:
+# on:
+#   push:
+#     branches: [ dev ]
+#   workflow_dispatch:
 
-env:
-  APP_DIR: .
-  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/xoxo-user-app
+# env:
+#   APP_DIR: .
+#   IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/xoxo-user-app
 
-jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ${{ env.APP_DIR }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v3
-      - uses: docker/setup-buildx-action@v3
-      - uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - uses: docker/build-push-action@v6
-        with:
-          context: ${{ env.APP_DIR }}
-          file: Dockerfile
-          push: true
-          tags: |
-            ${{ env.IMAGE_NAME }}:latest
-            ${{ env.IMAGE_NAME }}:${{ github.sha }}
+# jobs:
+#   build-and-push:
+#     runs-on: ubuntu-latest
+#     defaults:
+#       run:
+#         working-directory: ${{ env.APP_DIR }}
+#     steps:
+#       - uses: actions/checkout@v4
+#       - uses: docker/setup-qemu-action@v3
+#       - uses: docker/setup-buildx-action@v3
+#       - uses: docker/login-action@v3
+#         with:
+#           username: ${{ secrets.DOCKERHUB_USERNAME }}
+#           password: ${{ secrets.DOCKERHUB_TOKEN }}
+#       - uses: docker/build-push-action@v6
+#         with:
+#           context: ${{ env.APP_DIR }}
+#           file: Dockerfile
+#           push: true
+#           tags: |
+#             ${{ env.IMAGE_NAME }}:latest
+#             ${{ env.IMAGE_NAME }}:${{ github.sha }}
 
-  deploy-ec2:
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    steps:
-      - run: |
-          mkdir -p fe-user-dist
-          echo "NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}" > fe-user-dist/.env
-      - uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          source: "fe-user-dist/.env"
-          target: "~/fe-user"
-      - uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          script: |
-            set -e
-            docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/xoxo-user-app:latest
-            docker rm -f xoxo-user-app || true
-            mkdir -p ~/fe-user
-            [ -f ~/fe-user/.env ] || echo "NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}" > ~/fe-user/.env
-            docker run -d --name xoxo-user-app \
-              -p 3000:3000 \
-              --env-file ~/fe-user/.env \
-              --restart unless-stopped \
-              ${{ secrets.DOCKERHUB_USERNAME }}/xoxo-user-app:latest
+#   deploy-ec2:
+#     needs: build-and-push
+#     runs-on: ubuntu-latest
+#     steps:
+#       - run: |
+#           mkdir -p fe-user-dist
+#           echo "NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}" > fe-user-dist/.env
+#       - uses: appleboy/scp-action@v0.1.7
+#         with:
+#           host: ${{ secrets.EC2_HOST }}
+#           username: ${{ secrets.SERVER_USER }}
+#           key: ${{ secrets.EC2_KEY }}
+#           source: "fe-user-dist/.env"
+#           target: "~/fe-user"
+#       - uses: appleboy/ssh-action@v1.0.3
+#         with:
+#           host: ${{ secrets.EC2_HOST }}
+#           username: ${{ secrets.SERVER_USER }}
+#           key: ${{ secrets.EC2_KEY }}
+#           script: |
+#             set -e
+#             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+#             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/xoxo-user-app:latest
+#             docker rm -f xoxo-user-app || true
+#             mkdir -p ~/fe-user
+#             [ -f ~/fe-user/.env ] || echo "NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}" > ~/fe-user/.env
+#             docker run -d --name xoxo-user-app \
+#               -p 3000:3000 \
+#               --env-file ~/fe-user/.env \
+#               --restart unless-stopped \
+#               ${{ secrets.DOCKERHUB_USERNAME }}/xoxo-user-app:latest
