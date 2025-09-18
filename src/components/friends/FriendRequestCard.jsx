@@ -9,7 +9,6 @@ const FriendRequestCard = ({ friend }) => {
   const handleAccept = async () => {
     try {
       await acceptRequest(friend.id).unwrap();
-      console.log("Accepted:", friend.id);
     } catch (err) {
       console.error("Accept failed:", err);
     }
@@ -18,7 +17,6 @@ const FriendRequestCard = ({ friend }) => {
   const handleReject = async () => {
     try {
       await rejectRequest(friend.id).unwrap();
-      console.log("Accepted:", friend.id);
     } catch (err) {
       console.error("Accept failed:", err);
     }
