@@ -100,12 +100,12 @@ export default function LoginForm() {
             <div className="text-center lg:text-left">
               <div className="flex justify-center lg:justify-start">
                 <img
-                  src="/logo_xoxo_500px-removebg-preview.png"
-                  alt="Logo"
-                  className="h-50 w-50 rounded-full"
+                  src="/XoXo-login.png"
+                  alt="Logo XoXo Networking"
+                  className="mx-auto rounded-full w-[200px] h-[200px]"
                 />
               </div>
-              <p className="text-2xl text-gray-600 max-w-md mx-auto lg:mx-0">
+              <p className="text-2xl text-gray-600 max-w-md mx-auto">
                 <span className="text-blue-600">
                   <b>XOXO</b>
                 </span>{" "}
