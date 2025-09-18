@@ -76,9 +76,6 @@ export const chatApi = createApi({
             transformResponse: (response) => response.data,
         }),
 
-        // Send message is handled via WebSocket only (Kafka → Consumer → DB)
-        // No REST API endpoint for sending messages
-
         // Mark message as read
         markMessageAsRead: builder.mutation({
             query: (messageId) => ({

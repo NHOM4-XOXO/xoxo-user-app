@@ -60,35 +60,35 @@ export default function LoginForm() {
     }
   };
 
-  const handleGoogleLogin = () => {
-    const popup = window.open(
-      `${process.env.NEXT_PUBLIC_API_URL}/oauth2/authorization/google`, // endpoint Google OAuth
-      "GoogleLogin",
-      "width=500,height=600"
-    );
+  // const handleGoogleLogin = () => {
+  //   const popup = window.open(
+  //     `${process.env.NEXT_PUBLIC_API_URL}/oauth2/authorization/google`, // endpoint Google OAuth
+  //     "GoogleLogin",
+  //     "width=500,height=600"
+  //   );
 
-    const handleMessage = (event) => {
-      if (event.origin !== window.location.origin) return; // chỉ chấp nhận từ origin của bạn
+  //   const handleMessage = (event) => {
+  //     if (event.origin !== window.location.origin) return; // chỉ chấp nhận từ origin của bạn
 
-      const { type, token, profile } = event.data;
-      if (type === "OAUTH2_DONE" && token) {
-        dispatch(setCredentials({ token, profile })); // lưu vào Redux
-        router.replace("/"); // redirect home
-        popup.close();
-        window.removeEventListener("message", handleMessage);
-      }
-    };
+  //     const { type, token, profile } = event.data;
+  //     if (type === "OAUTH2_DONE" && token) {
+  //       dispatch(setCredentials({ token, profile })); // lưu vào Redux
+  //       router.replace("/"); // redirect home
+  //       popup.close();
+  //       window.removeEventListener("message", handleMessage);
+  //     }
+  //   };
 
-    window.addEventListener("message", handleMessage);
+  //   window.addEventListener("message", handleMessage);
 
-    // kiểm tra popup có bị đóng không
-    const timer = setInterval(() => {
-      if (popup.closed) {
-        clearInterval(timer);
-        window.removeEventListener("message", handleMessage);
-      }
-    }, 500);
-  };
+  //   // kiểm tra popup có bị đóng không
+  //   const timer = setInterval(() => {
+  //     if (popup.closed) {
+  //       clearInterval(timer);
+  //       window.removeEventListener("message", handleMessage);
+  //     }
+  //   }, 500);
+  // };
 
 
   return (
@@ -186,16 +186,18 @@ export default function LoginForm() {
                   </button>
                 </form>
 
-                {/* <button
+                <button
                   type="button"
-                  onClick={handleGoogleLogin}
+                  onClick={() => {
+                    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/login`;
+                  }}
                   className="w-full mt-4 flex items-center justify-center gap-2 bg-red-500 text-white py-3 px-4 rounded-md hover:bg-red-600 transition duration-200 text-lg font-semibold cursor-pointer"
                 >
                   <img src="https://www.svgrepo.com/show/355037/google.svg" alt="Google" className="w-5 h-5" />
                   Đăng nhập bằng Google
-                </button> */}
+                </button>
 
-                <GoogleLoginButton />
+                {/* <GoogleLoginButton /> */}
 
 
                 <div className="mt-4 text-center">

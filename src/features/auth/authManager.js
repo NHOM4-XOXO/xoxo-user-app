@@ -28,7 +28,7 @@ const setTokenCookie = (token) => {
         if (!expiry) return;
 
         const now = Date.now();
-        const expiryMs = expiry - now;
+        const expiryMs = expiry - now-60000;
 
         if (expiryMs <= 0) return;
 
