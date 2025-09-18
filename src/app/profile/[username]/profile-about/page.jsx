@@ -37,7 +37,7 @@ const fieldsConfig = [
 ];
 
 export default function ProfileAbout() {
-    const { username } = useContext(ProfileContext);
+    const { username, setIsLoading } = useContext(ProfileContext);
     const { data: profile = [], isLoading, isError } = useGetUserByUsernameQuery(username?.username);
     const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
     const [idUser, setIdUser] = useState(null);
@@ -52,6 +52,10 @@ export default function ProfileAbout() {
             value: profile[field] || "",
         }));
     }, [profile]);
+
+    useEffect(() => {
+        setIsLoading(isLoading)
+    }, [isLoading])
 
     useEffect(() => {
         const storedData = localStorage.getItem("auth");

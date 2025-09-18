@@ -55,6 +55,9 @@ const ProfileFriend = () => {
 
     const [currentUser, setCurrentUser] = useState(null);
     const [sendRequest, { isLoading: sendRequestLoading }] = useSendRequestMutation();
+    const { data: friends = [], isLoading: isLoadingFriends } = useGetFriendsByIduserQuery(profile?.id, { skip: !profile?.id });
+
+    const isMyProfile = currentUser?.id === profile?.id;
 
     const handleSendRequest = async (friendId) => {
         setLoadingId(friendId);
@@ -70,6 +73,10 @@ const ProfileFriend = () => {
     };
 
     useEffect(() => {
+        setIsLoading(isLoadingFriends)
+    }, [isLoadingFriends])
+
+    useEffect(() => {
         try {
             const auth = JSON.parse(localStorage.getItem("auth"));
             setCurrentUser(auth?.profile || null);
@@ -77,9 +84,7 @@ const ProfileFriend = () => {
             console.error("Không đọc được auth:", e);
         }
     }, []);
-    const { data: friends = [], isLoading: isLoadingFriends } = useGetFriendsByIduserQuery(profile?.id, { skip: !profile?.id });
 
-    const isMyProfile = currentUser?.id === profile?.id;
 
     const handleMenuClick = (e, friend) => {
         if (e.key === "unfriend") {
