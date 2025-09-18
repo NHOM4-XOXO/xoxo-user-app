@@ -14,6 +14,7 @@ import { IoTimer, IoClose } from "react-icons/io5";
 import { MdEvent } from "react-icons/md";
 import { BsMusicPlayerFill } from "react-icons/bs";
 import Link from "next/link";
+import SidebarFooter from "@/components/common/SidebarFooter";
 
 const items = [
   { icon: <FaMeta />, label: "XoXo AI", href: "/xoxo-ai" },
@@ -62,9 +63,11 @@ export default function Sidebar() {
       if (authData) {
         const parsedUser = JSON.parse(authData);
         setUser(parsedUser);
-        
+
         if (parsedUser && parsedUser.profile) {
-          setUserName(parsedUser.profile.firstName + " " + parsedUser.profile.lastName);
+          setUserName(
+            parsedUser.profile.firstName + " " + parsedUser.profile.lastName
+          );
           setUserAvatar(parsedUser.profile.avatarUrl || "/image/georgina.jpg");
         }
       }
@@ -222,13 +225,7 @@ export default function Sidebar() {
           </div>
         </div>
 
-        {/* Footer (dính đáy, không cuộn) */}
-        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-          <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1">
-            <p>Quyền riêng tư · Điều khoản · Quảng cáo · Lựa chọn quảng cáo</p>
-            <p>XOXO © 2025</p>
-          </div>
-        </div>
+        <SidebarFooter />
       </aside>
     </>
   );

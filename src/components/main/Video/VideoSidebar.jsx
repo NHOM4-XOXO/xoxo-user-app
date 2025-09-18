@@ -16,6 +16,7 @@ import { useEffect, useRef, useState } from "react";
 
 import SidebarShell from "@/components/ui/SidebarShell";
 import SidebarSection from "@/components/ui/SidebarSection";
+import SidebarFooter from "@/components/common/SidebarFooter";
 
 export default function WatchSidebar({ itemSelected, setItemSelected }) {
   const items = [
@@ -234,13 +235,7 @@ export default function WatchSidebar({ itemSelected, setItemSelected }) {
           </SidebarSection>
         </div>
 
-        {/* Footer chuẩn */}
-        <SidebarSection withTopBorder className="pt-4">
-          <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1 px-3">
-            <p>Quyền riêng tư · Điều khoản · Quảng cáo · Lựa chọn quảng cáo</p>
-            <p>XOXO © 2025</p>
-          </div>
-        </SidebarSection>
+        <SidebarFooter />
       </SidebarShell>
     </>
   );
