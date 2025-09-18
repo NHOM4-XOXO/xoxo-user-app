@@ -19,12 +19,6 @@ export default function Home() {
   const { data: profile, isSuccess } = useGetMyProfileQuery();
 
   useEffect(() => {
-    if (token) {
-      scheduleTokenRefresh(token);
-    }
-  }, [token]);
-
-  useEffect(() => {
     if (isSuccess && profile) {
       dispatch(setCredentials({ profile, token })); // dùng setCredentials
     }

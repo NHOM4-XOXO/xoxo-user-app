@@ -64,8 +64,13 @@ export const postApi = createApi({
         getPostsByAuthor: builder.query({
             query: (userId) => `/author/${userId}`,
             transformResponse: transform,
-            providesTags: (r, e, id) => [{ type: "Post", id }],
+            providesTags: (result) =>
+                result
+                    ? result.map((post) => ({ type: "Post", id: post.id }))
+                        .concat([{ type: "Post", id: "LIST" }])
+                    : [{ type: "Post", id: "LIST" }],
         }),
+
         getPostsOfMe: builder.query({
             query: () => `/me`,
             transformResponse: transform,
@@ -134,6 +139,7 @@ export const postApi = createApi({
             invalidatesTags: (r, e, { postId }) => [
                 { type: "Comment", id: postId },
                 { type: "Post", id: postId },
+                { type: "Post", id: "LIST" },
             ],
         }),
         addMediaToPost: builder.mutation({
@@ -165,8 +171,12 @@ export const postApi = createApi({
                 method: "PUT",
                 body,
             }),
-            invalidatesTags: (r, e, { postId }) => [{ type: "Post", id: postId }],
+            invalidatesTags: (r, e, { postId }) => [
+                { type: "Post", id: postId },
+                { type: "Post", id: "LIST" },
+            ],
         }),
+
 
         /* -------------------- DELETE -------------------- */
         deletePost: builder.mutation({
@@ -174,8 +184,9 @@ export const postApi = createApi({
                 url: `/${postId}`,
                 method: "DELETE",
             }),
-            invalidatesTags: ["Post"],
+            invalidatesTags: (r, e, postId) => [{ type: "Post", id: postId }],
         }),
+
         deletePostMedia: builder.mutation({
             query: ({ postId, mediaId }) => ({
                 url: `/${postId}/media/${mediaId}`,

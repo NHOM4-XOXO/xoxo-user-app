@@ -14,7 +14,7 @@ const transform = (response) => response.data.content;
 export const groupApi = createApi({
     reducerPath: "groupApi",
     baseQuery: fetchBaseQuery({
-        baseUrl: `https://xoxo.id.vn/api/v1`,
+        baseUrl: `${process.env.NEXT_PUBLIC_API_URL}/api/v1`,
         prepareHeaders,
         credentials: "include",
     }),

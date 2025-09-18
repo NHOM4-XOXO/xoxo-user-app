@@ -1,0 +1,44 @@
+// ClientProviders.js
+"use client";
+
+import { useState, createContext, useEffect } from "react";
+import { Geist, Geist_Mono } from "next/font/google";
+import ClientLayout from "@/layout/ClientLayout";
+import ThemeProvider from "@/components/ThemeProvider";
+import StoreProvider from "@/store/StoreProvider";
+import { Toaster } from "react-hot-toast";
+import LoadingOverlay from "@/components/LoadingOverlay";
+import { usePathname } from "next/navigation";
+
+
+// Fonts
+const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
+const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+
+export const RootContext = createContext();
+
+export default function ClientProviders({ children }) {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (pathname !== "/login" && pathname !== "/oauth2/success") {
+      setIsLoading(true);
+    }
+  }, [children, pathname]);
+
+  return (
+    <StoreProvider>
+      <RootContext.Provider value={{ setIsLoading }}>
+        <ThemeProvider>
+          <ClientLayout className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+            {children}
+          </ClientLayout>
+          <Toaster position="top-right" reverseOrder={false} />
+          {isLoading && <LoadingOverlay visible={isLoading} />}
+        </ThemeProvider>
+      </RootContext.Provider>
+    </StoreProvider>
+  );
+}

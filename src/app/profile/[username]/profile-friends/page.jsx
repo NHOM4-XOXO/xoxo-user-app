@@ -3,17 +3,13 @@ import { useContext, useEffect, useState } from "react";
 import { Search, MoreHorizontal, UserX, User, SquareX } from "lucide-react";
 import { Dropdown, Menu } from "antd";
 import { useTheme } from "next-themes";
-import { useGetFriendsByIduserQuery, useGetFriendsQuery } from "@/features/friendshipApi";
+import { useGetFriendsByIduserQuery, useSendRequestMutation, } from "@/features/friendshipApi";
 import { ProfileContext } from "../layout";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 const menu = {
     items: [
-        {
-            key: "view-profile",
-            icon: <User size={18} />,
-            label: <p className="font-semibold">Xem trang cá nhân</p>,
-        },
         {
             key: "unfollow",
             icon: <SquareX size={18} />,
@@ -27,18 +23,63 @@ const menu = {
     ],
 };
 
+const Spinner = () => (
+    <svg
+        className="animate-spin h-4 w-4 text-white"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+    >
+        <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+        />
+        <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+        />
+    </svg>
+);
+
+
 const ProfileFriend = () => {
     const { profile, setIsLoading } = useContext(ProfileContext);
     const tabs = ["Tất cả bạn bè", "Đang theo dõi"];
     const [activeTab, setActiveTab] = useState(tabs[0]);
+    const [loadingId, setLoadingId] = useState(null);
 
-    // const [isDark, setIsDark] = useState(false);
-    // const { theme, resolvedTheme } = useTheme();
-    // useEffect(() => {
-    //     // resolvedTheme sẽ là "dark" hoặc "light"
-    //     setIsDark(resolvedTheme === "dark");
-    // }, [resolvedTheme]);
+    const [currentUser, setCurrentUser] = useState(null);
+    const [sendRequest, { isLoading: sendRequestLoading }] = useSendRequestMutation();
+
+    const handleSendRequest = async (friendId) => {
+        setLoadingId(friendId);
+
+        try {
+            await sendRequest(friendId).unwrap();
+            toast.success("Đã gửi lời mời kết bạn!");
+        } catch (err) {
+            toast.error(err?.data?.message || "Gửi lời mời kết bạn thất bại!");
+        } finally {
+            setLoadingId(null);
+        }
+    };
+
+    useEffect(() => {
+        try {
+            const auth = JSON.parse(localStorage.getItem("auth"));
+            setCurrentUser(auth?.profile || null);
+        } catch (e) {
+            console.error("Không đọc được auth:", e);
+        }
+    }, []);
     const { data: friends = [], isLoading: isLoadingFriends } = useGetFriendsByIduserQuery(profile?.id, { skip: !profile?.id });
+
+    const isMyProfile = currentUser?.id === profile?.id;
 
     const handleMenuClick = (e, friend) => {
         if (e.key === "unfriend") {
@@ -135,8 +176,9 @@ const ProfileFriend = () => {
                                     </p> */}
                             </div>
 
-                            {activeTab === "Tất cả bạn bè" && (
-                                <div className="ml-auto">
+                            {/* Action */}
+                            <div className="ml-auto">
+                                {isMyProfile ? (
                                     <Dropdown
                                         menu={menu}
                                         placement="bottomRight"
@@ -147,8 +189,27 @@ const ProfileFriend = () => {
                                             <MoreHorizontal className="cursor-pointer text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-fb-dark-quaternary w-8 h-8 p-[0.4rem] rounded-full" />
                                         </button>
                                     </Dropdown>
-                                </div>
-                            )}
+                                ) : (
+                                    <button
+                                        onClick={() => handleSendRequest(friend.id)}
+                                        disabled={loadingId === friend.id}
+                                        className={`ml-auto bg-blue-600 hover:bg-blue-700 text-white 
+    px-4 py-1.5 rounded-md text-sm font-medium transition-colors cursor-pointer 
+    flex items-center justify-center gap-2
+    ${loadingId === friend.id ? "opacity-70 cursor-not-allowed" : ""}`}
+                                    >
+                                        {loadingId === friend.id ? (
+                                            <>
+                                                <Spinner />
+                                                <span>Đang gửi</span>
+                                            </>
+                                        ) : (
+                                            "Thêm bạn bè"
+                                        )}
+                                    </button>
+
+                                )}
+                            </div>
                         </div>
                     ))}
                 </div>

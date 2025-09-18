@@ -10,6 +10,7 @@ import EmojiButtonPicker from "@/components/common/EmojiButtonPicker";
 import MainPost from "./MainPost";
 import { useCommentPostMutation, useGetPostCommentsQuery } from "@/features/postApi";
 import { useSelector } from "react-redux";
+import CommentInput from "./CommentInput";
 
 
 const filterOptions = [
@@ -18,7 +19,7 @@ const filterOptions = [
     { key: "all", label: <div><p className="font-semibold">Tất cả bình luận</p><p className="text-xs text-gray-500 dark:text-gray-400">Hiển thị tất cả bình luận, bao gồm cả nội dung có thể là spam.</p></div> },
 ];
 
-function PostModal({ post, isModalOpen, setIsModalOpen, onCommentSuccess, reactionStats }) {
+function PostModal({ post, isModalOpen, setIsModalOpen, reactionStats }) {
     const [comment, setComment] = useState("");
     const [commentFilter, setCommentFilter] = useState("Phù hợp nhất");
     const [commentPost] = useCommentPostMutation();
@@ -29,8 +30,8 @@ function PostModal({ post, isModalOpen, setIsModalOpen, onCommentSuccess, reacti
     const profile = useSelector((state) => state.auth.profile);
     const avatarUrl = profile?.avatarUrl
 
-    const { data: comments, isLoading, isFetching } = useGetPostCommentsQuery(id, {
-        skip: !id, // chỉ gọi khi có id và có comment
+    const { data: comments, isLoading, isFetching, refetch } = useGetPostCommentsQuery(id, {
+        skip: !id || post?.post.commentCount === 0, // chỉ gọi khi có id và có comment
     });
 
     const { resolvedTheme } = useTheme();
@@ -67,9 +68,11 @@ function PostModal({ post, isModalOpen, setIsModalOpen, onCommentSuccess, reacti
                 parentCommentId: null,
             }).unwrap();
             setComment("");
-            onCommentSuccess();
+            if (post?.post.commentCount === 0) {
+                refetch();
+            }
         } catch (error) {
-            console.error("Gửi comment thất bại:", err);
+            console.error("Gửi comment thất bại:", error);
         }
     }
 
@@ -129,8 +132,25 @@ function PostModal({ post, isModalOpen, setIsModalOpen, onCommentSuccess, reacti
 
                     {/* Danh sách bình luận */}
                     {comments.map((c) => (
-                        <PostComment key={c.id} comment={c} />
+                        <PostComment
+                            key={c.id}
+                            comment={c}
+                            onReply={async (parentCommentId, content) => {
+                                try {
+                                    await commentPost({
+                                        postId: id,
+                                        content,
+                                        parentCommentId,
+                                    }).unwrap();
+                                    refetch();
+                                } catch (err) {
+                                    console.error("Reply thất bại", err);
+                                }
+                            }}
+                            avatarUrl={avatarUrl}
+                        />
                     ))}
+
                 </>
             ) : (
                 <p className="text-sm text-gray-500 dark:text-gray-400 italic">
@@ -141,39 +161,12 @@ function PostModal({ post, isModalOpen, setIsModalOpen, onCommentSuccess, reacti
 
             {/* Nhập bình luận */}
             <div className="absolute bottom-0 left-0 w-full bg-white dark:bg-fb-dark-secondary p-3 border-t border-gray-200 dark:border-gray-600">
-                <div className="flex gap-2 items-center">
-                    <Avatar src={avatarUrl} />
-                    <div className="flex-1 relative">
-                        <Input placeholder="Viết bình luận..." value={comment} onChange={(e) => setComment(e.target.value)} onPressEnter={handleSendComment} />
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex gap-2 text-gray-500 dark:text-fb-light-quaternary">
-                            <EmojiButtonPicker ref={emojiButtonRef} onSelect={(emoji) => setComment(prev => prev + emoji)} />
-
-                            {/* <Tooltip title="Đính kèm ảnh/video" placement="top">
-                            <label className="relative">
-                                <Camera className="w-4 h-4 hover:scale-110 transition-all duration-150 z-10 relative cursor-pointer" />
-                                <input
-                                    type="file"
-                                    accept="image/*,video/*"
-                                    className="absolute inset-0 w-full h-full opacity-0"
-                                    multiple
-                                    onChange={(e) => {
-                                        const files = Array.from(e.target.files).map(file => ({
-                                            url: URL.createObjectURL(file),
-                                            type: file.type.startsWith("image") ? "image" : "video",
-                                        }));
-                                        setSelectedFiles(prev => [...prev, ...files]);
-                                    }}
-                                />
-                            </label>
-                        </Tooltip> */}
-
-                            <Tooltip title="Bình luận" placement="top">
-                                <Send className={`w-4 h-4 transition-all duration-150 ${comment.trim() ? "cursor-pointer text-blue-500 hover:scale-110" : "cursor-not-allowed text-gray-400"}`}
-                                    onClick={handleSendComment} />
-                            </Tooltip>
-                        </div>
-                    </div>
-                </div>
+                <CommentInput
+                    avatarUrl={avatarUrl}
+                    onSubmit={(content) =>
+                        commentPost({ postId: id, content, parentCommentId: null })
+                    }
+                />
             </div>
 
             {/* Xem file upload */}

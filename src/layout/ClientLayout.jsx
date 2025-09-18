@@ -1,4 +1,4 @@
-"use client";
+'use client'
 
 import ChatWidget from "@/components/main/Chat/ChatWidget";
 import ChatBubble from "@/components/main/Chat/ChatBubble";
@@ -21,7 +21,7 @@ const ClientLayout = ({ children }) => {
   const windowHeight = useWindowHeight();
 
   // Danh sách các trang không hiển thị header và chat
-  const hideHeaderPaths = ["/login", "/forgot-password", "/email-verification"];
+  const hideHeaderPaths = ["/login", "/forgot-password", "/email-verification", "/oauth2/success"];
   const hideChatPaths = [
     "/login",
     "/forgot-password",

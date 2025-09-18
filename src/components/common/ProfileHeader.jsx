@@ -9,6 +9,7 @@ import {
     useUpdateAvatarMutation,
     useUpdateCoverMutation,
 } from "@/features/userApi";
+import { useGetFriendsByIduserQuery } from "@/features/friendshipApi";
 
 const tabs = [
     { label: "Bài viết", path: "/" },
@@ -22,6 +23,8 @@ function ProfileHeader({ userName, setIsLoading }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const { data: profile = [], isLoading, isFetching } = useGetUserByUsernameQuery(userName);
+    const { data: friends = [], isLoading: isLoadingFriends, } = useGetFriendsByIduserQuery(profile?.id, { skip: !profile?.id });
+
 
 
     const [updateAvatar] = useUpdateAvatarMutation();
@@ -39,8 +42,8 @@ function ProfileHeader({ userName, setIsLoading }) {
             return;
         }
 
-        setIsLoading && setIsLoading(isFetching || avatarLoading || coverLoading);
-    }, [isFetching || avatarLoading, coverLoading]);
+        setIsLoading && setIsLoading(isFetching || isLoadingFriends || avatarLoading || coverLoading);
+    }, [isFetching || isLoadingFriends || avatarLoading, coverLoading]);
 
     const handleAvatarChange = async (e) => {
         const file = e.target.files[0];
@@ -129,7 +132,7 @@ function ProfileHeader({ userName, setIsLoading }) {
                 <div className="sm:ml-4 text-center sm:text-left sm:mt-4 text-black dark:text-white">
                     <h1 className="font-bold text-lg">{`${displayName}`}</h1>
                     <p className="text-gray-600 dark:text-gray-400 text-sm hover:underline cursor-pointer">
-                        300 Bạn bè
+                        {friends.length} Bạn bè
                     </p>
                 </div>
                 <div className="sm:ml-auto sm:mt-4 mt-2 text-end">

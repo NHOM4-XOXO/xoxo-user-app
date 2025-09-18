@@ -1,7 +1,7 @@
 "use client";
 import Post from "@/components/main/Post/PostItem";
 import PostCreation from "@/components/main/PostCreation";
-import { useGetPostsByAuthorQuery } from "@/features/postApi";
+import { useGetPostsByAuthorQuery, useGetPostsOfMeQuery } from "@/features/postApi";
 import { useGetFriendsByIduserQuery } from "@/features/friendshipApi";
 import { useGetUserByUsernameQuery } from "@/features/userApi";
 import {
@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 
 import Link from "next/link";
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { ProfileContext } from './layout';
 
 
@@ -17,12 +17,30 @@ const ProfilePost = () => {
   const { username, setIsLoading } = useContext(ProfileContext);
   const { data: profile = [], isLoading: isLoadingProfile } = useGetUserByUsernameQuery(username?.username);
   const { data: friends = [], isLoading: isLoadingFriends, } = useGetFriendsByIduserQuery(profile?.id, { skip: !profile?.id });
-  const { data: posts = [], isLoading, } = useGetPostsByAuthorQuery(profile?.id, { skip: !profile?.id });
+
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
-    setIsLoading(isLoading || isLoadingFriends || isLoadingProfile);
-  }, [isLoading, isLoadingFriends, isLoadingProfile]);
-  if (isLoading || isLoadingFriends || isLoadingProfile) {
+    const stored = localStorage.getItem("auth"); // key lưu localStorage
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      setCurrentUser(parsed.profile);
+    }
+  }, []);
+
+  const isMe = currentUser?.username === profile?.username;
+
+  const {
+    data: posts = [],
+    isLoading: isLoadingPosts,
+  } = isMe
+      ? useGetPostsOfMeQuery(undefined, { skip: !profile?.id })
+      : useGetPostsByAuthorQuery(profile?.id, { skip: !profile?.id });
+
+  useEffect(() => {
+    setIsLoading(isLoadingPosts || isLoadingFriends || isLoadingProfile);
+  }, [isLoadingPosts, isLoadingFriends, isLoadingProfile]);
+  if (isLoadingPosts || isLoadingFriends || isLoadingProfile) {
     return null;
   }
   return (
