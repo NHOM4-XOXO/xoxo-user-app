@@ -10,6 +10,7 @@ import { setCredentials } from "@/features/auth/authSlice";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { scheduleTokenRefresh } from "@/features/auth/authManager";
+import GoogleLoginButton from "./GoogleLoginButton";
 
 
 export default function LoginForm() {
@@ -58,6 +59,37 @@ export default function LoginForm() {
       setError(err?.data?.message || "Đăng nhập thất bại");
     }
   };
+
+  // const handleGoogleLogin = () => {
+  //   const popup = window.open(
+  //     `${process.env.NEXT_PUBLIC_API_URL}/oauth2/authorization/google`, // endpoint Google OAuth
+  //     "GoogleLogin",
+  //     "width=500,height=600"
+  //   );
+
+  //   const handleMessage = (event) => {
+  //     if (event.origin !== window.location.origin) return; // chỉ chấp nhận từ origin của bạn
+
+  //     const { type, token, profile } = event.data;
+  //     if (type === "OAUTH2_DONE" && token) {
+  //       dispatch(setCredentials({ token, profile })); // lưu vào Redux
+  //       router.replace("/"); // redirect home
+  //       popup.close();
+  //       window.removeEventListener("message", handleMessage);
+  //     }
+  //   };
+
+  //   window.addEventListener("message", handleMessage);
+
+  //   // kiểm tra popup có bị đóng không
+  //   const timer = setInterval(() => {
+  //     if (popup.closed) {
+  //       clearInterval(timer);
+  //       window.removeEventListener("message", handleMessage);
+  //     }
+  //   }, 500);
+  // };
+
 
   return (
     <>
@@ -164,6 +196,9 @@ export default function LoginForm() {
                   <img src="https://www.svgrepo.com/show/355037/google.svg" alt="Google" className="w-5 h-5" />
                   Đăng nhập bằng Google
                 </button>
+
+                {/* <GoogleLoginButton /> */}
+
 
                 <div className="mt-4 text-center">
                   <a

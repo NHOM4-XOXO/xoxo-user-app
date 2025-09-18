@@ -11,7 +11,7 @@ import MessageDropdown from "./MessageDropdown";
 import NotificationDropdown from "./NotiDropDown";
 import SearchBar from "../../Search/SearchBar";
 import {
-  sampleMessages,
+  
   sampleNotifications,
 } from "../../../data/asideHeaderSampleData";
 import sampleFriends from "../../../data/sampleFriends";
@@ -23,6 +23,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { searchUsers } from "../../../features/searchApi";
 import useMergeState from "../../../hooks/useMergeState";
+import { useGetChatRoomsQuery } from "@/features/chatApi";
 
 export default function Header({ onContactClick }) {
   const router = useRouter();
@@ -426,7 +427,7 @@ export default function Header({ onContactClick }) {
           onClick={toggleMessageDropdown}
         >
           <FiMessageCircle className="text-2xl" />
-          <span className="absolute top-1 -right-1 bg-red-500 text-white rounded-full w-3 h-3" />
+          {/* <span className="absolute top-1 -right-1 bg-red-500 text-white rounded-full w-3 h-3" /> */}
         </button>
 
         <button
@@ -435,7 +436,7 @@ export default function Header({ onContactClick }) {
           onClick={toggleNotificationDropdown}
         >
           <IoMdNotifications className="text-2xl" />
-          <span className="absolute top-1 -right-1 bg-red-500 text-white rounded-full w-3 h-3" />
+          {/* <span className="absolute top-1 -right-1 bg-red-500 text-white rounded-full w-3 h-3" /> */}
         </button>
 
         <ProfileDropdown />
@@ -466,7 +467,7 @@ export default function Header({ onContactClick }) {
       {showMessages && (
         <div className="absolute top-2 right-2 z-50 sm:right-4 mt-2">
           <MessageDropdown
-            messages={sampleMessages}
+            messages={[]}
             onClose={() => setState({ showMessages: false })}
             onContactClick={onContactClick}
           />

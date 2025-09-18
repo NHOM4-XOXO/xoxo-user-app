@@ -30,7 +30,7 @@ function PostModal({ post, isModalOpen, setIsModalOpen, onCommentSuccess, reacti
     const avatarUrl = profile?.avatarUrl
 
     const { data: comments, isLoading, isFetching } = useGetPostCommentsQuery(id, {
-        skip: !id || post?.post.commentCount === 0, // chỉ gọi khi có id và có comment
+        skip: !id, // chỉ gọi khi có id và có comment
     });
 
     const { resolvedTheme } = useTheme();

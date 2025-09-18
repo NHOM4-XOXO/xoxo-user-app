@@ -1,34 +1,30 @@
 "use client";
 import Post from "@/components/main/Post/PostItem";
 import PostCreation from "@/components/main/PostCreation";
-import { useGetPostsOfMeQuery } from "@/features/postApi";
-import { useGetFriendsQuery } from "@/features/friendshipApi";
+import { useGetPostsByAuthorQuery } from "@/features/postApi";
+import { useGetFriendsByIduserQuery } from "@/features/friendshipApi";
+import { useGetUserByUsernameQuery } from "@/features/userApi";
 import {
   CalendarDaysIcon,
-  HeartIcon,
 } from "lucide-react";
 
 import Link from "next/link";
-import { useState, useEffect } from 'react';
-
+import { useContext, useEffect } from 'react';
+import { ProfileContext } from './layout';
 
 
 const ProfilePost = () => {
+  const { username, setIsLoading } = useContext(ProfileContext);
+  const { data: profile = [], isLoading: isLoadingProfile } = useGetUserByUsernameQuery(username?.username);
+  const { data: friends = [], isLoading: isLoadingFriends, } = useGetFriendsByIduserQuery(profile?.id, { skip: !profile?.id });
+  const { data: posts = [], isLoading, } = useGetPostsByAuthorQuery(profile?.id, { skip: !profile?.id });
 
-  const { data: posts = [], isLoading, } = useGetPostsOfMeQuery();
-  const { data: friends = [], isLoading: isLoadingFriends, } = useGetFriendsQuery();
-  const [profile, setProfile] = useState(null);
   useEffect(() => {
-    // Lấy từ localStorage
-    const stored = localStorage.getItem("auth");
-    if (stored) {
-      setProfile(JSON.parse(stored).profile);
-    }
-  }, []);
-
-
-
-  if (isLoading) return <p>Đang tải bài viết...</p>;
+    setIsLoading(isLoading || isLoadingFriends || isLoadingProfile);
+  }, [isLoading, isLoadingFriends, isLoadingProfile]);
+  if (isLoading || isLoadingFriends || isLoadingProfile) {
+    return null;
+  }
   return (
     <div className="flex flex-col-reverse md:flex-row gap-4">
 
@@ -117,7 +113,9 @@ const ProfilePost = () => {
                     alt={friend.username}
                   />
                   <p className="mt-1 font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400">
-                    {friend.firstName} {friend.lastName}
+                    <Link href={`/profile/${friend.username}`}>
+                      {friend.firstName} {friend.lastName}
+                    </Link>
                   </p>
                 </div>
               ))}

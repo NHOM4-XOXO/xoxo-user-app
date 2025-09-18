@@ -12,10 +12,10 @@ export default function OAuth2Success() {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        const token = searchParams.get("token");
+        const token = searchParams.get("jwt");
 
         if (token) {
-            Cookies.set("token", token, { expires: 1 / 144, secure: true, sameSite: "strict" });
+            Cookies.set("token", token, { expires:1/144, secure: true, sameSite: "strict" });
 
 
             dispatch(setCredentials({ token }));

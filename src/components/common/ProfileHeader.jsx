@@ -1,11 +1,11 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Modal } from "antd";
 import { Camera } from "lucide-react";
 import toast from "react-hot-toast";
 import ProfileTabs from "@/components/common/ProfileTabs";
 import {
-    useGetMyProfileQuery,
+    useGetUserByUsernameQuery,
     useUpdateAvatarMutation,
     useUpdateCoverMutation,
 } from "@/features/userApi";
@@ -18,10 +18,10 @@ const tabs = [
     { label: "Video", path: "profile-videos" },
 ];
 
-function ProfileHeader({ setIsLoading }) {
+function ProfileHeader({ userName, setIsLoading }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const { data: profile, isFetching, error, refetch } = useGetMyProfileQuery();
+    const { data: profile = [], isLoading, isFetching } = useGetUserByUsernameQuery(userName);
 
 
     const [updateAvatar] = useUpdateAvatarMutation();
@@ -31,9 +31,16 @@ function ProfileHeader({ setIsLoading }) {
     const [coverLoading, setCoverLoading] = useState(false);
 
     // Kích hoạt loading layout khi fetching / avatar / cover đang update
+    const isFirstRender = useRef(true);
+
     useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false; // lần đầu thì bỏ qua
+            return;
+        }
+
         setIsLoading && setIsLoading(isFetching || avatarLoading || coverLoading);
-    }, [isFetching, avatarLoading, coverLoading, setIsLoading]);
+    }, [isFetching || avatarLoading, coverLoading]);
 
     const handleAvatarChange = async (e) => {
         const file = e.target.files[0];
@@ -77,13 +84,13 @@ function ProfileHeader({ setIsLoading }) {
         }
     };
 
-    if (error) {
-        return <div className="p-4 text-red-500">Lỗi khi tải profile!</div>;
-    }
-
     const avatar = profile?.avatarUrl || "https://placehold.co/150x150?text=No+Avatar";
     const cover = profile?.coverUrl || "https://placehold.co/1000x300?text=No+Cover";
     const displayName = `${profile?.firstName || ""} ${profile?.lastName || ""}`.trim() || profile?.username || "Người dùng";
+
+    if (isFetching || avatarLoading || coverLoading) {
+        return null;
+    }
 
     return (
         <div className="rounded-lg bg-fb-light-primary dark:bg-fb-dark-secondary shadow-sm border-fb-light-tertiary dark:border-fb-dark-quaternary">
@@ -138,7 +145,7 @@ function ProfileHeader({ setIsLoading }) {
 
             {/* Tabs */}
             <div className="px-4">
-                <ProfileTabs tabs={tabs} />
+                <ProfileTabs userName={userName} tabs={tabs} />
             </div>
 
             {/* Modal chỉnh sửa */}

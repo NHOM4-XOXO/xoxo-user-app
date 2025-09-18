@@ -5,13 +5,14 @@ import {
     User,
 } from "lucide-react";
 import BoxInfo from "@/components/main/Post/BoxInfo";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useContext } from "react";
 import {
-    useGetMyProfileQuery,
+    useGetUserByUsernameQuery,
     useUpdateProfileMutation,
 } from "@/features/userApi";
 import { Modal, Form, Input, DatePicker, Button, Select } from "antd";
 import dayjs from "dayjs";
+import { ProfileContext } from "../layout";
 
 // cấu hình các field
 const fieldsConfig = [
@@ -36,9 +37,10 @@ const fieldsConfig = [
 ];
 
 export default function ProfileAbout() {
-    const { data: profile, isLoading, isError, refetch } = useGetMyProfileQuery();
+    const { username } = useContext(ProfileContext);
+    const { data: profile = [], isLoading, isError } = useGetUserByUsernameQuery(username?.username);
     const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
-
+    const [idUser, setIdUser] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [form] = Form.useForm();
 
@@ -50,6 +52,18 @@ export default function ProfileAbout() {
             value: profile[field] || "",
         }));
     }, [profile]);
+
+    useEffect(() => {
+        const storedData = localStorage.getItem("auth");
+        if (storedData) {
+            try {
+                const parsed = JSON.parse(storedData);
+                setIdUser(parsed?.profile?.id);
+            } catch (e) {
+                console.error("Error parsing localStorage data", e);
+            }
+        }
+    }, []);
 
     // CHÚ Ý: chỉ set/reset form khi modal mở để tránh setFieldsValue lúc form chưa mount
     useEffect(() => {
@@ -110,9 +124,9 @@ export default function ProfileAbout() {
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                     Thông tin cá nhân
                 </h2>
-                <Button type="primary" onClick={openModal}>
+                {idUser === profile?.id && (<Button type="primary" onClick={openModal}>
                     Chỉnh sửa
-                </Button>
+                </Button>)}
             </div>
 
             {/* Danh sách info */}

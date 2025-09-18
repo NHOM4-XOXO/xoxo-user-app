@@ -35,13 +35,14 @@ const PostCreation = () => {
   };
 
 
-  return (
+ if(lastName){
+   return (
     <>
       {/* Post Creation Bar */}
       <div className="bg-fb-light-primary dark:bg-fb-dark-secondary rounded-lg p-3 md:p-4 mb-4 md:mb-6 border-gray-700">
         <div className="flex items-center space-x-3 mb-3 md:mb-4">
           <img
-            src={profile?.avatarUrl || "/default-avatar.jpg"}
+            src="/default-avatar.jpg"
             alt="User Avatar"
             className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover flex-shrink-0 cursor-pointer hover:opacity-80"
           />
@@ -106,6 +107,7 @@ const PostCreation = () => {
       />
     </>
   );
+ }
 };
 
 export default PostCreation;
