@@ -9,6 +9,7 @@ import { HEADER_HEIGHT } from "@/constants";
 import { checkDeviceByWidth } from "@/utils/checkDeviceByWidth";
 import { useGetOrCreateDirectChatMutation } from "@/features/chatApi";
 import DebugPanel from "@/components/debug/DebugPanel";
+import { ChatProvider } from "@/contexts/ChatContext";
 
 export default function CleanMessagesPage() {
   const router = useRouter();
@@ -91,10 +92,11 @@ export default function CleanMessagesPage() {
   };
 
   return (
-    <div
-      className="flex text-black bg-fb-light-secondary dark:bg-fb-dark-primary dark:text-white"
-      style={{ height: `calc(100vh - ${HEADER_HEIGHT}px)` }}
-    >
+    <ChatProvider>
+      <div
+        className="flex text-black bg-fb-light-secondary dark:bg-fb-dark-primary dark:text-white"
+        style={{ height: `calc(100vh - ${HEADER_HEIGHT}px)` }}
+      >
       {/* Left Sidebar - Messages List */}
       <div
         className={`
@@ -160,8 +162,9 @@ export default function CleanMessagesPage() {
         </div>
       )}
 
-      {/* Debug Panel - Fixed position, only shows when needed */}
-      <DebugPanel />
-    </div>
+        {/* Debug Panel - Fixed position, only shows when needed */}
+        <DebugPanel />
+      </div>
+    </ChatProvider>
   );
 }

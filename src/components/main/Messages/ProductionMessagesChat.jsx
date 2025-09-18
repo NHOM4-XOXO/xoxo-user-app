@@ -29,6 +29,7 @@ export default function ProductionMessagesChat({
   const [message, setMessage] = useState("");
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [previewImageUrl, setPreviewImageUrl] = useState("");
+  const [hasTriedCreatingChat, setHasTriedCreatingChat] = useState(false);
   
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -43,6 +44,15 @@ export default function ProductionMessagesChat({
     isLoadingMessages,
     handleSendMessage,
   } = useChat(contact?.userId || contact?.id, contact?.chatRoom);
+
+  // Track khi đã thử tạo chat room
+  useEffect(() => {
+    if (contact && !currentChatRoom && !isCreatingChat) {
+      setHasTriedCreatingChat(true);
+    } else if (currentChatRoom) {
+      setHasTriedCreatingChat(false);
+    }
+  }, [contact, currentChatRoom, isCreatingChat]);
 
   // Resolve header name consistently with sidebar even after F5
   const { data: profileData } = useGetCurrentUserProfileQuery();
@@ -127,7 +137,7 @@ export default function ProductionMessagesChat({
   }
 
   // Show error state if chat room creation failed
-  if (!currentChatRoom && !isCreatingChat && contact) {
+  if (!currentChatRoom && !isCreatingChat && contact && hasTriedCreatingChat) {
     return (
       <div className="flex items-center justify-center flex-1 bg-fb-light-secondary dark:bg-fb-dark-secondary">
         <div className="text-center">
@@ -390,4 +400,3 @@ export default function ProductionMessagesChat({
     </div>
   );
 }
-

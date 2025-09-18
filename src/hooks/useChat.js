@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useGetOrCreateDirectChatMutation, useGetChatMessagesQuery } from '@/features/chatApi';
 import websocketService from '@/services/websocketService';
+import { useChatContext } from '@/contexts/ChatContext';
 
 export const useChat = (otherUserId = null, existingChatRoom = null) => {
     const [currentChatRoom, setCurrentChatRoom] = useState(existingChatRoom);
@@ -9,8 +10,10 @@ export const useChat = (otherUserId = null, existingChatRoom = null) => {
     const [typingUsers, setTypingUsers] = useState([]);
     const [isSendingMessage, setIsSendingMessage] = useState(false);
     const subscriptionRef = useRef(null);
+    const { refetchChatRooms, handleChatListUpdate, forceRefreshChatRooms } = useChatContext();
 
     const [getOrCreateDirectChat, { isLoading: isCreatingChat }] = useGetOrCreateDirectChatMutation();
+    
     
     const {
         data: messagesData,
@@ -133,7 +136,7 @@ export const useChat = (otherUserId = null, existingChatRoom = null) => {
             setIsSendingMessage(true);
             console.log('Sending message via WebSocket:', { chatRoomId: currentChatRoom.id, content, type });
             
-            // Send via WebSocket only - backend will handle Kafka → Consumer → Database
+            // Send via WebSocket
             await websocketService.sendMessage(
                 currentChatRoom.id,
                 content,
@@ -143,7 +146,74 @@ export const useChat = (otherUserId = null, existingChatRoom = null) => {
                 replyToMessageId
             );
 
+            // No REST send; backend handles persistence via Kafka from WebSocket
+
             console.log('Message sent via WebSocket (Kafka → Consumer → DB)');
+            
+            // Simulate WebSocket message to trigger sidebar update
+            const now = new Date().toISOString();
+            const mockMessage = {
+                id: Date.now(), // Temporary ID
+                chatRoomId: currentChatRoom.id,
+                content: content,
+                senderId: currentChatRoom.currentUserId,
+                sentAt: now,
+                type: type,
+                mediaUrl: mediaUrl,
+                mediaType: mediaType,
+                replyToMessageId: replyToMessageId,
+            };
+            
+            // Trigger the chat list update immediately
+            console.log('🔄 Triggering manual chat list update with mock message:', mockMessage);
+            if (handleChatListUpdate) {
+                console.log('✅ Calling handleChatListUpdate from context (immediate)');
+                handleChatListUpdate(mockMessage);
+            } else {
+                console.warn('⚠️ handleChatListUpdate not available in context');
+            }
+            
+            // Force refetch from API to get latest data from server
+            setTimeout(() => {
+                if (forceRefreshChatRooms) {
+                    console.log('🔄 Force refetching from API after sending message');
+                    forceRefreshChatRooms();
+                }
+            }, 200); // Reduced delay to 200ms
+            
+            // Update chat room locally immediately
+            if (currentChatRoom?.id) {
+                const now = new Date().toISOString();
+                console.log('🔄 Updating chat room locally with new message:', content);
+                
+                // Force a re-render by updating the chat room state
+                setCurrentChatRoom(prev => ({
+                    ...prev,
+                    lastMessage: {
+                        content: content,
+                        sentAt: now,
+                        senderId: currentChatRoom.currentUserId,
+                    },
+                    lastMessageAt: now,
+                }));
+            }
+            
+            // Refetch chat rooms list to update last message and timestamp
+            if (refetchChatRooms) {
+                console.log('🔄 Refetching chat rooms list after sending message');
+                // Call immediately without delay
+                refetchChatRooms();
+            } else {
+                console.warn('⚠️ refetchChatRooms function not available');
+            }
+            
+            // Force refresh from API to get latest data from server
+            setTimeout(() => {
+                if (forceRefreshChatRooms) {
+                    console.log('🔄 Force refetching from API after sending message');
+                    forceRefreshChatRooms();
+                }
+            }, 100); // Short delay to ensure API has processed
 
         } catch (error) {
             console.error('Failed to send message:', error);
@@ -151,7 +221,7 @@ export const useChat = (otherUserId = null, existingChatRoom = null) => {
         } finally {
             setIsSendingMessage(false);
         }
-    }, [currentChatRoom?.id, isSendingMessage]);
+    }, [currentChatRoom?.id, isSendingMessage, refetchChatRooms, handleChatListUpdate, forceRefreshChatRooms]);
 
     // Load messages when chat room changes
     useEffect(() => {

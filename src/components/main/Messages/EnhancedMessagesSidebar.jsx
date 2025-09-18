@@ -32,9 +32,7 @@ export default function EnhancedMessagesSidebar({
 
   // Debug logging
   useEffect(() => {
-    console.log('EnhancedMessagesSidebar - chatRooms:', chatRooms);
-    console.log('EnhancedMessagesSidebar - isLoadingChatRooms:', isLoadingChatRooms);
-    console.log('EnhancedMessagesSidebar - chatRoomsError:', chatRoomsError);
+  
   }, [chatRooms, isLoadingChatRooms, chatRoomsError]);
 
   // Filter chat rooms based on search term
@@ -70,50 +68,38 @@ export default function EnhancedMessagesSidebar({
 
   // Convert chat room to contact format for compatibility
   const convertChatRoomToContact = (chatRoom) => {
-    console.log('Converting chat room to contact:', chatRoom);
+   
     
     const currentUserId = getCurrentUserId();
-    console.log('Current user ID from token:', currentUserId);
-    console.log('Chat room createdBy:', chatRoom.createdBy);
-    console.log('Chat room participantIds:', chatRoom.participantIds);
-    
-    // For direct chats, find the other participant ID from participantIds
+   
+  
     let otherParticipantId = null;
     if (chatRoom.participantIds && Array.isArray(chatRoom.participantIds)) {
       otherParticipantId = chatRoom.participantIds.find(id => id !== currentUserId);
     }
     
-    console.log('Other participant ID:', otherParticipantId);
+
     
-    // Determine display name based on participant analysis
     let displayName = chatRoom.name; // Default fallback
     
     if (chatRoom.type === 'DIRECT' && otherParticipantId) {
-      // For direct chats, we need to determine the correct name
-      // The chatRoom.name should contain the other participant's name
-      // But we need to verify this is correct
+      
       
       if (chatRoom.createdBy === currentUserId) {
-        // Current user created the chat
-        // chatRoom.name should be the other participant's name
+ 
         displayName = chatRoom.name;
-        console.log('Current user is creator, chat room name should be other participant:', displayName);
+        
       } else {
-        // Other user created the chat
-        // chatRoom.name should be the creator's name (other participant)
+       
         displayName = chatRoom.name;
-        console.log('Other user is creator, chat room name should be creator:', displayName);
+      
       }
       
-      // Additional validation: if chatRoom.name seems to be current user's name, 
-      // we might need to fetch the other participant's name
-      if (displayName && displayName.includes('Nguyễn Hoàng Tuấn')) {
-        console.log('⚠️ Chat room name appears to be current user name, might need to fetch other participant name');
-        // For now, keep the name but log the issue
-      }
+      
+
     }
 
-    console.log('Final display name:', displayName);
+   
 
     return {
       id: chatRoom.id,
@@ -121,7 +107,9 @@ export default function EnhancedMessagesSidebar({
       avatar: "/default-avatar.jpg", // Default avatar for now
       isOnline: false, // Default offline status
       lastSeen: chatRoom.lastMessageAt,
-      lastMessage: chatRoom.lastMessage?.content || "",
+      lastMessage: typeof chatRoom.lastMessage === 'string' 
+        ? chatRoom.lastMessage 
+        : chatRoom.lastMessage?.content || "",
       unreadCount: chatRoom.unreadCount || 0,
       chatRoom: chatRoom, // Include full chat room data
       userId: otherParticipantId, // Include other participant ID for chat initialization
