@@ -7,21 +7,18 @@ import {
   Phone,
   Video,
   Info,
-  Smile,
   Paperclip,
   Send,
   ThumbsUp,
-  Download,
   Loader2,
 } from "lucide-react";
 import ScrollableContainer from "@/components/common/ScrollableContainer";
 import {
   ContentMultipleLines,
-  CountContentLines,
 } from "@/utils/ContentMultipleLines";
 import ImagePreviewModal from "@/components/common/ImagePreviewModal";
 import { useChat } from "@/hooks/useChat";
-// Debug components removed - now available in DebugPanel
+import { useGetCurrentUserProfileQuery } from "@/features/chatApi";
 
 export default function EnhancedMessagesChat({
   contact,
@@ -32,11 +29,10 @@ export default function EnhancedMessagesChat({
   const [message, setMessage] = useState("");
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [previewImageUrl, setPreviewImageUrl] = useState("");
-  
+
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
-  // Use the chat hook with the contact's user ID (not chat room ID)
   const {
     currentChatRoom,
     messages,
@@ -48,36 +44,29 @@ export default function EnhancedMessagesChat({
     initializeChat,
   } = useChat(contact?.userId || contact?.id, contact?.chatRoom);
 
-  // Initialize chat when contact changes
   useEffect(() => {
     if (contact?.chatRoom?.id) {
-      // If we already have a chat room, use it directly
-      console.log('EnhancedMessagesChat - Using existing chat room:', contact.chatRoom.id);
-      // No need to create, just load messages and connect to WebSocket
+      console.log("EnhancedMessagesChat - Using existing chat room:", contact.chatRoom.id);
     } else if (contact?.userId) {
-      console.log('EnhancedMessagesChat - Initializing chat with user ID:', contact.userId);
+      console.log("EnhancedMessagesChat - Initializing chat with user ID:", contact.userId);
       initializeChat(contact.userId);
     } else if (contact?.id && !contact?.chatRoom) {
-      // Fallback: if no userId but has id and no chatRoom, assume id is user ID
-      console.log('EnhancedMessagesChat - Fallback: using contact.id as user ID:', contact.id);
+      console.log("EnhancedMessagesChat - Fallback: using contact.id as user ID:", contact.id);
       initializeChat(contact.id);
     }
   }, [contact?.userId, contact?.id, contact?.chatRoom, initializeChat]);
 
-  // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const handleSendMessageClick = async () => {
     if (!message.trim() || isSendingMessage) return;
-
     try {
       await handleSendMessage(message.trim());
       setMessage("");
     } catch (error) {
       console.error("Failed to send message:", error);
-      // You might want to show a toast notification here
     }
   };
 
@@ -91,9 +80,6 @@ export default function EnhancedMessagesChat({
   const handleFileSelect = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
-
-    // TODO: Implement file upload
-    // For now, just show a placeholder
     console.log("File upload not implemented yet:", file.name);
     event.target.value = "";
   };
@@ -105,6 +91,19 @@ export default function EnhancedMessagesChat({
       minute: "2-digit",
     });
   };
+
+  const { data: currentProfile } = useGetCurrentUserProfileQuery();
+
+  // Ưu tiên lấy currentUserId từ localStorage -> API -> null
+  const getCurrentUserId = () => {
+    try {
+      const localId = localStorage.getItem("currentUserId");
+      if (localId) return Number(localId);
+    } catch (_) { }
+    return currentProfile?.id ? Number(currentProfile.id) : null;
+  };
+
+  const currentUserId = getCurrentUserId();
 
   const isFirstInGroup = (currentIndex) => {
     if (currentIndex === 0) return true;
@@ -120,7 +119,6 @@ export default function EnhancedMessagesChat({
     return currentMsg.senderId !== nextMsg.senderId;
   };
 
-  // Show loading state while creating chat
   if (isCreatingChat) {
     return (
       <div className="flex items-center justify-center flex-1 bg-fb-light-secondary dark:bg-fb-dark-secondary">
@@ -132,7 +130,6 @@ export default function EnhancedMessagesChat({
     );
   }
 
-  // Show error state if chat room creation failed
   if (!currentChatRoom && !isCreatingChat) {
     return (
       <div className="flex items-center justify-center flex-1 bg-fb-light-secondary dark:bg-fb-dark-secondary">
@@ -217,18 +214,22 @@ export default function EnhancedMessagesChat({
         ) : (
           <div className="space-y-1">
             {messages.map((msg, index) => {
-              const isFromMe = msg.senderId === currentChatRoom?.currentUserId;
+              console.log("DEBUG:", {
+                senderId: msg?.senderId,
+                currentUserId,
+                equal: Number(msg?.senderId) === Number(currentUserId),
+              });
+              const isFromMe = Number(msg?.senderId) === Number(currentUserId);
+
               const showAvatar = isLastInGroup(index) && !isFromMe;
               const showName = isFirstInGroup(index) && !isFromMe;
 
               return (
                 <div
                   key={msg.id}
-                  className={`flex ${isFromMe ? "justify-end" : "justify-start"} ${
-                    isFirstInGroup(index) ? "mt-4" : "mt-1"
-                  }`}
+                  className={`flex ${isFromMe ? "justify-end" : "justify-start"} ${isFirstInGroup(index) ? "mt-4" : "mt-1"
+                    }`}
                 >
-                  {/* Avatar for received messages */}
                   {!isFromMe && (
                     <div className="w-8 mr-2">
                       {showAvatar && (
@@ -244,7 +245,6 @@ export default function EnhancedMessagesChat({
                   )}
 
                   <div className={`max-w-[70%] ${isFromMe ? "ml-auto" : ""}`}>
-                    {/* Sender name for received messages */}
                     {showName && !isFromMe && (
                       <p className="mb-1 ml-3 text-xs text-gray-500">
                         {msg.senderName || contact.name}
@@ -252,27 +252,24 @@ export default function EnhancedMessagesChat({
                     )}
 
                     <div
-                      className={`px-3 py-2 rounded-2xl ${
-                        isFromMe
-                          ? "bg-blue-600 text-white"
-                          : "bg-white dark:bg-fb-dark-tertiary text-black dark:text-white"
-                      } ${
-                        isFirstInGroup(index) && isLastInGroup(index)
+                      className={`px-3 py-2 rounded-2xl ${isFromMe
+                        ? "bg-blue-600 text-white"
+                        : "bg-white dark:bg-fb-dark-tertiary text-black dark:text-white"
+                        } ${isFirstInGroup(index) && isLastInGroup(index)
                           ? "rounded-2xl"
                           : isFirstInGroup(index)
-                          ? isFromMe
-                            ? "rounded-br-lg"
-                            : "rounded-bl-lg"
-                          : isLastInGroup(index)
-                          ? isFromMe
-                            ? "rounded-tr-lg"
-                            : "rounded-tl-lg"
-                          : isFromMe
-                          ? "rounded-r-lg"
-                          : "rounded-l-lg"
-                      }`}
+                            ? isFromMe
+                              ? "rounded-br-lg"
+                              : "rounded-bl-lg"
+                            : isLastInGroup(index)
+                              ? isFromMe
+                                ? "rounded-tr-lg"
+                                : "rounded-tl-lg"
+                              : isFromMe
+                                ? "rounded-r-lg"
+                                : "rounded-l-lg"
+                        }`}
                     >
-                      {/* Message content */}
                       {msg.type === "IMAGE" && msg.mediaUrl ? (
                         <div>
                           <Image
@@ -299,12 +296,10 @@ export default function EnhancedMessagesChat({
                         </div>
                       )}
 
-                      {/* Message status and time */}
                       {isLastInGroup(index) && (
                         <div
-                          className={`flex items-center justify-end mt-1 space-x-1 ${
-                            isFromMe ? "text-blue-200" : "text-gray-500"
-                          }`}
+                          className={`flex items-center justify-end mt-1 space-x-1 ${isFromMe ? "text-blue-200" : "text-gray-500"
+                            }`}
                         >
                           <span className="text-xs">
                             {formatMessageTime(msg.sentAt || msg.createdAt)}
@@ -326,12 +321,9 @@ export default function EnhancedMessagesChat({
         )}
       </ScrollableContainer>
 
-      {/* Debug components moved to DebugPanel */}
-
       {/* Input Area */}
       <div className="p-4 border-t border-gray-300 bg-fb-light-primary dark:bg-fb-dark-secondary dark:border-fb-dark-tertiary">
         <div className="flex items-end space-x-3">
-          {/* File upload */}
           <input
             ref={fileInputRef}
             type="file"
@@ -346,7 +338,6 @@ export default function EnhancedMessagesChat({
             <Paperclip className="w-5 h-5 text-blue-600" />
           </button>
 
-          {/* Message input */}
           <div className="flex-1">
             <textarea
               value={message}
@@ -368,7 +359,6 @@ export default function EnhancedMessagesChat({
             />
           </div>
 
-          {/* Send button */}
           {message.trim() ? (
             <button
               onClick={handleSendMessageClick}
@@ -389,7 +379,6 @@ export default function EnhancedMessagesChat({
         </div>
       </div>
 
-      {/* Image Preview Modal */}
       <ImagePreviewModal
         isOpen={isPreviewModalOpen}
         onClose={() => setIsPreviewModalOpen(false)}

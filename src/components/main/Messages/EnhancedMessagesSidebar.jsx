@@ -191,7 +191,7 @@ export default function EnhancedMessagesSidebar({
           <Search className="absolute w-4 h-4 text-gray-500 -translate-y-1/2 left-3 top-1/2" />
           <input
             type="text"
-            placeholder="Tìm kiếm trên Messenger"
+            placeholder="Tìm kiếm trên XoxoMess"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full py-2 pl-10 pr-4 text-sm rounded-full bg-fb-light-secondary dark:bg-fb-dark-tertiary focus:outline-none focus:ring-1 focus:ring-fb-dark-quaternary"

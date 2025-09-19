@@ -1,6 +1,8 @@
-import { useState } from "react";
-import { contactsData, groupChatsData } from "@/data/rightSidebarData";
+import { useState, useMemo } from "react";
 import { Search, MoreHorizontal, Plus } from "lucide-react";
+import { useChatList } from "@/hooks/useChatList";
+import { useGetCurrentUserProfileQuery, useGetUserByIdQuery } from "@/features/chatApi";
+import Cookies from "js-cookie";
 
 const RightSideBar = ({
   isSettingsOpen,
@@ -9,9 +11,128 @@ const RightSideBar = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredContacts = contactsData.filter((contact) =>
-    contact.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Load real chat rooms
+  const { chatRooms, isLoadingChatRooms, markChatAsRead } = useChatList();
+
+  // Current user id
+  const { data: profile } = useGetCurrentUserProfileQuery();
+  const getCurrentUserId = () => {
+    try {
+      if (profile?.id) return Number(profile.id);
+      const token = Cookies.get("token");
+      if (!token) return null;
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      return Number(payload.userId || payload.id || payload.sub);
+    } catch (_) {
+      return null;
+    }
+  };
+  const currentUserId = getCurrentUserId();
+
+  const normalizeChatRoom = (room) => {
+    const lastMsgObj = typeof room.lastMessage === 'object' && room.lastMessage !== null
+      ? room.lastMessage
+      : {
+          content: room.lastMessageContent || (typeof room.lastMessage === 'string' ? room.lastMessage : ''),
+          sentAt: room.lastMessageAt || room.lastMessage?.sentAt,
+        };
+
+    return {
+      ...room,
+      lastMessage: lastMsgObj,
+      lastMessageAt: room.lastMessageAt || lastMsgObj?.sentAt || room.updatedAt,
+    };
+  };
+
+  const filteredChatRooms = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
+    if (!Array.isArray(chatRooms)) return [];
+    const normalized = chatRooms.map(normalizeChatRoom);
+    if (!term) return normalized;
+    return normalized.filter((room) =>
+      (room.name || "").toLowerCase().includes(term)
+    );
+  }, [chatRooms, searchTerm]);
+
+  const convertChatRoomToContact = (chatRoom) => {
+    return {
+      id: chatRoom.id,
+      userId:
+        chatRoom.otherParticipantId ||
+        chatRoom.participantIds?.find((id) => id !== chatRoom.currentUserId) ||
+        chatRoom.id,
+      name: getDisplayName(chatRoom),
+      avatar: chatRoom.avatarUrl || "/default-avatar.jpg",
+      isOnline: chatRoom.isOnline,
+      chatRoom,
+    };
+  };
+
+  const getDisplayName = (room) => {
+    // Build current user's display name if possible to avoid showing own name
+    const currentUserName = profile
+      ? `${profile.firstName || ''} ${profile.lastName || ''}`.trim() || profile.username || profile.email
+      : null;
+
+    if (room?.otherParticipantName) return room.otherParticipantName;
+
+    // If we have parallel arrays of ids and names, pick the other participant's name
+    if (
+      Array.isArray(room?.participantIds) &&
+      Array.isArray(room?.participantNames) &&
+      room.participantIds.length === room.participantNames.length &&
+      currentUserId != null
+    ) {
+      const idx = room.participantIds.findIndex((id) => Number(id) !== Number(currentUserId));
+      if (idx >= 0 && room.participantNames[idx]) return room.participantNames[idx];
+    }
+
+    // Use room name if it's not obviously the current user's name
+    if (
+      room?.name &&
+      String(room.name).trim().toLowerCase() !== 'null' &&
+      (!currentUserName || room.name !== currentUserName)
+    ) {
+      return room.name;
+    }
+
+    // Fallback
+    return `Phòng #${room?.id ?? '?'}`;
+  };
+
+  const RightSidebarChatItem = ({ room, onClick }) => {
+    let otherParticipantId = null;
+    if (Array.isArray(room?.participantIds) && currentUserId != null) {
+      otherParticipantId = room.participantIds.find((id) => Number(id) !== Number(currentUserId)) ?? null;
+    }
+
+    const { data: userData } = useGetUserByIdQuery(otherParticipantId, { skip: otherParticipantId == null });
+
+    const displayName = userData
+      ? `${userData.firstName || ''} ${userData.lastName || ''}`.trim() || userData.username || userData.email
+      : getDisplayName(room);
+
+    const avatarUrl = userData?.avatarUrl || room.avatarUrl || "/default-avatar.jpg";
+
+    return (
+      <div
+        className="flex items-center p-3 rounded-lg cursor-pointer transition-colors hover:bg-fb-light-tertiary dark:hover:bg-fb-dark-tertiary"
+        onClick={() => onClick(room)}
+      >
+        <img src={avatarUrl} alt={displayName} className="w-10 h-10 rounded-full object-cover" />
+        <div className="ml-3 flex-1 min-w-0">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-semibold text-gray-700 dark:text-white truncate">{displayName}</p>
+            {room.lastMessageAt && (
+              <span className="text-xs text-gray-500">
+                {new Date(room.lastMessageAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="w-80 xl:w-96 bg-fb-light-secondary dark:bg-fb-dark-primary text-white h-[calc(100vh-56px)] border-gray-700 hidden xl:block">
@@ -35,76 +156,25 @@ const RightSideBar = ({
         </div>
       </div>
 
-      {/* Contacts List */}
+      {/* Chat Rooms List */}
       <div className="px-2">
-        {filteredContacts.map((contact) => (
-          <div
-            key={contact.id}
-            className="flex items-center p-2 hover:bg-fb-light-tertiary dark:hover:bg-fb-dark-tertiary rounded-lg cursor-pointer transition-colors group"
-            onClick={() => onContactClick(contact)}
-          >
-            <div className="relative">
-              <img
-                src={contact.avatar || "/placeholder.svg"}
-                alt={contact.name}
-                className="w-10 h-10 rounded-full object-cover"
-              />
-              <div
-                className={`absolute -bottom-1 -right-1 w-3 h-3 ${
-                  contact.isOnline ? "bg-green-500" : "bg-red-500"
-                } border-2 border-gray-300 dark:border-gray-900 rounded-full`}
-              ></div>
-            </div>
-            <div className="ml-3 flex-1 min-w-0">
-              <div className="flex items-center justify-between">
-                <p className="text-base font-medium text-gray-600 dark:text-white truncate">
-                  {contact.name}
-                </p>
-                {contact.lastSeen && (
-                  <span className="text-xs text-gray-400 ml-2">
-                    {contact.lastSeen}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-        ))}
+        {isLoadingChatRooms ? (
+          <div className="p-4 text-center text-gray-500">Đang tải cuộc trò chuyện…</div>
+        ) : (
+          filteredChatRooms.map((room) => (
+            <RightSidebarChatItem
+              key={room.id}
+              room={room}
+              onClick={(r) => onContactClick(convertChatRoomToContact(r))}
+            />
+          ))
+        )}
       </div>
 
-      {/* Group Chats Section */}
+      {/* Create Group Chat Button */}
       <div className="mt-6 px-3 md:px-4">
         <div className="border-t border-gray-300 dark:border-gray-700 pt-4">
-          <h3 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-4">
-            Nhóm chat
-          </h3>
-
-          {groupChatsData.map((group) => (
-            <div
-              key={group.id}
-              className="flex items-center p-2 hover:bg-fb-light-tertiary dark:hover:bg-fb-dark-tertiary rounded-lg cursor-pointer transition-colors mb-2"
-            >
-              <div className="relative">
-                <img
-                  src={group.avatar || "/placeholder.svg"}
-                  alt={group.name}
-                  className="w-10 h-10 rounded-full object-cover"
-                />
-              </div>
-              <div className="ml-3 flex-1 min-w-0">
-                <div className="flex items-center justify-between">
-                  <p className="text-base font-medium text-gray-600 dark:text-white truncate">
-                    {group.name}
-                  </p>
-                  <span className="text-xs text-gray-400 ml-2">
-                    {group.lastActivity}
-                  </span>
-                </div>
-              </div>
-            </div>
-          ))}
-
-          {/* Create Group Chat Button */}
-          <div className="flex items-center p-2 hover:bg-fb-light-tertiary dark:hover:bg-fb-dark-tertiary rounded-lg cursor-pointer transition-colors mt-4">
+          <div className="flex items-center p-2 hover:bg-fb-light-tertiary dark:hover:bg-fb-dark-tertiary rounded-lg cursor-pointer transition-colors">
             <div className="w-8 h-8 bg-gray-300 dark:bg-gray-700 rounded-full flex items-center justify-center">
               <Plus className="w-4 h-4 text-gray-600 dark:text-gray-300" />
             </div>

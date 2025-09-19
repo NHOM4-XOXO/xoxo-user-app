@@ -19,7 +19,7 @@ const SettingMainView = ({ settings, toggleSetting, setCurrentView }) => (
         Cài đặt đoạn chat
       </h3>
       <p className="text-sm text-gray-500 dark:text-gray-300">
-        Tùy chỉnh trải nghiệm trên Messenger.
+        Tùy chỉnh trải nghiệm trên XoxoMess.
       </p>
     </div>
 
