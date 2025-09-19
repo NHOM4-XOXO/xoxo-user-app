@@ -126,7 +126,6 @@ const PostCreationModal = ({
         content: postContent,
         status: "ACTIVE",
         type: "USER_POST",
-        parentPostId: 0,
         location: "",
         hashtags: "",
         isPublic: true,

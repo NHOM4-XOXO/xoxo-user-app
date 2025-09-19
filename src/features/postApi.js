@@ -74,7 +74,11 @@ export const postApi = createApi({
         getPostsOfMe: builder.query({
             query: () => `/me`,
             transformResponse: transform,
-            providesTags: ["Post"],
+            providesTags: (result) =>
+                result
+                    ? result.map((post) => ({ type: "Post", id: post.id }))
+                        .concat([{ type: "Post", id: "LIST" }])
+                    : [{ type: "Post", id: "LIST" }],
         }),
         getMyReaction: builder.query({
             query: (postId) => `/${postId}/my-reaction`,
