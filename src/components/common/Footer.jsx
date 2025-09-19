@@ -8,9 +8,15 @@ export default function Footer() {
               <img
                 src="/logo_xoxo_500px-removebg-preview.png"
                 alt="XOXO"
-                className="h-10 w-10 rounded-full mr-3"
+                className="h-10 w-10 rounded-full mr-3 cursor-pointer"
+                onClick={() => (window.location.href = "/login")}
               />
-              <span className="text-xl font-bold text-blue-600">XOXO</span>
+              <span
+                className="text-xl font-bold text-blue-600 cursor-pointer"
+                onClick={() => (window.location.href = "/login")}
+              >
+                XOXO
+              </span>
             </div>
             <p className="text-gray-600 text-xm">
               Kết nối, chia sẻ và khám phá thế giới cùng bạn bè.
@@ -27,7 +33,10 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="/login" className="hover:text-blue-600 transition-colors">
+                <a
+                  href="/login"
+                  className="hover:text-blue-600 transition-colors"
+                >
                   Đăng nhập
                 </a>
               </li>
@@ -85,7 +94,6 @@ export default function Footer() {
               </li>
             </ul>
           </div>
-
         </div>
 
         {/* Bottom section */}
