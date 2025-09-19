@@ -79,12 +79,12 @@ export default function Header({ onContactClick }) {
           showResults: false,
           loading: false,
         });
-        return; 
+        return;
       }
 
-      
-      setState({ 
-        loading: true, 
+
+      setState({
+        loading: true,
         showResults: true,
         results: { users: [], posts: [], groups: [], totalResults: 0 }, // Clear old results
       });
@@ -211,7 +211,7 @@ export default function Header({ onContactClick }) {
 
   const handleUserClick = (user) => {
     // Chuyển đến profile của user
-    router.push(`/profile/${user.id}`);
+    router.push(`/profile/${user.username}`);
     setState({
       searchTerm: "",
       results: { users: [], posts: [], groups: [], totalResults: 0 },

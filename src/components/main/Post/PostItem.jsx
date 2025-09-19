@@ -16,7 +16,6 @@ import {
 const Post = ({ data }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { id, commentCount } = data?.post || {};
-  const [count, setCount] = useState(commentCount || 0);
   const [showPopup, setShowPopup] = useState(false);
   const [selectedReaction, setSelectedReaction] = useState({
     icon: <ThumbsUp />,
@@ -52,7 +51,7 @@ const Post = ({ data }) => {
         setSelectedReaction({
           name: "Thích",
           icon: myReaction.emoji || <ThumbsUp />,
-          colorName: "text-blue-600",
+          colorName: "text-yellow-600",
         });
         setIsLiked(true);
         break;
@@ -107,9 +106,9 @@ const Post = ({ data }) => {
   }, [myReaction]);
   const renderData = useMemo(() => {
     return data
-      ? { ...data, commentCount: count }
-      : { post: undefined, commentCount: count };
-  }, [data, count]);
+      ? { ...data }
+      : { post: undefined };
+  }, [data]);
 
   // nếu chưa có id => không render
   if (!id) return null;
@@ -173,9 +172,9 @@ const Post = ({ data }) => {
                 }
               } else {
                 setSelectedReaction({
-                  icon: <ThumbsUp />,
+                  icon: "👍",
                   name: "Thích",
-                  colorName: "text-blue-600",
+                  colorName: "text-yellow-500",
                 });
                 setIsLiked(true);
                 try {
@@ -223,7 +222,7 @@ const Post = ({ data }) => {
           onClick={() => setIsModalOpen(true)}
           className="w-1/3 hover:bg-gray-100 dark:hover:bg-fb-dark-tertiary flex items-center justify-center gap-2 py-2 rounded-md cursor-pointer"
         >
-          <MessageCircle size={18} /> Bình luận ({count})
+          <MessageCircle size={18} /> Bình luận ({commentCount})
         </button>
 
         {/* Share */}
@@ -242,7 +241,6 @@ const Post = ({ data }) => {
           isLoading={isLoading}
           isModalOpen={isModalOpen}
           setIsModalOpen={setIsModalOpen}
-          onCommentSuccess={() => setCount((prev) => prev + 1)}
           reactionStats={reactionStats}
         />
       )}

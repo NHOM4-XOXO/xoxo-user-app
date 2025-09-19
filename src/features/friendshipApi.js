@@ -48,12 +48,11 @@ export const friendshipApi = createApi({
 
         /* -------------------- MUTATION -------------------- */
         sendRequest: builder.mutation({
-            query: (data) => ({
+            query: (friendId) => ({
                 url: "",
                 method: "POST",
-                body: data, // { receiverId }
+                body: { friendId: friendId },
             }),
-            invalidatesTags: ["Friendship"],
         }),
         rejectRequest: builder.mutation({
             query: (friendshipId) => ({

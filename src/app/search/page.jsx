@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   FiSearch,
@@ -8,8 +8,10 @@ import {
   FiUsers as FiGroups,
 } from "react-icons/fi";
 import { searchUsers, searchPosts, searchGroups } from "@/features/searchApi";
+import { RootContext } from "../ClientProviders";
 
 export default function SearchPage() {
+  const { setIsLoading } = useContext(RootContext);
   const searchParams = useSearchParams();
   const [keyword, setKeyword] = useState("");
   const [activeTab, setActiveTab] = useState("all");
@@ -23,6 +25,10 @@ export default function SearchPage() {
     totalGroups: 0,
     totalResults: 0,
   });
+
+  useEffect(() => {
+    setIsLoading(loading)
+  }, [loading])
 
   const handleSearch = async (searchKeyword = keyword) => {
     if (!searchKeyword.trim()) return;
@@ -302,11 +308,10 @@ export default function SearchPage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
-                  activeTab === tab.id
-                    ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                    : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-                }`}
+                className={`flex items-center gap-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors ${activeTab === tab.id
+                  ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                  : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                  }`}
               >
                 {tab.icon}
                 {tab.label}

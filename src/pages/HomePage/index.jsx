@@ -1,19 +1,26 @@
+"use client"
 import Sidebar from "../../components/main/LeftSidebar-Home/Sidebar";
 import RightSideBar from "@/components/main/RightSidebar-Home/RightSideBar";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import PostCreation from "@/components/main/PostCreation";
 import SettingsDropdown from "@/components/main/RightSidebar-Home/SettingsDropdown";
 import ScrollableContainer from "@/components/common/ScrollableContainer";
 import Post from "@/components/main/Post/PostItem";
 import { HEADER_HEIGHT } from "@/constants";
 import { useGetPublicPostsQuery } from "@/features/postApi";
+import { RootContext } from "@/app/ClientProviders";
 
 export default function HomePage() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const { setIsLoading } = useContext(RootContext);
   const {
     data: posts = [],
     isLoading,
   } = useGetPublicPostsQuery();
+
+  useEffect(() => {
+    setIsLoading(isLoading);
+  }, [isLoading])
 
   return (
     <main

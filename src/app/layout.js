@@ -4,6 +4,7 @@ import ClientLayout from "@/layout/ClientLayout";
 import ThemeProvider from "@/components/ThemeProvider";
 import StoreProvider from "@/store/StoreProvider";
 import { Toaster } from "react-hot-toast";
+import ClientProviders from "./ClientProviders";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -26,12 +27,7 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
-        <StoreProvider>
-          <ThemeProvider>
-            <ClientLayout>{children}</ClientLayout>
-            <Toaster position="top-right" reverseOrder={false} />
-          </ThemeProvider>
-        </StoreProvider>
+        <ClientProviders>{children}</ClientProviders>
       </body>
     </html>
   );

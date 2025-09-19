@@ -1,7 +1,7 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import { profileMenuItems } from "@/data/profileMenuItems";
+import { getProfileMenuItems } from "@/data/profileMenuItems";
 import Link from "next/link";
 
 export default function ProfileDropdown() {
@@ -10,6 +10,7 @@ export default function ProfileDropdown() {
   const [userName, setUserName] = useState("User");
   const [userAvatar, setUserAvatar] = useState("/image/georgina.jpg");
   const menuRef = useRef(null);
+  const items = getProfileMenuItems();
 
   // const storedProfile = localStorage.getItem("auth");
 
@@ -64,7 +65,7 @@ export default function ProfileDropdown() {
 
       {isOpen && (
         <div className="absolute -right-2 top-11 mt-2 w-48 bg-white dark:bg-fb-dark-secondary shadow-lg rounded-lg py-2 z-50">
-          {profileMenuItems.map((item) => {
+          {items.map((item) => {
             if (item.type === "divider") {
               return (
                 <hr

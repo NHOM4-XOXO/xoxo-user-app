@@ -22,5 +22,5 @@ export function middleware(request) {
 }
 
 export const config = {
-  matcher: ["/", "/profile/:path*", "/groups/:path*", "/"], // các route cần bảo vệ
+  matcher: ["/", "/profile/:path*", "/groups/:path*", "/friends/:path*", "/"], // các route cần bảo vệ
 };

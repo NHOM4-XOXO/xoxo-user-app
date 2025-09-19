@@ -15,12 +15,6 @@ const items = [
   // { href: "/friends/requests", icon: <RiUserAddLine />, label: "Lời mời kết bạn" },
   { href: "/friends/suggestions", icon: <MdOutlinePeople />, label: "Gợi ý" },
   { href: "/friends/all", icon: <FaUserFriends />, label: "Tất cả bạn bè" },
-  { href: "/friends/birthdays", icon: <HiOutlineGift />, label: "Sinh nhật" },
-  {
-    href: "/friends/custom-lists",
-    icon: <BsListUl />,
-    label: "Danh sách tuỳ chỉnh",
-  },
 ];
 
 export default function SidebarFriend() {
@@ -57,10 +51,9 @@ export default function SidebarFriend() {
                   <Link
                     href={item.href}
                     className={`flex items-center space-x-3 p-3 rounded-lg transition-colors
-                      ${
-                        isActive
-                          ? "bg-gray-200 dark:bg-gray-700 font-semibold"
-                          : "hover:bg-gray-100 dark:hover:bg-gray-800"
+                      ${isActive
+                        ? "bg-gray-200 dark:bg-gray-700 font-semibold"
+                        : "hover:bg-gray-100 dark:hover:bg-gray-800"
                       }
                     `}
                   >

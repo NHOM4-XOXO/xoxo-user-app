@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   X,
   ChevronDown,
@@ -10,9 +10,10 @@ import {
   MoreHorizontal,
   Lock,
   Globe,
+  Loader2,
 } from "lucide-react";
 import { useUploadMediaMutation, useUploadMultipleMediaMutation } from "@/features/mediaApi";
-import { useCreatePostMutation } from "@/features/postApi";
+import { useCreatePostMutation, useUpdatePostMutation } from "@/features/postApi";
 import { useSelector } from "react-redux";
 
 const PostCreationModal = ({
@@ -24,16 +25,17 @@ const PostCreationModal = ({
   setSelectedFiles,
   handleFileSelect,
   removeFile,
+  editingPost = null,
 }) => {
   const [privacyIndex, setPrivacyIndex] = useState(0);
   const [showPrivacyDropdown, setShowPrivacyDropdown] = useState(false);
   const [mediaIds, setMediaIds] = useState([]);
-
+  const [loading, setLoading] = useState(false);
   const fileInputRef = useRef(null);
-
   const [uploadMedia] = useUploadMediaMutation();
   const [uploadMultipleMedia] = useUploadMultipleMediaMutation();
   const [createPost] = useCreatePostMutation();
+  const [updatePost] = useUpdatePostMutation();
   const { profile } = useSelector((state) => state.auth);
   const displayName = `${profile?.firstName || ""} ${profile?.lastName || ""}`.trim() || profile?.username || "Người dùng";
 
@@ -42,91 +44,130 @@ const PostCreationModal = ({
     { value: "onlyMe", label: "Chỉ mình tôi", icon: <Lock className="w-5 h-5" /> },
   ];
 
+  // Khi mở modal với bài viết cũ → đổ dữ liệu vào state
+  useEffect(() => {
+    if (editingPost) {
+      setPostContent(editingPost?.post?.content || "");
+      setMediaIds(editingPost?.media?.map((m) => m.id) || []);
+
+      // map media cũ thành selectedFiles (để preview)
+      setSelectedFiles(
+        (editingPost.media || []).map((m) => ({
+          id: m.id,
+          url: m.mediaUrl, // backend trả về
+          type: m.mediaType?.toLowerCase() || "image",
+          file: null,
+        }))
+      );
+    } else {
+      setPostContent("");
+      setMediaIds([]);
+      setSelectedFiles([]);
+    }
+  }, [editingPost, setPostContent, setSelectedFiles]);
 
 
-  const handleUploadFiles = async () => {
-    try {
-      if (selectedFiles.length === 0) return [];
+  // Upload file mới
+  const handleUploadFiles = async (files = selectedFiles) => {
+    if (!files) return [];
+    const fileArray = Array.isArray(files) ? files : [files];
 
-      let uploadedIds = [];
+    const ids = [];
 
-      if (selectedFiles.length === 1) {
-        // Trường hợp 1 file → gọi uploadMedia
-        const file = selectedFiles[0].file;
+    for (const file of fileArray) {
+      let rawFile = null;
 
-        let mediaType = "IMAGE";
-        if (file.type.startsWith("video/")) mediaType = "VIDEO";
-        else if (file.type.startsWith("audio/")) mediaType = "AUDIO";
-
-        const res = await uploadMedia({ file, mediaType }).unwrap();
-
-        // backend single trả về object { id, ... }
-        uploadedIds.push(res.id);
-
-      } else {
-        // Trường hợp nhiều file → gọi uploadMultipleMedia
-        const files = selectedFiles.map((f) => f.file);
-
-        // Lấy mediaType theo file đầu tiên (giả sử đồng bộ IMAGE/VIDEO/AUDIO)
-        let mediaType = "IMAGE";
-        if (files[0].type.startsWith("video/")) mediaType = "VIDEO";
-        else if (files[0].type.startsWith("audio/")) mediaType = "AUDIO";
-
-        const res = await uploadMultipleMedia({ files, mediaType }).unwrap();
-
-        // backend multiple trả về list [{ id, ... }]
-        uploadedIds = res.map((m) => m.id);
+      if (file instanceof File) {
+        rawFile = file; // trường hợp push thẳng File
+      } else if (file?.file instanceof File) {
+        rawFile = file.file; // trường hợp đã wrap thành object {url, type, file}
       }
 
-      setMediaIds(uploadedIds);
-      return uploadedIds;
-    } catch (err) {
-      console.error("Upload media thất bại:", err);
-      return [];
-    }
-  };
+      if (rawFile) {
+        let mediaType = "IMAGE";
+        if (rawFile.type.startsWith("video/")) mediaType = "VIDEO";
+        else if (rawFile.type.startsWith("audio/")) mediaType = "AUDIO";
 
+        const res = await uploadMedia({ file: rawFile, mediaType }).unwrap();
+        ids.push(res.id);
+
+        setSelectedFiles((prev) =>
+          prev.map((f) =>
+            f === file
+              ? {
+                id: res.id,
+                url: res.mediaUrl,
+                type: mediaType.toLowerCase(),
+                file: null, // sau khi upload thì bỏ file local đi
+              }
+              : f
+          )
+        );
+      } else {
+        // media cũ (edit) thì giữ nguyên
+        if (file.id) ids.push(file.id);
+      }
+    }
+
+    return ids;
+  };
 
   /* ------------ Tạo post ------------ */
   const handlePost = async () => {
     if (!postContent.trim() && selectedFiles.length === 0) return;
 
     try {
-      let uploadedIds = mediaIds;
-      if (selectedFiles.length > 0) {
-        uploadedIds = await handleUploadFiles();
-      }
+      setLoading(true);
 
-      await createPost({
+      const uploadedIds = await handleUploadFiles(selectedFiles);
+      console.log(uploadedIds);
+
+      const payload = {
         content: postContent,
         status: "ACTIVE",
         type: "USER_POST",
-        parentPostId: null,
+        parentPostId: 0,
         location: "",
         hashtags: "",
-        isPublic: privacyOptions[privacyIndex].value === "public",
+        isPublic: true,
         allowComments: true,
         allowLikes: true,
         allowShares: true,
         mediaIds: uploadedIds,
-      }).unwrap();
+      };
 
-      // Reset form
+      if (editingPost) {
+        await updatePost({ postId: editingPost?.post.id, body: payload }).unwrap();
+      } else {
+        await createPost(payload).unwrap();
+      }
+
+
+      // Reset
       setPostContent("");
       setMediaIds([]);
       setSelectedFiles([]);
       setPrivacyIndex(0);
       onClose();
     } catch (err) {
-      console.error("Lỗi tạo post:", err);
+      console.error("Lỗi tạo/chỉnh sửa post:", err);
+    } finally {
+      setLoading(false);
     }
   };
+
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-fb-light-primary dark:bg-fb-dark-secondary rounded-lg w-full max-w-lg max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 mb-0">
+      <div className="relative bg-fb-light-primary dark:bg-fb-dark-secondary rounded-lg w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        {/* Overlay loading toàn modal */}
+        {loading && (
+          <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-50 rounded-lg">
+            <Loader2 className="w-10 h-10 text-white animate-spin" />
+          </div>
+        )}
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-700">
           <h2 className="text-xl font-semibold text-black dark:text-white">
@@ -223,6 +264,7 @@ const PostCreationModal = ({
               ))}
             </div>
           )}
+
         </div>
 
         {/* Add to Post Section */}
@@ -270,7 +312,7 @@ const PostCreationModal = ({
             disabled={!postContent.trim() && selectedFiles.length === 0}
             className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg"
           >
-            Đăng
+            {editingPost ? "Lưu thay đổi" : "Đăng"}
           </button>
         </div>
       </div>
