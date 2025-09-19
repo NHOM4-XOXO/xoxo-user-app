@@ -119,7 +119,7 @@ export default function ProfileAbout() {
         }
     };
 
-    if (isLoading) return <p>Đang tải...</p>;
+    if (isLoading) return "";
     if (isError) return <p>Lỗi khi tải thông tin</p>;
 
     return (

@@ -94,6 +94,8 @@ const ProfileFriend = () => {
         }
     };
 
+    if (isLoadingFriends) return "";
+
     return (
         <div className="rounded-lg bg-fb-light-primary dark:bg-fb-dark-secondary text-gray-800 dark:text-white flex flex-col p-4 space-y-3 shadow-sm dark:border-fb-dark-tertiary">
             {/* Header */}

@@ -52,7 +52,8 @@ const FriendRequestCard = ({ friend, customButton, type = null }) => {
           src={userData?.avatarUrl || "/default-avatar.jpg"}
           alt={userData?.username || "Avatar người dùng"}
           fill
-          className="object-cover w-full h-full"
+          sizes="(max-width: 768px) 50vw, 33vw"
+          priority
         />
       </div>
 
