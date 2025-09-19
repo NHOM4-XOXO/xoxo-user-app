@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="vi">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>Demo HTML5 Game</title>
+        <style>
+    html,body { height:100%; margin:0; background:#0b1020; color:#fff; font-family:system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    .wrap { height:100%; display:flex; flex-direction:column; }
+    header { padding:10px 14px; background:rgba(255,255,255,.06); border-bottom:1px solid rgba(255,255,255,.08) }
+    canvas { display:block; width:100%; height:100%; background:radial-gradient(ellipse at top left, #1a2448, #0b1020 60%); }
+    .bar { display:flex; align-items:center; gap:10px; font-size:14px; opacity:.9 }
+    .btn { background:#2563eb; color:#fff; border:none; padding:6px 10px; border-radius:10px; cursor:pointer }
+    .btn:hover { filter:brightness(1.05) }
+    .board { padding:8px 14px; background:rgba(255,255,255,.04); border-top:1px solid rgba(255,255,255,.08); font-size:13px; opacity:.8 }
+  </style>
+    </head>
+    <body>
+        <div class="wrap">
+            <header>
+                <div class="bar">
+                    <strong>Demo HTML5 Runner</strong>
+                    <button class="btn" id="restart">Chơi lại</button>
+                    <span>Điều khiển: ← → hoặc A/D (nhấn giữ để di chuyển)</span>
+                </div>
+            </header>
+            <canvas id="game"></canvas>
+            <div class="board">Tránh chướng ngại vật, ăn orb phát sáng để + điểm.</div>
+        </div>
+        <script>
+    const cvs = document.getElementById("game");
+    const ctx = cvs.getContext("2d");
+    const DPR = window.devicePixelRatio || 1;
+    function resize(){
+      const w = cvs.clientWidth, h = window.innerHeight - 96;
+      cvs.width = w * DPR; cvs.height = h * DPR;
+      ctx.setTransform(DPR,0,0,DPR,0,0);
+    }
+    window.addEventListener("resize", resize); resize();
+
+    let running = true, score = 0, t = 0;
+    const player = { x: 80, y: 0, w: 26, h: 26, speed: 5 };
+    const obstacles = [];
+    const orbs = [];
+    function reset(){
+      running = true; score = 0; t = 0;
+      obstacles.length = 0; orbs.length = 0;
+      player.x = 80; player.y = 0;
+    }
+    document.getElementById("restart").onclick = reset;
+
+    const keys = {};
+    window.addEventListener("keydown", (e)=> keys[e.key] = true);
+    window.addEventListener("keyup", (e)=> keys[e.key] = false);
+
+    function spawn(){
+      if (t % 70 === 0) obstacles.push({ x: cvs.width + 40, y: rand(40, cvs.height-60), r: rand(12, 22), v: rand(3,6) });
+      if (t % 110 === 0) orbs.push({ x: cvs.width + 40, y: rand(40, cvs.height-60), r: 8, v: 3 });
+    }
+    function rand(a,b){ return Math.floor(Math.random()*(b-a+1))+a }
+
+    function step(){
+      if (!running) return;
+      requestAnimationFrame(step);
+      t++;
+
+      // logic
+      if (keys["ArrowRight"]||keys["d"]||keys["D"]) player.x += player.speed;
+      if (keys["ArrowLeft"]||keys["a"]||keys["A"]) player.x -= player.speed;
+      player.x = Math.max(20, Math.min(cvs.width-20, player.x));
+
+      spawn();
+
+      for (const o of obstacles) o.x -= o.v;
+      for (const o of orbs) o.x -= o.v;
+
+      for (let i=obstacles.length-1;i>=0;i--){
+        const o = obstacles[i];
+        if (dist(player.x, player.y, o.x, o.y) < o.r + 18) { running=false; }
+        if (o.x < -40) obstacles.splice(i,1);
+      }
+      for (let i=orbs.length-1;i>=0;i--){
+        const o = orbs[i];
+        if (dist(player.x, player.y, o.x, o.y) < o.r + 18) { score += 5; orbs.splice(i,1); }
+        if (o.x < -40) orbs.splice(i,1);
+      }
+
+      draw();
+    }
+    function dist(x1,y1,x2,y2){ const dx=x1-x2, dy=y1-y2; return Math.hypot(dx,dy); }
+
+    function draw(){
+      ctx.clearRect(0,0,cvs.width,cvs.height);
+
+      for (let i=0;i<40;i++){
+        const x = (i*97 + t*0.8) % (cvs.width+100) - 50;
+        const y = (i*61 % cvs.height);
+        ctx.fillStyle = "rgba(255,255,255,0.08)";
+        ctx.beginPath(); ctx.arc(x, y, (i%3)+1, 0, Math.PI*2); ctx.fill();
+      }
+
+      player.y = cvs.height/2 + Math.sin(t/40)*60;
+      ctx.fillStyle = "#60a5fa";
+      roundRect(player.x-18, player.y-18, 36, 36, 8, true);
+
+      ctx.fillStyle = "#ef4444";
+      for (const o of obstacles){ ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, Math.PI*2); ctx.fill(); }
+
+      for (const o of orbs){
+        const g = ctx.createRadialGradient(o.x, o.y, 1, o.x, o.y, o.r);
+        g.addColorStop(0, "rgba(99,102,241,1)");
+        g.addColorStop(1, "rgba(99,102,241,0)");
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, Math.PI*2); ctx.fill();
+      }
+
+      ctx.fillStyle = "rgba(255,255,255,.9)"; ctx.font = "14px system-ui, -apple-system, Segoe UI, Roboto";
+      ctx.fillText("Điểm: " + score, 12, 20);
+      if (!running){ ctx.font="bold 28px system-ui"; ctx.fillText("Game Over — bấm Chơi lại", 12, 54); }
+    }
+
+    function roundRect(x,y,w,h,r,fill){
+      ctx.beginPath();
+      ctx.moveTo(x+r, y);
+      ctx.arcTo(x+w, y, x+w, y+h, r);
+      ctx.arcTo(x+w, y+h, x, y+h, r);
+      ctx.arcTo(x, y+h, x, y, r);
+      ctx.arcTo(x, y, x+w, y, r);
+      ctx.closePath();
+      if (fill) ctx.fill();
+    }
+
+    reset(); step();
+  </script>
+    </body>
+</html>
