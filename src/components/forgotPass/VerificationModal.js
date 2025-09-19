@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import ResetPasswordModal from "./ResetPasswordModal";
+import ResetPasswordModal from "./ResetPassword";
 
 export default function VerificationModal({ isOpen, onClose, method, user }) {
   const [verificationCode, setVerificationCode] = useState("");
