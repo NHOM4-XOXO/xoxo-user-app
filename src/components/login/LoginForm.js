@@ -47,8 +47,7 @@ export default function LoginForm() {
     e.preventDefault();
     try {
       const res = await login(formData).unwrap();
-      const { email, token } = res.data; // backend trả ra gì thì lấy thêm
-
+      const { email, token } = res.data; 
       dispatch(setCredentials({ email, token }));
       scheduleTokenRefresh(token);
 
