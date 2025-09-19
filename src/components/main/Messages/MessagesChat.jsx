@@ -19,6 +19,8 @@ import {
   CountContentLines,
 } from "@/utils/ContentMultipleLines";
 import ImagePreviewModal from "@/components/common/ImagePreviewModal";
+import Cookies from "js-cookie";
+import { useGetCurrentUserProfileQuery } from "@/features/chatApi";
 
 export default function MessagesChat({
   contact,
@@ -85,9 +87,31 @@ export default function MessagesChat({
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [previewImageUrl, setPreviewImageUrl] = useState("");
 
+  // Fetch current user profile to obtain reliable current user id
+  const { data: currentProfile } = useGetCurrentUserProfileQuery();
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  const getCurrentUserId = () => {
+    try {
+      // Prefer cached value if available
+      if (typeof window !== "undefined") {
+        const cached = window.__currentUserId || localStorage.getItem("currentUserId");
+        if (cached) return Number(cached);
+      }
+
+      const token = Cookies.get("token");
+      if (!token) return null;
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      const id = payload.userId || payload.id || payload.sub;
+      return id != null ? Number(id) : null;
+    } catch (e) {
+      return null;
+    }
+  };
+  const currentUserId = currentProfile?.id ?? getCurrentUserId();
 
   const handleSendMessage = () => {
     if (message.trim()) {
@@ -165,7 +189,12 @@ export default function MessagesChat({
   };
 
   const renderMessage = (msg, index) => {
-    const isMe = msg.sender === "me";
+    const senderId = msg.senderId ?? msg.userId ?? msg.sender?.id ?? null;
+    const isMe = senderId != null && currentUserId != null
+      ? Number(senderId) === Number(currentUserId)
+      : msg.sender === "me";
+    // minimal debug to verify alignment input values
+    console.debug('align', { senderId, currentUserId, isMe });
     const isFirst = isFirstInGroup(index);
     const isLast = isLastInGroup(index);
 

@@ -27,7 +27,7 @@ export default function MessageDropdown({ messages, onClose, onContactClick }) {
       </h3>
       <input
         type="text"
-        placeholder="Tìm kiếm trên Messenger"
+        placeholder="Tìm kiếm trên XoxoMess"
         className="w-full px-3 py-1 mb-2 text-sm rounded-full bg-gray-100 dark:bg-gray-700 text-black outline-none dark:placeholder:text-gray-400"
       />
       <div className="max-h-72 overflow-y-auto space-y-2">
@@ -72,7 +72,7 @@ export default function MessageDropdown({ messages, onClose, onContactClick }) {
         href="/messages"
         className="block text-center text-blue-500 text-sm mt-2 dark:text-white"
       >
-        Xem tất cả trong Messenger
+        Xem tất cả trong XoxoMess
       </Link>
     </div>
   );

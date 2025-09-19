@@ -10,6 +10,7 @@ import { checkDeviceByWidth } from "@/utils/checkDeviceByWidth";
 import { useGetOrCreateDirectChatMutation } from "@/features/chatApi";
 import DebugPanel from "@/components/debug/DebugPanel";
 import ErrorBoundary from "@/components/common/ErrorBoundary";
+import { ChatProvider } from "@/contexts/ChatContext";
 
 export default function EnhancedMessagesPage() {
   const router = useRouter();
@@ -101,10 +102,11 @@ export default function EnhancedMessagesPage() {
 
   return (
     <ErrorBoundary>
-      <div
-        className="flex text-black bg-fb-light-secondary dark:bg-fb-dark-primary dark:text-white"
-        style={{ height: `calc(100vh - ${HEADER_HEIGHT}px)` }}
-      >
+      <ChatProvider>
+        <div
+          className="flex text-black bg-fb-light-secondary dark:bg-fb-dark-primary dark:text-white"
+          style={{ height: `calc(100vh - ${HEADER_HEIGHT}px)` }}
+        >
       {/* Left Sidebar - Messages List */}
       <div
         className={`
@@ -175,8 +177,10 @@ export default function EnhancedMessagesPage() {
       )}
       </div>
 
-      {/* Debug Panel - Fixed position, toggleable */}
-      <DebugPanel />
+        {/* Debug Panel - Fixed position, toggleable */}
+        <DebugPanel />
+        </div>
+      </ChatProvider>
     </ErrorBoundary>
   );
 }

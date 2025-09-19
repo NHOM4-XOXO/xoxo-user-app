@@ -153,9 +153,12 @@ export default function ChatRoomWithUserInfo({
         
         <div className="flex items-center justify-between">
           <p className="text-sm text-gray-600 truncate dark:text-gray-400 flex-1">
-            {chatRoom.lastMessage?.content || "Chưa có tin nhắn"}
+            {typeof chatRoom.lastMessage === 'string' 
+              ? chatRoom.lastMessage 
+              : chatRoom.lastMessage?.content || "Chưa có tin nhắn"}
           </p>
-          {chatRoom.unreadCount > 0 && (
+          {/* Unread badge disabled */}
+          {false && chatRoom.unreadCount > 0 && (
             <div className="ml-2 px-2 py-1 bg-blue-600 text-white text-xs rounded-full min-w-[20px] text-center">
               {chatRoom.unreadCount > 99 ? "99+" : chatRoom.unreadCount}
             </div>

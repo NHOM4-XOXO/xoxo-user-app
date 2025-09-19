@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import Cookies from "js-cookie";
+import { refreshTokenFlow, logoutFlow } from "@/features/auth/authManager";
 
 const prepareHeaders = (headers) => {
     const token = Cookies.get("token");
@@ -7,20 +8,37 @@ const prepareHeaders = (headers) => {
     return headers;
 };
 
-const baseQuery = fetchBaseQuery({
+// Base query for chat APIs
+const rawBaseQuery = fetchBaseQuery({
     baseUrl: process.env.NEXT_PUBLIC_API_URL || "https://xoxo.id.vn",
     prepareHeaders: (headers) => {
         const token = Cookies.get("token");
-        
         if (token) {
             headers.set("Authorization", `Bearer ${token}`);
-            
         }
         headers.set("Content-Type", "application/json");
         return headers;
     },
     credentials: "include",
 });
+
+// Local 401 auto-refresh
+const baseQuery = async (args, api, extraOptions) => {
+    let result = await rawBaseQuery(args, api, extraOptions);
+    if (result.error && result.error.status === 401) {
+        try {
+            const newToken = await refreshTokenFlow();
+            if (newToken) {
+                result = await rawBaseQuery(args, api, extraOptions);
+            } else {
+                logoutFlow();
+            }
+        } catch (e) {
+            logoutFlow();
+        }
+    }
+    return result;
+};
 
 export const chatApi = createApi({
     reducerPath: "chatApi",
@@ -53,8 +71,16 @@ export const chatApi = createApi({
             query: ({ page = 0, size = 20 }) => ({
                 url: `/api/v1/chat/rooms?page=${page}&size=${size}`,
                 method: "GET",
+                headers: {
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache'
+                }
             }),
-            providesTags: ["ChatRoom"],
+            keepUnusedDataFor: 0,
+            providesTags: (result, error, arg) => [
+                "ChatRoom",
+                ...(result?.map(({ id }) => ({ type: "ChatRoom", id })) || [])
+            ],
             transformResponse: (response) => {
                 // API returns array directly, not wrapped in content
                 if (Array.isArray(response.data)) {
@@ -152,7 +178,6 @@ export const {
     useGetOrCreateDirectChatMutation,
     useGetChatRoomsQuery,
     useGetChatMessagesQuery,
-    useSendMessageMutation,
     useMarkMessageAsReadMutation,
     useMarkMessageAsDeliveredMutation,
     useGetUnreadMessageCountQuery,
