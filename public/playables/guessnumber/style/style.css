@@ -1,0 +1,189 @@
+@import url("https://fonts.googleapis.com/css?family=Press+Start+2P&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: inherit;
+}
+
+html {
+  font-size: 62.5%;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Press Start 2P", sans-serif;
+  color: #eee;
+  background-color: #222;
+}
+
+/* LAYOUT */
+header {
+  position: relative;
+  height: 35vh;
+  border-bottom: 7px solid #eee;
+}
+
+main {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  height: 60vh;
+}
+
+.left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 52rem;
+}
+
+.right {
+  width: 52rem;
+  font-size: 2rem;
+}
+
+/* ELEMENT STYLE */
+h1 {
+  position: absolute;
+  text-align: center;
+  width: 100%;
+  top: 52%;
+  left: 50%;
+  font-size: 4rem;
+  transform: translate(
+    -50%,
+    -50%
+  ); /*Kéo phần tử về giữa màn hình kết hợp cùng position: absolute*/
+}
+
+.between {
+  position: absolute;
+  font-size: 1.5rem;
+  right: 2rem;
+  top: 2rem;
+}
+
+.again {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+}
+
+.number {
+  position: absolute;
+  font-size: 4rem;
+  background-color: #eee;
+  color: #222;
+  left: 50%;
+  bottom: 0;
+  width: 15rem;
+  text-align: center;
+  padding: 3rem 0rem;
+  transform: translate(-50%, 50%);
+  border-radius: 3px;
+}
+
+.guess {
+  display: block;
+  background: none;
+  border: 4px solid #eee;
+  font-family: inherit;
+  width: 25rem;
+  font-size: 5rem;
+  padding: 2.5rem;
+  color: inherit;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.btn {
+  border: none;
+  background-color: #eee;
+  color: #222;
+  font-size: 2rem;
+  padding: 2rem 3rem;
+  font-family: inherit;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.btn:hover {
+  background-color: #ccc;
+}
+
+.message {
+  height: 3rem;
+  margin-bottom: 8rem;
+}
+
+.label_score {
+  margin-bottom: 2rem;
+}
+
+footer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+  html {
+    font-size: 55%;
+  }
+
+  h1 {
+    font-size: 3rem;
+  }
+
+  .secret_number {
+    font-size: 3rem;
+    width: 12rem;
+    padding: 2rem 0;
+  }
+
+  .btn {
+    font-size: 1.8rem;
+    padding: 1.5rem 2rem;
+  }
+
+  .guess {
+    font-size: 4rem;
+    padding: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  html {
+    font-size: 50%;
+  }
+
+  h1 {
+    font-size: 2.4rem;
+  }
+
+  .between,
+  .again {
+    font-size: 1.2rem;
+    top: 1rem;
+  }
+
+  .secret_number {
+    font-size: 2.5rem;
+    padding: 1.5rem 0;
+    width: 10rem;
+  }
+
+  .btn {
+    font-size: 1.6rem;
+  }
+
+  .guess {
+    font-size: 3.5rem;
+  }
+  main {
+    display: flex;
+    text-align: center;
+    flex-wrap: wrap;
+  }
+}
