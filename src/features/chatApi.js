@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import Cookies from "js-cookie";
 import { refreshTokenFlow, logoutFlow } from "@/features/auth/authManager";
 
-const prepareHeaders = (headers) => {
+const prepareHeaders = (headers, { getState }) => {
     const token = Cookies.get("token");
     if (token) headers.set("Authorization", `Bearer ${token}`);
     return headers;
