@@ -174,7 +174,7 @@ export default function DetailedVideoView({ postId }) {
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center space-x-3">
               <Image
-                src={post.author.avatar || "/placeholder.svg"}
+                src={post.author.avatarUrl || "/default-avatar.jpg"}
                 alt={post.author.name}
                 width={40}
                 height={40}

@@ -66,7 +66,7 @@ export default function ChatBubble({
         {/* Avatar */}
         <div className="relative w-14 h-14 bg-white dark:bg-fb-dark-secondary rounded-full border-2 border-white dark:border-gray-600 shadow-lg hover:shadow-xl transition-shadow duration-200">
           <Image
-            src={contact.avatar || "/placeholder.svg?height=56&width=56"}
+            src={contact.avatarUrl || "/default-avatar.jpg"}
             alt={contact.name}
             width={56}
             height={56}
