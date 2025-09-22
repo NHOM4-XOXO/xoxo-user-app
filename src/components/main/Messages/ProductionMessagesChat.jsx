@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import Image from "next/image";
 import {
   ArrowLeft,
@@ -57,17 +57,44 @@ export default function ProductionMessagesChat({
   // Resolve header name consistently with sidebar even after F5
   const { data: profileData } = useGetCurrentUserProfileQuery();
   const myId = profileData?.id;
-  const otherId = currentChatRoom?.participantIds && myId != null
-    ? (currentChatRoom.participantIds[0] === myId
-        ? currentChatRoom.participantIds[1]
-        : currentChatRoom.participantIds[0])
-    : null;
-  const { data: otherUser } = useGetUserByIdQuery(otherId, { skip: otherId == null });
+  
+  // Get all participant IDs for potential multiple users
+  const participantIds = currentChatRoom?.participantIds || [];
+  const otherParticipantIds = participantIds.filter(id => id !== myId);
+  
+  // Fetch user data for all other participants
+  const participantQueries = otherParticipantIds.map(participantId => 
+    useGetUserByIdQuery(participantId, { skip: !participantId })
+  );
+  
+  // Create a map of user data by ID for quick lookup
+  const participantsMap = useMemo(() => {
+    const map = {};
+    participantQueries.forEach((query, index) => {
+      const participantId = otherParticipantIds[index];
+      if (query.data) {
+        map[participantId] = query.data;
+      }
+    });
+    return map;
+  }, [participantQueries, otherParticipantIds]);
+  
+  // For backward compatibility, keep otherUser for direct chats
+  const otherId = otherParticipantIds[0];
+  const { data: otherUser } = useGetUserByIdQuery(otherId, { skip: !otherId });
   const otherResolvedName = otherUser
     ? `${(otherUser.firstName || "")} ${(otherUser.lastName || "")}`.trim() || otherUser.username || otherUser.email
     : undefined;
   // Prefer resolved name from API to keep consistent with sidebar
   const headerName = otherResolvedName || contact?.name || (otherId ? `User ${otherId}` : "Unknown User");
+  
+  // Function to get user data by sender ID
+  const getSenderData = (senderId) => {
+    if (senderId === myId) {
+      return profileData; // Current user data
+    }
+    return participantsMap[senderId] || null;
+  };
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -163,7 +190,7 @@ export default function ProductionMessagesChat({
           )}
           <div className="relative">
             <Image
-              src={contact?.avatar || "/default-avatar.jpg"}
+              src={otherUser?.avatarUrl || "/default-avatar.jpg"}
               alt={contact?.name || "User"}
               width={40}
               height={40}
@@ -221,9 +248,15 @@ export default function ProductionMessagesChat({
         ) : (
           <div className="space-y-1">
             {messages.map((msg, index) => {
-              const isFromMe = msg.senderId === currentChatRoom?.currentUserId;
+              const isFromMe = msg.senderId === myId;
               const showAvatar = isLastInGroup(index) && !isFromMe;
               const showName = isFirstInGroup(index) && !isFromMe;
+              
+              // Get sender data for avatar display
+              const senderData = getSenderData(msg.senderId);
+              const senderName = senderData 
+                ? `${(senderData.firstName || "")} ${(senderData.lastName || "")}`.trim() || senderData.username || senderData.email
+                : `User ${msg.senderId}`;
 
               return (
                 <div
@@ -237,8 +270,8 @@ export default function ProductionMessagesChat({
                     <div className="w-8 mr-2">
                       {showAvatar && (
                         <Image
-                          src={contact?.avatar || "/default-avatar.jpg"}
-                          alt={contact?.name || "User"}
+                          src={senderData?.avatarUrl || "/default-avatar.jpg"}
+                          alt={senderName}
                           width={32}
                           height={32}
                           className="object-cover rounded-full"
@@ -251,7 +284,7 @@ export default function ProductionMessagesChat({
                     {/* Sender name for received messages */}
                     {showName && !isFromMe && (
                       <p className="mb-1 ml-3 text-xs text-gray-500">
-                        {msg.senderName || contact?.name}
+                        {senderName}
                       </p>
                     )}
 

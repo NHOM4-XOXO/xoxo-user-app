@@ -28,58 +28,6 @@ export default function MessagesChat({
   onToggleChatInfo,
   showBackButton,
 }) {
-  const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      sender: "other",
-      content: `Chào bạn, tôi là ${contact.name}!`,
-      timestamp: "10:00 AM",
-      type: "text",
-    },
-    {
-      id: 2,
-      sender: "other",
-      content: "Bạn có khỏe không?",
-      timestamp: "10:00 AM",
-      type: "text",
-    },
-    {
-      id: 3,
-      sender: "other",
-      content: "Tôi hy vọng bạn đang ổn",
-      timestamp: "10:01 AM",
-      type: "text",
-    },
-    {
-      id: 4,
-      sender: "me",
-      content: "Chào bạn!",
-      timestamp: "10:02 AM",
-      type: "text",
-    },
-    {
-      id: 5,
-      sender: "me",
-      content: "Mình khỏe, cảm ơn bạn!",
-      timestamp: "10:02 AM",
-      type: "text",
-    },
-    {
-      id: 6,
-      sender: "me",
-      content: "Bạn thì sao?",
-      timestamp: "10:03 AM",
-      type: "text",
-    },
-    {
-      id: 7,
-      sender: "other",
-      content: "Mình cũng ổn. Hôm nay bạn có rảnh không?",
-      timestamp: "10:05 AM",
-      type: "text",
-    },
-  ]);
 
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -189,12 +137,8 @@ export default function MessagesChat({
   };
 
   const renderMessage = (msg, index) => {
-    const senderId = msg.senderId ?? msg.userId ?? msg.sender?.id ?? null;
-    const isMe = senderId != null && currentUserId != null
-      ? Number(senderId) === Number(currentUserId)
-      : msg.sender === "me";
-    // minimal debug to verify alignment input values
-    console.debug('align', { senderId, currentUserId, isMe });
+    // Check if message is from current user (me)
+    const isMe = msg.senderId === currentUserId || msg.sender === "me";
     const isFirst = isFirstInGroup(index);
     const isLast = isLastInGroup(index);
 
@@ -207,7 +151,7 @@ export default function MessagesChat({
           <div className="flex-shrink-0 mr-3">
             {isLast ? (
               <Image
-                src={contact.avatar || "/placeholder.svg"}
+                src={contact.avatarUrl || "/default-avatar.jpg"}
                 alt={contact.name}
                 width={36}
                 height={36}
@@ -335,7 +279,7 @@ export default function MessagesChat({
               )}
               <div className="flex-shrink-0">
                 <Image
-                  src={contact.avatar || "/placeholder.svg"}
+                  src={contact.avatarUrl || "/default-avatar.jpg"}
                   alt={contact.name}
                   width={40}
                   height={40}

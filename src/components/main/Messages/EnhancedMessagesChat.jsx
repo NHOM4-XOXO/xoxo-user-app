@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import Image from "next/image";
 import {
   ArrowLeft,
@@ -18,7 +18,7 @@ import {
 } from "@/utils/ContentMultipleLines";
 import ImagePreviewModal from "@/components/common/ImagePreviewModal";
 import { useChat } from "@/hooks/useChat";
-import { useGetCurrentUserProfileQuery } from "@/features/chatApi";
+import { useGetCurrentUserProfileQuery, useGetUserByIdQuery } from "@/features/chatApi";
 
 export default function EnhancedMessagesChat({
   contact,
@@ -43,6 +43,43 @@ export default function EnhancedMessagesChat({
     handleSendMessage,
     initializeChat,
   } = useChat(contact?.userId || contact?.id, contact?.chatRoom);
+
+  // Fetch user data for avatar display
+  const { data: profileData } = useGetCurrentUserProfileQuery();
+  const myId = profileData?.id;
+  
+  // Get all participant IDs for potential multiple users
+  const participantIds = currentChatRoom?.participantIds || [];
+  const otherParticipantIds = participantIds.filter(id => id !== myId);
+  
+  // Fetch user data for all other participants
+  const participantQueries = otherParticipantIds.map(participantId => 
+    useGetUserByIdQuery(participantId, { skip: !participantId })
+  );
+  
+  // Create a map of user data by ID for quick lookup
+  const participantsMap = useMemo(() => {
+    const map = {};
+    participantQueries.forEach((query, index) => {
+      const participantId = otherParticipantIds[index];
+      if (query.data) {
+        map[participantId] = query.data;
+      }
+    });
+    return map;
+  }, [participantQueries, otherParticipantIds]);
+  
+  // For backward compatibility, keep otherUser for direct chats
+  const otherId = otherParticipantIds[0];
+  const { data: otherUser } = useGetUserByIdQuery(otherId, { skip: !otherId });
+  
+  // Function to get user data by sender ID
+  const getSenderData = (senderId) => {
+    if (senderId === myId) {
+      return profileData; // Current user data
+    }
+    return participantsMap[senderId] || null;
+  };
 
   useEffect(() => {
     if (contact?.chatRoom?.id) {
@@ -156,7 +193,7 @@ export default function EnhancedMessagesChat({
           )}
           <div className="relative">
             <Image
-              src={contact.avatar || "/default-avatar.jpg"}
+              src={otherUser?.avatarUrl || "/default-avatar.jpg"}
               alt={contact.name}
               width={40}
               height={40}
@@ -219,10 +256,16 @@ export default function EnhancedMessagesChat({
                 currentUserId,
                 equal: Number(msg?.senderId) === Number(currentUserId),
               });
-              const isFromMe = Number(msg?.senderId) === Number(currentUserId);
+              const isFromMe = Number(msg?.senderId) === Number(myId);
 
               const showAvatar = isLastInGroup(index) && !isFromMe;
               const showName = isFirstInGroup(index) && !isFromMe;
+              
+              // Get sender data for avatar display
+              const senderData = getSenderData(msg.senderId);
+              const senderName = senderData 
+                ? `${(senderData.firstName || "")} ${(senderData.lastName || "")}`.trim() || senderData.username || senderData.email
+                : `User ${msg.senderId}`;
 
               return (
                 <div
@@ -234,8 +277,8 @@ export default function EnhancedMessagesChat({
                     <div className="w-8 mr-2">
                       {showAvatar && (
                         <Image
-                          src={contact.avatar || "/default-avatar.jpg"}
-                          alt={contact.name}
+                          src={senderData?.avatarUrl || "/default-avatar.jpg"}
+                          alt={senderName}
                           width={32}
                           height={32}
                           className="object-cover rounded-full"
@@ -247,7 +290,7 @@ export default function EnhancedMessagesChat({
                   <div className={`max-w-[70%] ${isFromMe ? "ml-auto" : ""}`}>
                     {showName && !isFromMe && (
                       <p className="mb-1 ml-3 text-xs text-gray-500">
-                        {msg.senderName || contact.name}
+                        {senderName}
                       </p>
                     )}
 

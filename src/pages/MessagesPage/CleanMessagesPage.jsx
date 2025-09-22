@@ -53,7 +53,7 @@ export default function CleanMessagesPage() {
       const contact = {
         id: result.id,
         name: result.name,
-        avatar: result.participants?.find(p => p.id !== result.currentUserId)?.avatarUrl,
+        avatarUrl: result.participants?.find(p => p.id !== result.currentUserId)?.avatarUrl,
         isOnline: false,
         userId: userId, // Keep the original user ID
         chatRoom: result,

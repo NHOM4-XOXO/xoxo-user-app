@@ -63,7 +63,7 @@ export default function CommentSection({ comments: initialComments, postId }) {
       className={`mt-2 flex space-x-2 ${isReply ? "ml-8" : ""}`}
     >
       <Image
-        src={comment.author.avatar || "/placeholder.svg"}
+        src={comment.author.avatar|| "/default-avatar.jpg"}
         alt={comment.author.name}
         width={32}
         height={32}

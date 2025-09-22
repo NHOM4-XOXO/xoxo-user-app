@@ -106,7 +106,7 @@ export default function MessagesSidebar({
             >
               <div className="relative">
                 <Image
-                  src={contact.avatar || "/placeholder.svg"}
+                  src={contact.avatarUrl || "/default-avatar.jpg"}
                   alt={contact.name}
                   width={48}
                   height={48}

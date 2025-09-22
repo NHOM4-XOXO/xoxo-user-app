@@ -95,7 +95,7 @@ export default function OnlineFriends({ contacts, onSelectContact }) {
           >
             <div className="relative mb-2">
               <Image
-                src={contact.avatar || "/placeholder.svg"}
+                src={contact.avatarUrl || "/default-avatar.jpg"}
                 alt={contact.name}
                 width={56}
                 height={56}

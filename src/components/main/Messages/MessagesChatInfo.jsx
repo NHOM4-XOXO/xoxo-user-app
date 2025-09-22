@@ -19,6 +19,7 @@ import {
   ALargeSmall,
 } from "lucide-react";
 import ScrollableContainer from "@/components/common/ScrollableContainer";
+import { useGetUserByIdQuery, useGetCurrentUserProfileQuery } from "@/features/chatApi";
 
 export default function MessagesChatInfo({ contact, onClose }) {
   const [expandedSections, setExpandedSections] = useState({
@@ -26,6 +27,12 @@ export default function MessagesChatInfo({ contact, onClose }) {
     privacy: false,
     media: false,
   });
+
+  // Fetch user data for avatar display
+  const { data: profileData } = useGetCurrentUserProfileQuery();
+  const myId = profileData?.id;
+  const otherId = contact?.userId || contact?.chatRoom?.participantIds?.find(id => id !== myId);
+  const { data: otherUser } = useGetUserByIdQuery(otherId, { skip: !otherId });
 
   const toggleSection = (section) => {
     setExpandedSections((prev) => ({
@@ -43,7 +50,7 @@ export default function MessagesChatInfo({ contact, onClose }) {
   ];
 
   return (
-    <div className="h-full py-3 pr-3">
+    <div className="h-full ">
       <div className="flex flex-col h-full overflow-hidden bg-fb-light-primary dark:bg-fb-dark-secondary rounded-xl">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-300 dark:border-fb-dark-tertiary">
@@ -60,7 +67,7 @@ export default function MessagesChatInfo({ contact, onClose }) {
           {/* Contact Info */}
           <div className="p-6 text-center border-b border-fb-light-tertiary dark:border-fb-dark-tertiary">
             <Image
-              src={contact.avatar || "/placeholder.svg"}
+              src={otherUser?.avatarUrl || "/default-avatar.jpg"}
               alt={contact.name}
               width={80}
               height={80}

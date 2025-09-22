@@ -129,7 +129,7 @@ const MainPost = ({ data, reactionStats, currentUserId }) => {
         <div className="flex gap-2">
           <img
             className="w-10 h-10 rounded-full border border-gray-300 dark:border-fb-dark-quaternary"
-            src={author.avatar}
+            src={author.avatar || "/default-avatar.jpg"}
             alt="Avatar"
           />
           <div>

@@ -53,7 +53,7 @@ export default function VideoPost({ post }) {
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center space-x-3">
           <Image
-            src={post.author.avatar || "/placeholder.svg"}
+            src={post.author.avatar || "/default-avatar.jpg"}
             alt={post.author.name}
             width={40}
             height={40}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import Image from "next/image";
 import { Minus, X, Smile, Paperclip, Send, Download, ThumbsUp } from "lucide-react";
 import { HEADER_HEIGHT } from "@/constants";
@@ -8,6 +8,8 @@ import { BASE_HEIGHT } from "@/constants/ChatWidget";
 import ImagePreviewModal from "../../common/ImagePreviewModal";
 import { ContentMultipleLines, CountContentLines } from "@/utils/ContentMultipleLines";
 import ScrollableContainer from "@/components/common/ScrollableContainer";
+import { useChat } from "@/hooks/useChat";
+import { useGetUserByIdQuery, useGetCurrentUserProfileQuery } from "@/features/chatApi";
 
 export default function ChatWidget({
   contact,
@@ -16,13 +18,76 @@ export default function ChatWidget({
   positionOffset = 0,
   windowHeight,
 }) {
-  const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [previewImageUrl, setPreviewImageUrl] = useState("");
+
+  // Use the chat hook with the contact's user ID and existing chat room
+  const {
+    currentChatRoom,
+    messages,
+    isConnected,
+    isCreatingChat,
+    isSendingMessage,
+    isLoadingMessages,
+    handleSendMessage,
+    initializeChat,
+  } = useChat(contact?.userId || contact?.id, contact?.chatRoom);
+
+  // Fetch user data for avatar display
+  const { data: profileData } = useGetCurrentUserProfileQuery();
+  const myId = profileData?.id;
+  
+  // Get all participant IDs for potential multiple users
+  const participantIds = currentChatRoom?.participantIds || [];
+  const otherParticipantIds = participantIds.filter(id => id !== myId);
+  
+  // Fetch user data for all other participants
+  const participantQueries = otherParticipantIds.map(participantId => 
+    useGetUserByIdQuery(participantId, { skip: !participantId })
+  );
+  
+  // Create a map of user data by ID for quick lookup
+  const participantsMap = useMemo(() => {
+    const map = {};
+    participantQueries.forEach((query, index) => {
+      const participantId = otherParticipantIds[index];
+      if (query.data) {
+        map[participantId] = query.data;
+      }
+    });
+    return map;
+  }, [participantQueries, otherParticipantIds]);
+  
+  // Get the correct other user ID - prioritize contact.userId if available
+  const otherId = contact?.userId || otherParticipantIds[0];
+  const { data: otherUser } = useGetUserByIdQuery(otherId, { skip: !otherId });
+  
+  // Function to get user data by sender ID
+  const getSenderData = (senderId) => {
+    if (senderId === myId) {
+      return profileData; // Current user data
+    }
+    return participantsMap[senderId] || null;
+  };
+
+  // Get the display user data for header - prioritize otherUser, fallback to participantsMap
+  const displayUser = otherUser || (otherId ? participantsMap[otherId] : null);
+
+  // Debug logging
+  useEffect(() => {
+    console.log("ChatWidget Debug:", {
+      contact: contact,
+      otherId: otherId,
+      otherUser: otherUser,
+      participantsMap: participantsMap,
+      displayUser: displayUser,
+      myId: myId
+    });
+  }, [contact, otherId, otherUser, participantsMap, displayUser, myId]);
 
   // Calculate dynamic max height
   const dynamicMaxHeight = windowHeight
@@ -33,121 +98,45 @@ export default function ChatWidget({
   // 80px + index * (width (w-80) + gap)
   const rightPosition = 80 + positionOffset * (320 + 16);
 
+  // Initialize chat when contact changes
   useEffect(() => {
-    // Simulate fetching messages for the contact
-    setMessages([
-      {
-        id: 1,
-        sender: "other",
-        content: `Chào bạn, tôi là ${contact.name}!`,
-        timestamp: "10:00 AM",
-        type: "text",
-      },
-      {
-        id: 2,
-        sender: "other",
-        content: "Bạn có khỏe không?",
-        timestamp: "10:00 AM",
-        type: "text",
-      },
-      {
-        id: 3,
-        sender: "other",
-        content: "Tôi hy vọng bạn đang ổn",
-        timestamp: "10:01 AM",
-        type: "text",
-      },
-      {
-        id: 4,
-        sender: "me",
-        content: "Chào bạn!",
-        timestamp: "10:02 AM",
-        type: "text",
-      },
-      {
-        id: 5,
-        sender: "me",
-        content: "Mình khỏe, cảm ơn bạn!",
-        timestamp: "10:02 AM",
-        type: "text",
-      },
-      {
-        id: 6,
-        sender: "me",
-        content: "Bạn thì sao?",
-        timestamp: "10:03 AM",
-        type: "text",
-      },
-      {
-        id: 7,
-        sender: "other",
-        content: "Mình cũng ổn. Hôm nay bạn có rảnh không?",
-        timestamp: "10:05 AM",
-        type: "text",
-      },
-    ]);
-  }, [contact]);
+    if (contact?.chatRoom?.id) {
+      console.log("ChatWidget - Using existing chat room:", contact.chatRoom.id);
+    } else if (contact?.userId) {
+      console.log("ChatWidget - Initializing chat with user ID:", contact.userId);
+      initializeChat(contact.userId);
+    } else if (contact?.id && !contact?.chatRoom) {
+      console.log("ChatWidget - Fallback: using contact.id as user ID:", contact.id);
+      initializeChat(contact.id);
+    }
+  }, [contact?.userId, contact?.id, contact?.chatRoom, initializeChat]);
 
+  // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSendMessage = () => {
-    if (message.trim()) {
-      const newMessage = {
-        id: messages.length + 1,
-        sender: "me",
-        content: message.trim(),
-        timestamp: new Date().toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-        file: null,
-      };
-      setMessages([...messages, newMessage]);
+  const handleSendMessageClick = async () => {
+    if (!message.trim() || isSendingMessage) return;
+
+    try {
+      await handleSendMessage(message.trim());
       setMessage("");
+    } catch (error) {
+      console.error("Failed to send message:", error);
     }
   };
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSendMessage();
+      handleSendMessageClick();
     }
   };
 
   const handleFileSelect = (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const fileUrl = URL.createObjectURL(file);
-    let fileType = "other";
-
-    if (file.type.startsWith("image/")) {
-      fileType = "image";
-    } else if (file.type.startsWith("video/")) {
-      fileType = "video";
-    } else if (file.type.startsWith("audio/")) {
-      fileType = "audio";
-    }
-
-    const newMessage = {
-      id: messages.length + 1,
-      sender: "me",
-      content: null,
-      timestamp: new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      file: {
-        url: fileUrl,
-        type: fileType,
-        name: file.name,
-        size: file.size,
-      },
-    };
-
-    setMessages([...messages, newMessage]);
+    // File upload functionality can be implemented here
+    // For now, we'll just clear the input
     event.target.value = "";
   };
 
@@ -156,7 +145,7 @@ export default function ChatWidget({
     if (currentIndex === 0) return true;
     const currentMsg = messages[currentIndex];
     const prevMsg = messages[currentIndex - 1];
-    return currentMsg.sender !== prevMsg.sender;
+    return currentMsg.senderId !== prevMsg.senderId;
   };
 
   // Kiểm tra xem có phải tin nhắn cuối cùng trong nhóm không
@@ -164,13 +153,20 @@ export default function ChatWidget({
     if (currentIndex === messages.length - 1) return true;
     const currentMsg = messages[currentIndex];
     const nextMsg = messages[currentIndex + 1];
-    return currentMsg.sender !== nextMsg.sender;
+    return currentMsg.senderId !== nextMsg.senderId;
   };
 
   const renderMessage = (msg, index) => {
-    const isMe = msg.sender === "me";
+    // Check if message is from current user (me)
+    const isMe = msg.senderId === myId;
     const isFirst = isFirstInGroup(index);
     const isLast = isLastInGroup(index);
+    
+    // Get sender data for avatar display
+    const senderData = getSenderData(msg.senderId);
+    const senderName = senderData 
+      ? `${(senderData.firstName || "")} ${(senderData.lastName || "")}`.trim() || senderData.username || senderData.email
+      : `User ${msg.senderId}`;
 
     return (
       <div
@@ -181,8 +177,8 @@ export default function ChatWidget({
           <div className="flex-shrink-0 mr-3">
             {isLast ? (
               <Image
-                src={contact.avatar || "/placeholder.svg"}
-                alt={contact.name}
+                src={senderData?.avatarUrl || "/default-avatar.jpg"}
+                alt={senderName}
                 width={36}
                 height={36}
                 className="object-cover rounded-full w-9 h-9"
@@ -194,12 +190,12 @@ export default function ChatWidget({
         )}
         <div
           className={`${
-            msg.file?.type === "audio" ? "w-3/4" : "max-w-xs lg:max-w-md"
+            msg.mediaType === "AUDIO" ? "w-3/4" : "max-w-xs lg:max-w-md"
           } ${isMe ? "order-1" : "order-2"}`}
         >
           <div
             className={`px-4 py-2 ${
-              !msg.content && msg.file?.type !== "other"
+              !msg.content && msg.mediaType !== "TEXT"
                 ? ""
                 : isMe
                 ? `bg-blue-600 text-white ${
@@ -222,29 +218,29 @@ export default function ChatWidget({
                   }`
             }`}
           >
-            {!msg.content && msg.file?.type !== "other" ? (
+            {!msg.content && msg.mediaType !== "TEXT" ? (
               <div
                 className={`w-full p-2 rounded-lg ${
-                  msg.file
+                  msg.mediaUrl
                     ? "bg-fb-light-tertiary dark:bg-fb-dark-tertiary dark:text-white"
                     : isMe
                     ? "bg-blue-500 text-white"
                     : "bg-gray-200 dark:bg-gray-700 text-black dark:text-white"
                 }`}
               >
-                {msg.file.type === "image" && (
+                {msg.mediaType === "IMAGE" && (
                   <img
-                    src={msg.file.url || "/placeholder.svg"}
-                    alt={msg.file.name}
+                    src={msg.mediaUrl || "/placeholder.svg"}
+                    alt="Image"
                     className="rounded-md cursor-pointer"
-                    onClick={() => openImagePreview(msg.file.url)}
+                    onClick={() => openImagePreview(msg.mediaUrl)}
                   />
                 )}
-                {msg.file.type === "video" && (
-                  <video src={msg.file.url} controls className="rounded-md" />
+                {msg.mediaType === "VIDEO" && (
+                  <video src={msg.mediaUrl} controls className="rounded-md" />
                 )}
-                {msg.file.type === "audio" && (
-                  <audio src={msg.file.url} controls className="w-full" />
+                {msg.mediaType === "AUDIO" && (
+                  <audio src={msg.mediaUrl} controls className="w-full" />
                 )}
               </div>
             ) : (
@@ -255,14 +251,14 @@ export default function ChatWidget({
                   </p>
                 )}
 
-                {msg.file && (
+                {msg.mediaUrl && (
                   <a
-                    href={msg.file.url}
-                    download={msg.file.name}
+                    href={msg.mediaUrl}
+                    download="file"
                     className="flex items-center space-x-2 hover:underline"
                   >
                     <Download className="w-4 h-4" />
-                    <span className="text-sm font-bold">{msg.file.name}</span>
+                    <span className="text-sm font-bold">File</span>
                   </a>
                 )}
               </div>
@@ -274,7 +270,10 @@ export default function ChatWidget({
                 isMe ? "text-right" : "text-left"
               }`}
             >
-              {msg.timestamp}
+              {msg.sentAt ? new Date(msg.sentAt).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              }) : ""}
             </p>
           )}
         </div>
@@ -307,20 +306,23 @@ export default function ChatWidget({
           <div className="flex items-center space-x-2">
             <div className="relative">
               <Image
-                src={contact.avatar || "/default-avatar.jpg"}
-                alt={contact.name}
+                src={displayUser?.avatarUrl || "/default-avatar.jpg"}
+                alt={displayUser?.firstName || contact.name}
                 width={32}
                 height={32}
                 className="object-cover rounded-full"
               />
               <div
                 className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 ${
-                  contact.isOnline ? "bg-green-500" : "bg-red-500"
+                  displayUser?.isOnline ? "bg-green-500" : "bg-red-500"
                 } border border-white dark:border-fb-dark-secondary rounded-full`}
               ></div>
             </div>
             <span className="text-sm font-semibold text-black dark:text-white">
-              {contact.name}
+              {displayUser ? 
+                `${(displayUser.firstName || "")} ${(displayUser.lastName || "")}`.trim() || displayUser.username || displayUser.email
+                : contact.name
+              }
             </span>
           </div>
           <div className="flex items-center space-x-1">
@@ -342,7 +344,22 @@ export default function ChatWidget({
         {/* Message Area */}
         <ScrollableContainer className="flex-1">
           <div className="p-3 space-y-3">
-            {messages.map((msg, index) => renderMessage(msg, index))}
+            {isLoadingMessages ? (
+              <div className="flex items-center justify-center h-32">
+                <div className="text-center">
+                  <p className="text-sm text-gray-500">Đang tải tin nhắn...</p>
+                </div>
+              </div>
+            ) : messages.length === 0 ? (
+              <div className="flex items-center justify-center h-32">
+                <div className="text-center">
+                  <p className="text-gray-500 mb-2">Chưa có tin nhắn nào</p>
+                  <p className="text-sm text-gray-400">Hãy bắt đầu cuộc trò chuyện!</p>
+                </div>
+              </div>
+            ) : (
+              messages.map((msg, index) => renderMessage(msg, index))
+            )}
             <div ref={messagesEndRef} />
           </div>
         </ScrollableContainer>
@@ -382,8 +399,9 @@ export default function ChatWidget({
               />
               {message.trim() ? (
                 <button
-                  onClick={handleSendMessage}
-                  className="absolute p-1 text-blue-600 transition-colors -translate-y-1/2 cursor-pointer right-2 top-1/2 hover:text-blue-700"
+                  onClick={handleSendMessageClick}
+                  disabled={isSendingMessage}
+                  className="absolute p-1 text-blue-600 transition-colors -translate-y-1/2 cursor-pointer right-2 top-1/2 hover:text-blue-700 disabled:opacity-50"
                 >
                   <Send className="w-5 h-5" />
                 </button>

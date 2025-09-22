@@ -68,43 +68,36 @@ export default function EnhancedMessagesSidebar({
 
   // Convert chat room to contact format for compatibility
   const convertChatRoomToContact = (chatRoom) => {
-   
-    
     const currentUserId = getCurrentUserId();
-   
   
     let otherParticipantId = null;
     if (chatRoom.participantIds && Array.isArray(chatRoom.participantIds)) {
       otherParticipantId = chatRoom.participantIds.find(id => id !== currentUserId);
     }
     
-
-    
     let displayName = chatRoom.name; // Default fallback
     
     if (chatRoom.type === 'DIRECT' && otherParticipantId) {
-      
-      
       if (chatRoom.createdBy === currentUserId) {
- 
         displayName = chatRoom.name;
-        
       } else {
-       
         displayName = chatRoom.name;
-      
       }
-      
-      
-
     }
 
-   
+    // Debug logging
+    console.log("convertChatRoomToContact Debug:", {
+      chatRoom: chatRoom,
+      currentUserId: currentUserId,
+      participantIds: chatRoom.participantIds,
+      otherParticipantId: otherParticipantId,
+      displayName: displayName
+    });
 
     return {
       id: chatRoom.id,
       name: displayName,
-      avatar: "/default-avatar.jpg", // Default avatar for now
+      avatarUrl: null, // Will be populated by ChatRoomWithUserInfo component
       isOnline: false, // Default offline status
       lastSeen: chatRoom.lastMessageAt,
       lastMessage: typeof chatRoom.lastMessage === 'string' 
@@ -278,15 +271,33 @@ export default function EnhancedMessagesSidebar({
                 return true; // "all" tab
               })
               .map((chatRoom) => {
-                const contact = convertChatRoomToContact(chatRoom);
-                
                 return (
                   <ChatRoomWithUserInfo
                     key={chatRoom.id}
                     chatRoom={chatRoom}
-                    isSelected={selectedContact?.id === contact.id}
+                    isSelected={selectedContact?.id === chatRoom.id}
                     onSelect={(chatRoom) => {
-                      const contact = convertChatRoomToContact(chatRoom);
+                      // Create contact object with user data
+                      const currentUserId = getCurrentUserId();
+                      let otherParticipantId = null;
+                      if (chatRoom.participantIds && Array.isArray(chatRoom.participantIds)) {
+                        otherParticipantId = chatRoom.participantIds.find(id => id !== currentUserId);
+                      }
+                      
+                      const contact = {
+                        id: chatRoom.id,
+                        name: chatRoom.name,
+                        avatarUrl: null, // Will be populated by the chat component
+                        isOnline: false,
+                        lastSeen: chatRoom.lastMessageAt,
+                        lastMessage: typeof chatRoom.lastMessage === 'string' 
+                          ? chatRoom.lastMessage 
+                          : chatRoom.lastMessage?.content || "",
+                        unreadCount: chatRoom.unreadCount || 0,
+                        chatRoom: chatRoom,
+                        userId: otherParticipantId,
+                      };
+                      
                       onSelectContact(contact);
                     }}
                     onMarkAsRead={markChatAsRead}
