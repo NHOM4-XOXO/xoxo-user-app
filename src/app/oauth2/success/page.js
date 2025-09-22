@@ -29,7 +29,6 @@ export default function OAuth2Success() {
                 // Lưu token vào cookie (tuổi ngắn) và Redux store
                 Cookies.set("token", token, { expires: 1 / 144, secure: true, sameSite: "strict" });
                 dispatch(setCredentials({ token }));
-
                 setStatus("success");
 
                 // Delay 1s để người dùng thấy trạng thái success trước khi redirect

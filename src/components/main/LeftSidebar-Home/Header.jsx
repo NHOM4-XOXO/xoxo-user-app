@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { FaUserFriends, FaStore } from "react-icons/fa";
 import { FiSearch, FiMessageCircle, FiRefreshCw } from "react-icons/fi";
 import { IoMdHome, IoMdNotifications } from "react-icons/io";
@@ -11,7 +11,7 @@ import MessageDropdown from "./MessageDropdown";
 import NotificationDropdown from "./NotiDropDown";
 import SearchBar from "../../Search/SearchBar";
 import {
-  
+
   sampleNotifications,
 } from "../../../data/asideHeaderSampleData";
 import sampleFriends from "../../../data/sampleFriends";
@@ -60,6 +60,17 @@ export default function Header({ onContactClick }) {
   const searchWrapperRef = useRef(null);
   const messageRef = useRef(null);
   const notiRef = useRef(null);
+
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    try {
+      const profile = JSON.parse(localStorage.getItem("profile"));
+      setProfile(profile || null);
+    } catch (e) {
+      console.error("Không đọc được localStorage:", e);
+    }
+  }, []);
 
   // Search functionality với API call
   useEffect(() => {
@@ -262,34 +273,35 @@ export default function Header({ onContactClick }) {
               ) : (
                 <>
                   {/* Users */}
-                  {results.users && results.users.length > 0 && (
-                    <div className="mb-3">
-                      <h4 className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-2 px-2">
-                        Mọi người
-                      </h4>
-                      {results.users.slice(0, 3).map((user) => (
-                        <div
-                          key={user.id}
-                          onClick={() => handleUserClick(user)}
-                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer flex items-center gap-3"
-                        >
-                          <img
-                            src={user.avatarUrl || "/default-avatar.jpg"}
-                            alt={user.username}
-                            className="w-8 h-8 rounded-full object-cover"
-                          />
-                          <div>
-                            <p className="font-medium text-gray-900 dark:text-white">
-                              {user.firstName} {user.lastName}
-                            </p>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                              @{user.username}
-                            </p>
-                          </div>
+                  {results.users.slice(0, 3).map((user) => {
+                    const isMe = user.username === profile?.username; // so sánh
+                    return (
+                      <div
+                        key={user.id}
+                        onClick={() => !isMe && handleUserClick(user)}
+                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer flex items-center gap-3"
+                      >
+                        <img
+                          src={user.avatarUrl || "/default-avatar.jpg"}
+                          alt={user.username}
+                          className="w-8 h-8 rounded-full object-cover"
+                        />
+                        <div>
+                          <p className="font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                            {user.firstName} {user.lastName}
+                            {isMe && (
+                              <span className="text-xs bg-blue-500 text-white px-2 py-0.5 rounded-full">
+                                Bạn
+                              </span>
+                            )}
+                          </p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            @{user.username}
+                          </p>
                         </div>
-                      ))}
-                    </div>
-                  )}
+                      </div>
+                    );
+                  })}
 
                   {/* Posts */}
                   {results.posts && results.posts.length > 0 && (

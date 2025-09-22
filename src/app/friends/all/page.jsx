@@ -1,8 +1,9 @@
+import AllFriendsPage from '@/components/friends/AllFriend'
 import React from 'react'
 
 function AllFriend() {
     return (
-        <div>page</div>
+        <AllFriendsPage />
     )
 }
 
