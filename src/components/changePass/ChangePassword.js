@@ -6,6 +6,8 @@ import { useChangePasswordMutation } from "@/features/auth/authApi";
 import { useDispatch } from "react-redux";
 import { logout } from "@/features/auth/authSlice";
 import { toast } from "react-hot-toast";
+// import { set } from "react-hook-form";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function ChangePassword() {
   const router = useRouter();
@@ -23,6 +25,13 @@ export default function ChangePassword() {
   });
   const [logoutAllDevices, setLogoutAllDevices] = useState(false);
   const [changePassword, { isLoading }] = useChangePasswordMutation();
+  const toggleShowPassword = (field) => {
+    setShowPasswords((prev) => ({
+      ...prev,
+      [field]: !prev[field],
+    }));
+  };
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -81,26 +90,25 @@ export default function ChangePassword() {
 
       toast.success("Đổi mật khẩu thành công!");
 
-      console.log("logoutAllDevices:", logoutAllDevices);
+      // console.log("logoutAllDevices:", logoutAllDevices);
 
      
-      if (logoutAllDevices) {
-        console.log("Preparing to logout...");
-        dispatch(logout());
+      // if (logoutAllDevices) {
+      //   console.log("Preparing to logout...");
+      //   dispatch(logout());
 
-        router.refresh(); 
-        router.replace("/login"); 
+      //   router.refresh(); 
+      //   router.replace("/login"); 
 
-        setTimeout(() => {
-          window.location.href = "/login";
-        }, 100);
-      } else {
-        router.push("/");
-      }
-    } catch (error) {
+      //   setTimeout(() => {
+      //     window.location.href = "/login";
+      //   }, 100);
+      // } else {
+      router.push("/");
+      } catch (error) {
       console.log("Change password error:", error);
 
-      // Kiểm tra token hết hạn
+      
       if (error?.status === 401 || error?.status === 403) {
         toast.error("Phiên đăng nhập đã hết hạn");
         dispatch(logout());
@@ -108,7 +116,7 @@ export default function ChangePassword() {
         return;
       }
 
-      // Xử lý lỗi mật khẩu cũ sai
+      
       if (error?.status === 400) {
         setErrors({ oldPassword: "Mật khẩu cũ không đúng" });
         toast.error("Mật khẩu cũ không đúng");
@@ -133,7 +141,6 @@ export default function ChangePassword() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Mật khẩu cũ */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Mật khẩu cũ
@@ -149,6 +156,17 @@ export default function ChangePassword() {
                   }`}
                   placeholder="Nhập mật khẩu cũ"
                 />
+                <button
+                  type="button"
+                  onClick={() => toggleShowPassword("old")}
+                  className="absolute right-3 top-4 text-gray-500 cursor-pointer"
+                >
+                  {showPasswords.old ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
               </div>
               {errors.oldPassword && (
                 <p className="text-red-500 text-sm mt-1">
@@ -157,7 +175,6 @@ export default function ChangePassword() {
               )}
             </div>
 
-            {/* Mật khẩu mới */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Mật khẩu mới
@@ -173,6 +190,17 @@ export default function ChangePassword() {
                   }`}
                   placeholder="Nhập mật khẩu mới"
                 />
+                <button
+                  type="button"
+                  onClick={() => toggleShowPassword("new")}
+                  className="absolute right-3 top-4 text-gray-500 cursor-pointer"
+                >
+                  {showPasswords.new ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
               </div>
               {errors.newPassword && (
                 <p className="text-red-500 text-sm mt-1">
@@ -181,7 +209,6 @@ export default function ChangePassword() {
               )}
             </div>
 
-            {/* Xác nhận mật khẩu mới */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Xác nhận mật khẩu mới
@@ -199,6 +226,17 @@ export default function ChangePassword() {
                   }`}
                   placeholder="Nhập lại mật khẩu mới"
                 />
+                <button
+                  type="button"
+                  onClick={() => toggleShowPassword("confirm")}
+                  className="absolute right-3 top-4 text-gray-500 cursor-pointer"
+                >
+                  {showPasswords.confirm ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
               </div>
               {errors.confirmPassword && (
                 <p className="text-red-500 text-sm mt-1">
@@ -207,7 +245,8 @@ export default function ChangePassword() {
               )}
             </div>
 
-            <div className="flex items-start">
+            {/* Tính năng đang phát triển...Đang cập nhật */}
+            {/* <div className="flex items-start">
               <input
                 type="checkbox"
                 id="logoutAllDevices"
@@ -226,9 +265,8 @@ export default function ChangePassword() {
                   Bạn sẽ cần đăng nhập lại trên tất cả các thiết bị khác
                 </p>
               </div>
-            </div>
+            </div> */}
 
-            {/* Buttons */}
             <div className="flex space-x-4">
               <button
                 type="button"
