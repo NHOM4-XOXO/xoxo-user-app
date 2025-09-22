@@ -11,7 +11,6 @@ import MessageDropdown from "./MessageDropdown";
 import NotificationDropdown from "./NotiDropDown";
 import SearchBar from "../../Search/SearchBar";
 import {
-  
   sampleNotifications,
 } from "../../../data/asideHeaderSampleData";
 import sampleFriends from "../../../data/sampleFriends";
@@ -44,6 +43,9 @@ export default function Header({ onContactClick }) {
     loading: false,
     showResults: false,
   });
+
+  // Fetch chat rooms from API
+  const { data: chatRooms = [], isLoading: isLoadingChatRooms } = useGetChatRoomsQuery({ page: 0, size: 10 });
 
   const {
     showMessages,
@@ -466,7 +468,8 @@ export default function Header({ onContactClick }) {
       {showMessages && (
         <div className="absolute top-2 right-2 z-50 sm:right-4 mt-2">
           <MessageDropdown
-            messages={[]}
+            messages={chatRooms}
+            isLoading={isLoadingChatRooms}
             onClose={() => setState({ showMessages: false })}
             onContactClick={onContactClick}
           />
