@@ -62,8 +62,8 @@ export default function ChatWidget({
     return map;
   }, [participantQueries, otherParticipantIds]);
   
-  // For backward compatibility, keep otherUser for direct chats
-  const otherId = otherParticipantIds[0];
+  // Get the correct other user ID - prioritize contact.userId if available
+  const otherId = contact?.userId || otherParticipantIds[0];
   const { data: otherUser } = useGetUserByIdQuery(otherId, { skip: !otherId });
   
   // Function to get user data by sender ID
@@ -73,6 +73,21 @@ export default function ChatWidget({
     }
     return participantsMap[senderId] || null;
   };
+
+  // Get the display user data for header - prioritize otherUser, fallback to participantsMap
+  const displayUser = otherUser || (otherId ? participantsMap[otherId] : null);
+
+  // Debug logging
+  useEffect(() => {
+    console.log("ChatWidget Debug:", {
+      contact: contact,
+      otherId: otherId,
+      otherUser: otherUser,
+      participantsMap: participantsMap,
+      displayUser: displayUser,
+      myId: myId
+    });
+  }, [contact, otherId, otherUser, participantsMap, displayUser, myId]);
 
   // Calculate dynamic max height
   const dynamicMaxHeight = windowHeight
@@ -291,21 +306,21 @@ export default function ChatWidget({
           <div className="flex items-center space-x-2">
             <div className="relative">
               <Image
-                src={otherUser?.avatarUrl || "/default-avatar.jpg"}
-                alt={otherUser?.firstName || contact.name}
+                src={displayUser?.avatarUrl || "/default-avatar.jpg"}
+                alt={displayUser?.firstName || contact.name}
                 width={32}
                 height={32}
                 className="object-cover rounded-full"
               />
               <div
                 className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 ${
-                  otherUser?.isOnline ? "bg-green-500" : "bg-red-500"
+                  displayUser?.isOnline ? "bg-green-500" : "bg-red-500"
                 } border border-white dark:border-fb-dark-secondary rounded-full`}
               ></div>
             </div>
             <span className="text-sm font-semibold text-black dark:text-white">
-              {otherUser ? 
-                `${(otherUser.firstName || "")} ${(otherUser.lastName || "")}`.trim() || otherUser.username || otherUser.email
+              {displayUser ? 
+                `${(displayUser.firstName || "")} ${(displayUser.lastName || "")}`.trim() || displayUser.username || displayUser.email
                 : contact.name
               }
             </span>

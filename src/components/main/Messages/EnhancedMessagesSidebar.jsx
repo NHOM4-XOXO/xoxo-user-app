@@ -85,6 +85,15 @@ export default function EnhancedMessagesSidebar({
       }
     }
 
+    // Debug logging
+    console.log("convertChatRoomToContact Debug:", {
+      chatRoom: chatRoom,
+      currentUserId: currentUserId,
+      participantIds: chatRoom.participantIds,
+      otherParticipantId: otherParticipantId,
+      displayName: displayName
+    });
+
     return {
       id: chatRoom.id,
       name: displayName,
