@@ -78,8 +78,8 @@ const ProfileFriend = () => {
 
     useEffect(() => {
         try {
-            const auth = JSON.parse(localStorage.getItem("auth"));
-            setCurrentUser(auth?.profile || null);
+            const profile = JSON.parse(localStorage.getItem("profile"));
+            setCurrentUser(profile || null);
         } catch (e) {
             console.error("Không đọc được auth:", e);
         }

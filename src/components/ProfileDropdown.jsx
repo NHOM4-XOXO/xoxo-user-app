@@ -27,14 +27,14 @@ export default function ProfileDropdown() {
   };
   useEffect(() => {
     try {
-      const authData = localStorage.getItem("auth");
-      if (authData) {
-        const parsedUser = JSON.parse(authData);
+      const profile = localStorage.getItem("profile");
+      if (profile) {
+        const parsedUser = JSON.parse(profile);
         setUser(parsedUser);
 
-        if (parsedUser && parsedUser.profile) {
-          setUserName(parsedUser.profile.firstName + " " + parsedUser.profile.lastName);
-          setUserAvatar(parsedUser.profile.avatarUrl || "/image/georgina.jpg");
+        if (parsedUser) {
+          setUserName(parsedUser.firstName + " " + parsedUser.lastName);
+          setUserAvatar(parsedUser.avatarUrl || "/image/georgina.jpg");
         }
       }
     } catch (error) {

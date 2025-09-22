@@ -9,13 +9,18 @@ const FriendRequestCard = ({ friend, customButton, type = null }) => {
   const [acceptRequest, { isLoading: isAcceptting }] = useAcceptRequestMutation();
   const [rejectRequest, { isLoading: isRejecting }] = useRejectRequestMutation();
 
-  const { data: userData, isLoading: isUserLoading } = useGetUserByUsernameQuery(friend.user.username, { skip: !friend.user.username });
+  const { data: userData, isLoading: isUserLoading } = useGetUserByUsernameQuery(
+    friend.user.username,
+    { skip: !friend.user.username }
+  );
 
   const handleAccept = async () => {
     if (customButton?.onClick) return customButton.onClick();
     try {
       await acceptRequest(friend.id).unwrap();
-      toast.success(`Đã chấp nhận lời mời kết bạn từ ${friend.user.displayName || friend.user.username}`);
+      toast.success(
+        `Đã chấp nhận lời mời kết bạn từ ${friend.user.displayName || friend.user.username}`
+      );
     } catch (err) {
       toast.error(err?.data?.message || "Chấp nhận lời mời kết bạn thất bại");
     }
@@ -31,84 +36,81 @@ const FriendRequestCard = ({ friend, customButton, type = null }) => {
     }
   };
 
-  // Nếu userData đang load, hiển thị skeleton
   if (isUserLoading) {
     return (
-      <div className="rounded-lg overflow-hidden dark:bg-[#242526] shadow-md border border-gray-300 dark:border-gray-700 animate-pulse">
-        <div className="w-full h-40 bg-gray-300 dark:bg-gray-700"></div>
-        <div className="p-3 space-y-2">
-          <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-3/4 mx-auto"></div>
-          <div className="h-8 bg-gray-300 dark:bg-gray-600 rounded w-full"></div>
-        </div>
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 flex flex-col items-center text-center animate-pulse">
+        <div className="w-24 h-24 bg-gray-300 dark:bg-gray-700 rounded-full mb-3"></div>
+        <div className="h-4 w-3/4 bg-gray-300 dark:bg-gray-600 rounded mb-2"></div>
+        <div className="h-3 w-1/2 bg-gray-300 dark:bg-gray-600 rounded"></div>
       </div>
     );
   }
 
   return (
-    <div className="rounded-lg overflow-hidden dark:bg-[#242526] shadow-md border border-gray-300 dark:border-gray-700 cursor-pointer">
-      {/* Avatar top full */}
-      <div className="relative w-full h-40 sm:h-48 md:h-52 lg:h-56">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition p-4 flex flex-col items-center text-center">
+      {/* Avatar tròn */}
+      <div className="relative w-24 h-24 mb-3">
         <Image
           src={userData?.avatarUrl || "/default-avatar.jpg"}
           alt={userData?.username || "Avatar người dùng"}
           fill
-          sizes="(max-width: 768px) 50vw, 33vw"
-          priority
+          className="rounded-full object-cover border"
+          sizes="96px"
         />
       </div>
 
-      {/* Info + Button */}
-      <div className="p-3 text-center text-black dark:text-white">
-        <p className="font-semibold truncate hover:underline cursor-pointer">
-          <Link href={`/profile/${userData?.username}`}>
-            {userData?.firstName} {userData?.lastName}
-          </Link>
-        </p>
-        {customButton && (
-          <p>
-            Có {friend?.user?.mutualFriendsCount} bạn chung
-          </p>
-        )}
+      {/* Tên */}
+      <h3 className="font-semibold text-lg dark:text-white">
+        <Link href={`/profile/${userData?.username}`}>
+          {userData?.firstName} {userData?.lastName}
+        </Link>
+      </h3>
 
-        <div className="mt-3 flex flex-col space-y-2">
-          {customButton ? (
-            <button
-              onClick={handleAccept}
-              disabled={isAcceptting || isRejecting}
-              className={`${customButton.bgColor} ${customButton.hoverColor} text-white py-1.5 rounded font-medium`}
-            >
-              {customButton.label}
-            </button>
-          ) : (
-            <>
-              {type === "RECEIVED" ? (
-                <>
-                  <button
-                    onClick={handleAccept}
-                    disabled={isAcceptting || isRejecting}
-                    className="bg-blue-600 hover:bg-blue-700 text-white py-1.5 rounded font-medium"
-                  >
-                    Xác nhận
-                  </button>
-                  <button
-                    onClick={handleReject}
-                    disabled={isAcceptting || isRejecting}
-                    className="bg-gray-500 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 text-white py-1.5 rounded font-medium"
-                  >
-                    Xóa
-                  </button>
-                </>
-              ) : type === "SENT" ? (
+      {/* Bạn chung */}
+      {friend?.user?.mutualFriendsCount && (<p className="text-sm text-gray-500 dark:text-gray-400">
+        {`${friend?.user?.mutualFriendsCount} bạn chung`}
+      </p>)}
+
+
+      {/* Nút */}
+      <div className="mt-4 w-full space-y-2">
+        {customButton ? (
+          <button
+            onClick={handleAccept}
+            disabled={isAcceptting || isRejecting}
+            className={`${customButton.bgColor} ${customButton.hoverColor} w-full text-white text-sm px-5 py-2 rounded-full transition-colors`}
+          >
+            {customButton.label}
+          </button>
+        ) : (
+          <>
+            {type === "RECEIVED" ? (
+              <>
                 <button
-                  className="bg-green-500 text-white py-1.5 rounded font-medium cursor-not-allowed"
-                  disabled
+                  onClick={handleAccept}
+                  disabled={isAcceptting || isRejecting}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm px-5 py-2 rounded-full transition-colors"
                 >
-                  Đã gửi lời mời
+                  Xác nhận
                 </button>
-              ) : null}
-            </>
-          )}
-        </div>
+                <button
+                  onClick={handleReject}
+                  disabled={isAcceptting || isRejecting}
+                  className="w-full bg-gray-500 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 text-white text-sm px-5 py-2 rounded-full transition-colors"
+                >
+                  Xóa
+                </button>
+              </>
+            ) : type === "SENT" ? (
+              <button
+                className="w-full bg-green-500 text-white text-sm px-5 py-2 rounded-full cursor-not-allowed"
+                disabled
+              >
+                Đã gửi lời mời
+              </button>
+            ) : null}
+          </>
+        )}
       </div>
     </div>
   );

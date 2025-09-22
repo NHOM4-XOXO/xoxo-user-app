@@ -12,15 +12,15 @@ import { RootContext } from "@/app/ClientProviders";
 
 export default function HomePage() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const { setIsLoading } = useContext(RootContext);
+  // const { setIsLoading } = useContext(RootContext);
   const {
     data: posts = [],
     isLoading,
   } = useGetPublicPostsQuery();
 
-  useEffect(() => {
-    setIsLoading(isLoading);
-  }, [isLoading])
+  // useEffect(() => {
+  //   setIsLoading(isLoading);
+  // }, [isLoading])
 
   return (
     <main

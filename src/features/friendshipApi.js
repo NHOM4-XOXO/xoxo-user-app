@@ -1,21 +1,12 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import Cookies from "js-cookie";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { createBaseQueryWithReauth } from "./auth/baseQueryWithReauth ";
 
-const prepareHeaders = (headers) => {
-    const token = Cookies.get("token");
-    if (token) headers.set("Authorization", `Bearer ${token}`);
-    return headers;
-};
 
 const transform = (response) => response.data;
 
 export const friendshipApi = createApi({
     reducerPath: "friendshipApi",
-    baseQuery: fetchBaseQuery({
-        baseUrl: `${process.env.NEXT_PUBLIC_API_URL}/api/friendships`,
-        prepareHeaders,
-        credentials: "include",
-    }),
+    baseQuery: createBaseQueryWithReauth(`${process.env.NEXT_PUBLIC_API_URL}/api/friendships`),
     tagTypes: ["Friendship"],
 
     endpoints: (builder) => ({

@@ -9,7 +9,13 @@ const PostCreation = () => {
   const [postContent, setPostContent] = useState("");
   const [selectedFiles, setSelectedFiles] = useState([]);
   const fileInputRef = useRef(null);
-  const { profile } = useSelector((state) => state.auth);
+  let profile;
+  try {
+    profile = JSON.parse(localStorage.getItem("profile"));
+  } catch (e) {
+    console.error("Không đọc được localStorage:", e);
+    profile = null;
+  }
   const lastName = profile?.lastName;
 
   const handleFileSelect = (e) => {
