@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import Cookies from "js-cookie";
 
 
 const initialState = {
@@ -23,5 +24,5 @@ const authSlice = createSlice({
     },
 });
 
-export const { setCredentials, clearCredentials } = authSlice.actions;
+export const { setCredentials, clearCredentials, logout } = authSlice.actions;
 export default authSlice.reducer;

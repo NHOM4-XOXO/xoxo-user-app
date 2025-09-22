@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { scheduleTokenRefresh } from "@/features/auth/authManager";
 import GoogleLoginButton from "./GoogleLoginButton";
+import Footer from "../common/Footer";
 
 
 export default function LoginForm() {
@@ -150,10 +151,11 @@ export default function LoginForm() {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className={`w-full py-3 px-4 rounded-md font-semibold text-lg transition duration-200 cursor-pointer ${isLoading
-                      ? "bg-gray-400 text-gray-200 cursor-not-allowed"
-                      : "bg-blue-600 text-white hover:bg-blue-700"
-                      }`}
+                    className={`w-full py-3 px-4 rounded-md font-semibold text-lg transition duration-200 cursor-pointer ${
+                      isLoading
+                        ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                        : "bg-blue-600 text-white hover:bg-blue-700"
+                    }`}
                   >
                     {isLoading ? (
                       <span className="flex items-center justify-center">
@@ -192,12 +194,15 @@ export default function LoginForm() {
                   }}
                   className="w-full mt-4 flex items-center justify-center gap-2 bg-red-500 text-white py-3 px-4 rounded-md hover:bg-red-600 transition duration-200 text-lg font-semibold cursor-pointer"
                 >
-                  <img src="https://www.svgrepo.com/show/355037/google.svg" alt="Google" className="w-5 h-5" />
+                  <img
+                    src="https://www.svgrepo.com/show/355037/google.svg"
+                    alt="Google"
+                    className="w-5 h-5"
+                  />
                   Đăng nhập bằng Google
                 </button>
 
                 {/* <GoogleLoginButton /> */}
-
 
                 <div className="mt-4 text-center">
                   <a
@@ -247,6 +252,7 @@ export default function LoginForm() {
           </div>
         </div>
       )}
+      <Footer />
     </>
   );
 }

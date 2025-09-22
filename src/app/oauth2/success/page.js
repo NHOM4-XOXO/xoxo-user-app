@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "@/features/auth/authSlice";
 import Cookies from "js-cookie";
+import { scheduleTokenRefresh } from "@/features/auth/authManager";
 
 // Spinner component đơn giản
 export function Spinner({ className = "" }) {
@@ -27,7 +28,7 @@ export default function OAuth2Success() {
         if (token) {
             try {
                 // Lưu token vào cookie (tuổi ngắn) và Redux store
-                Cookies.set("token", token, { expires: 1 / 144, secure: true, sameSite: "strict" });
+                scheduleTokenRefresh(token)
                 dispatch(setCredentials({ token }));
                 setStatus("success");
 

@@ -28,7 +28,7 @@ const setTokenCookie = (token) => {
         if (!expiry) return;
 
         const now = Date.now();
-        const expiryMs = expiry - now-60000;
+        const expiryMs = expiry - now - 60000;
 
         if (expiryMs <= 0) return;
 
@@ -62,16 +62,29 @@ export const scheduleTokenRefresh = (token) => {
 
     if (refreshTimeout) clearTimeout(refreshTimeout);
 
-    if (refreshTime > 0) {
-        refreshTimeout = setTimeout(() => {
-            console.log("[AuthManager] Auto refreshing token...");
-            refreshTokenFlow();
-        }, refreshTime);
-        console.log(
-            `[AuthManager] Refresh scheduled in ${(refreshTime / 1000).toFixed(0)}s`
-        );
-    }
+    refreshTimeout = setTimeout(() => {
+        console.log("[AuthManager] Auto refreshing token...");
+        refreshTokenFlow();
+    }, refreshTime);
+    console.log(
+        `[AuthManager] Refresh scheduled in ${(refreshTime / 1000).toFixed(0)}s`
+    );
 };
+
+// export const scheduleTokenRefresh = (token) => {
+//     setTokenCookie(token); // vẫn lưu token vào cookie
+
+//     // Clear timeout cũ nếu có
+//     if (refreshTimeout) clearTimeout(refreshTimeout);
+
+//     // Test: refresh sau 3 phút
+//     refreshTimeout = setTimeout(() => {
+//         console.log("[AuthManager] Auto refreshing token (test 3 phút)...");
+//         refreshTokenFlow();
+//     }, 60 * 1000); // 3 phút = 180000 ms
+
+//     console.log(`[AuthManager] Refresh scheduled in 3 minutes for testing`);
+// };
 
 /**
  * Hàm gọi refresh token
