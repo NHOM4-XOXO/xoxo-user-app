@@ -10,10 +10,7 @@ import Image from "next/image";
 import MessageDropdown from "./MessageDropdown";
 import NotificationDropdown from "./NotiDropDown";
 import SearchBar from "../../Search/SearchBar";
-import {
-
-  sampleNotifications,
-} from "../../../data/asideHeaderSampleData";
+// sampleNotifications removed: now using API
 import sampleFriends from "../../../data/sampleFriends";
 import NavItem from "../../../components/Navbar/NavItem";
 import ThemeToggle from "../../ThemeToggle";
@@ -24,6 +21,7 @@ import { useRouter } from "next/navigation";
 import { searchUsers } from "../../../features/searchApi";
 import useMergeState from "../../../hooks/useMergeState";
 import { useGetChatRoomsQuery } from "@/features/chatApi";
+import { useGetNotificationsQuery, useGetUnreadCountQuery } from "@/features/userApi";
 
 export default function Header({ onContactClick }) {
   const router = useRouter();
@@ -47,6 +45,10 @@ export default function Header({ onContactClick }) {
 
   // Fetch chat rooms from API
   const { data: chatRooms = [], isLoading: isLoadingChatRooms } = useGetChatRoomsQuery({ page: 0, size: 10 });
+  const { data: notificationsResp, isLoading: isLoadingNotifications } = useGetNotificationsQuery({ page: 0, size: 20 });
+  const notifications = notificationsResp?.content || [];
+  const { data: unreadCountData } = useGetUnreadCountQuery();
+  const unreadCount = typeof unreadCountData === "number" ? unreadCountData : unreadCountData?.data ?? 0;
 
   const {
     showMessages,
@@ -450,7 +452,11 @@ export default function Header({ onContactClick }) {
           onClick={toggleNotificationDropdown}
         >
           <IoMdNotifications className="text-2xl" />
-          {/* <span className="absolute top-1 -right-1 bg-red-500 text-white rounded-full w-3 h-3" /> */}
+          {unreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full min-w-[18px] h-[18px] text-[11px] leading-[18px] text-center px-1">
+              {unreadCount > 99 ? "99+" : unreadCount}
+            </span>
+          )}
         </button>
 
         <ProfileDropdown />
@@ -492,8 +498,9 @@ export default function Header({ onContactClick }) {
       {showNotifications && (
         <div className="absolute top-3 -right-15 z-50 sm:-right-15 mt-2">
           <NotificationDropdown
-            rel={notiRef}
-            notifications={sampleNotifications}
+            ref={notiRef}
+            notifications={notifications}
+            isLoading={isLoadingNotifications}
             onClose={() => setState({ showNotifications: false })}
           />
         </div>

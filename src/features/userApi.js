@@ -22,7 +22,7 @@ export const userApi = createApi({
             providesTags: (r, e, username) => [{ type: "User", id: username }],
         }),
         getNotifications: builder.query({
-            query: () => "/notifications",
+            query: ({ page = 0, size = 20 } = {}) => `/notifications?page=${page}&size=${size}`,
             transformResponse: transform,
             providesTags: ["Notification"],
         }),
@@ -72,14 +72,14 @@ export const userApi = createApi({
                 url: `/notifications/${id}/read`,
                 method: "PUT",
             }),
-            invalidatesTags: (r, e, id) => [{ type: "Notification", id }],
+            invalidatesTags: ["Notification"],
         }),
         deleteNotification: builder.mutation({
             query: (id) => ({
                 url: `/notifications/${id}/delete`,
                 method: "PUT",
             }),
-            invalidatesTags: (r, e, id) => [{ type: "Notification", id }],
+            invalidatesTags: ["Notification"],
         }),
         markAllRead: builder.mutation({
             query: () => ({
