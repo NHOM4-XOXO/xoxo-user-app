@@ -58,7 +58,6 @@ function ProfileHeader({ userName, setIsLoading }) {
             setAvatarLoading(true);
             await updateAvatar(formData).unwrap();
             toast.success("Cập nhật avatar thành công!", { id: toastId });
-            refetch();
         } catch {
             toast.error("Cập nhật avatar thất bại!", { id: toastId });
         } finally {
@@ -79,7 +78,6 @@ function ProfileHeader({ userName, setIsLoading }) {
             setCoverLoading(true);
             await updateCover(formData).unwrap();
             toast.success("Cập nhật cover thành công!", { id: toastId });
-            refetch();
         } catch {
             toast.error("Cập nhật cover thất bại!", { id: toastId });
         } finally {

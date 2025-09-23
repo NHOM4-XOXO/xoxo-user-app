@@ -36,6 +36,11 @@ export const friendshipApi = createApi({
             transformResponse: transform,
             providesTags: ["Friendship"],
         }),
+        isFriend: builder.query({
+            query: (userId) => `/${userId}/is-friend`,
+            transformResponse: transform,
+            providesTags: ["Friendship"],
+        }),
 
         /* -------------------- MUTATION -------------------- */
         sendRequest: builder.mutation({
@@ -44,6 +49,7 @@ export const friendshipApi = createApi({
                 method: "POST",
                 body: { friendId: friendId },
             }),
+            invalidatesTags: ["Friendship"],
         }),
         rejectRequest: builder.mutation({
             query: (friendshipId) => ({
@@ -61,6 +67,21 @@ export const friendshipApi = createApi({
             invalidatesTags: ["Friendship"],
         }),
 
+        /* -------------------- DELETE -------------------- */
+        deleteFriend: builder.mutation({
+            query: (friendshipId) => ({
+                url: `/${friendshipId}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: ["Friendship"],
+        }),
+        deleteRequest: builder.mutation({
+            query: (friendshipId) => ({
+                url: `/${friendshipId}/request`,
+                method: "DELETE",
+            }),
+            invalidatesTags: ["Friendship"],
+        }),
     }),
 });
 
@@ -70,8 +91,12 @@ export const {
     useGetReceivedPendingQuery,
     useGetFriendsQuery,
     useGetFriendsByIduserQuery,
+    useIsFriendQuery,
 
     useSendRequestMutation,
     useRejectRequestMutation,
     useAcceptRequestMutation,
+
+    useDeleteFriendMutation,
+    useDeleteRequestMutation,
 } = friendshipApi;
