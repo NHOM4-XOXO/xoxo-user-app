@@ -8,7 +8,7 @@ import MessagesChatInfo from "@/components/main/Messages/MessagesChatInfo";
 import { HEADER_HEIGHT } from "@/constants";
 import { checkDeviceByWidth } from "@/utils/checkDeviceByWidth";
 import { useGetOrCreateDirectChatMutation, useGetChatRoomsQuery, useGetUserByIdQuery } from "@/features/chatApi";
-import DebugPanel from "@/components/debug/DebugPanel";
+
 import ErrorBoundary from "@/components/common/ErrorBoundary";
 import { ChatProvider } from "@/contexts/ChatContext";
 
