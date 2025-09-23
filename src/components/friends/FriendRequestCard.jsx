@@ -1,18 +1,26 @@
 import React from "react";
 import Image from "next/image";
-import { useAcceptRequestMutation, useRejectRequestMutation } from "@/features/friendshipApi";
+import { useAcceptRequestMutation, useDeleteFriendMutation, useDeleteRequestMutation, useIsFriendQuery, useRejectRequestMutation } from "@/features/friendshipApi";
 import { useGetUserByUsernameQuery } from "@/features/userApi";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 const FriendRequestCard = ({ friend, customButton, type = null }) => {
   const [acceptRequest, { isLoading: isAcceptting }] = useAcceptRequestMutation();
   const [rejectRequest, { isLoading: isRejecting }] = useRejectRequestMutation();
-
+  const [deleteFriend, { isLoading: isDeleting }] = useDeleteFriendMutation();
+  const username = type === "SENT" || "DELETE" ? friend?.user?.username : friend?.friend?.username;
   const { data: userData, isLoading: isUserLoading } = useGetUserByUsernameQuery(
-    friend.user.username,
-    { skip: !friend.user.username }
+    username,
+    { skip: !username }
   );
+  console.log(friend);
+
+  const { data: checkIsfriend } = useIsFriendQuery(
+    type === "DELETE" ? friend?.user?.id : skipToken
+  );
+
 
   const handleAccept = async () => {
     if (customButton?.onClick) return customButton.onClick();
@@ -27,14 +35,41 @@ const FriendRequestCard = ({ friend, customButton, type = null }) => {
   };
 
   const handleReject = async () => {
-    if (!customButton) {
-      try {
-        await rejectRequest(friend.id).unwrap();
-      } catch (err) {
-        console.error("Reject failed:", err);
-      }
+    try {
+      await rejectRequest(friend.id).unwrap();
+      toast.success("Đã xóa lời mời kết bạn");
+    } catch (err) {
+      toast.error("Xóa lời mời thất bại");
     }
   };
+
+  const handleDeleteRequest = async () => {
+    try {
+      await deleteRequest(friend.id).unwrap();
+      toast.success("Đã hủy lời mời kết bạn");
+    } catch (err) {
+      toast.error("Hủy lời mời thất bại");
+    }
+  };
+
+
+
+  const handleRemoveFriend = async () => {
+    if (!checkIsfriend?.friendshipId) {
+      toast.error("Không tìm thấy quan hệ bạn bè");
+      return;
+    }
+
+    try {
+      await deleteFriend(checkIsfriend.friendshipId).unwrap();
+      toast.success(
+        `Đã hủy kết bạn với ${friend?.user?.displayName || friend?.user?.username}`
+      );
+    } catch (err) {
+      toast.error(err?.data?.message || "Hủy kết bạn thất bại");
+    }
+  };
+
 
   if (isUserLoading) {
     return (
@@ -89,26 +124,34 @@ const FriendRequestCard = ({ friend, customButton, type = null }) => {
                 <button
                   onClick={handleAccept}
                   disabled={isAcceptting || isRejecting}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm px-5 py-2 rounded-full transition-colors"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm px-5 py-2 rounded-full transition-colors cursor-pointer"
                 >
                   Xác nhận
                 </button>
                 <button
                   onClick={handleReject}
                   disabled={isAcceptting || isRejecting}
-                  className="w-full bg-gray-500 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 text-white text-sm px-5 py-2 rounded-full transition-colors"
+                  className="w-full bg-gray-500  hover:bg-gray-400 text-white text-sm px-5 py-2 rounded-full transition-colors cursor-pointer"
                 >
                   Xóa
                 </button>
               </>
             ) : type === "SENT" ? (
               <button
-                className="w-full bg-green-500 text-white text-sm px-5 py-2 rounded-full cursor-not-allowed"
-                disabled
+                onClick={handleDeleteRequest}
+                className="w-full bg-red-500 hover:bg-red-400 text-white text-sm px-5 py-2 rounded-full transition-colors cursor-pointer"
               >
-                Đã gửi lời mời
+                Hủy lời mời
               </button>
-            ) : null}
+            ) : type === "DELETE" ? (
+              <button
+                onClick={() => handleRemoveFriend()}
+                className="w-full bg-red-500 hover:bg-red-600 text-white text-sm px-5 py-2 rounded-full transition-colors"
+              >
+                Hủy kết bạn
+              </button>
+            ) : null
+            }
           </>
         )}
       </div>
