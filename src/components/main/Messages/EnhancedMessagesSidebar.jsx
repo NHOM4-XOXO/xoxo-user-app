@@ -276,30 +276,7 @@ export default function EnhancedMessagesSidebar({
                     key={chatRoom.id}
                     chatRoom={chatRoom}
                     isSelected={selectedContact?.id === chatRoom.id}
-                    onSelect={(chatRoom) => {
-                      // Create contact object with user data
-                      const currentUserId = getCurrentUserId();
-                      let otherParticipantId = null;
-                      if (chatRoom.participantIds && Array.isArray(chatRoom.participantIds)) {
-                        otherParticipantId = chatRoom.participantIds.find(id => id !== currentUserId);
-                      }
-                      
-                      const contact = {
-                        id: chatRoom.id,
-                        name: chatRoom.name,
-                        avatarUrl: null, // Will be populated by the chat component
-                        isOnline: false,
-                        lastSeen: chatRoom.lastMessageAt,
-                        lastMessage: typeof chatRoom.lastMessage === 'string' 
-                          ? chatRoom.lastMessage 
-                          : chatRoom.lastMessage?.content || "",
-                        unreadCount: chatRoom.unreadCount || 0,
-                        chatRoom: chatRoom,
-                        userId: otherParticipantId,
-                      };
-                      
-                      onSelectContact(contact);
-                    }}
+                    onSelect={onSelectContact}
                     onMarkAsRead={markChatAsRead}
                   />
                 );

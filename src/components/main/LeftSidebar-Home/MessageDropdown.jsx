@@ -35,8 +35,8 @@ function MessageItem({ chatRoom, onContactClick, onClose }) {
       // Create contact object with proper structure
       const contact = {
         id: chatRoom.id,
-        name: chatRoom.name,
-        avatarUrl: otherUser?.avatarUrl || null,
+        name: displayName, // Use the computed displayName instead of chatRoom.name
+        avatarUrl: displayAvatar, // Use the computed displayAvatar
         isOnline: otherUser?.isOnline || false,
         userId: otherId,
         chatRoom: chatRoom,

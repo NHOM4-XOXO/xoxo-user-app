@@ -20,7 +20,7 @@ import {
 } from "@/utils/ContentMultipleLines";
 import ImagePreviewModal from "@/components/common/ImagePreviewModal";
 import Cookies from "js-cookie";
-import { useGetCurrentUserProfileQuery } from "@/features/chatApi";
+import { useGetCurrentUserProfileQuery, useGetUserByIdQuery } from "@/features/chatApi";
 
 export default function MessagesChat({
   contact,
@@ -34,9 +34,22 @@ export default function MessagesChat({
 
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [previewImageUrl, setPreviewImageUrl] = useState("");
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState([]);
 
   // Fetch current user profile to obtain reliable current user id
   const { data: currentProfile } = useGetCurrentUserProfileQuery();
+  
+  // Fetch other user data for proper display
+  const otherUserId = contact?.userId || contact?.id;
+  const { data: otherUser } = useGetUserByIdQuery(otherUserId, { skip: !otherUserId });
+
+  // Get display data - prioritize API data, fallback to contact data
+  const displayAvatar = otherUser?.avatarUrl || contact?.avatarUrl || "/default-avatar.jpg";
+  const displayName = otherUser ? 
+    `${(otherUser.firstName || "")} ${(otherUser.lastName || "")}`.trim() || otherUser.username || otherUser.email
+    : contact?.name || `User ${otherUserId}`;
+  const displayIsOnline = otherUser?.isOnline ?? contact?.isOnline ?? false;
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -151,8 +164,8 @@ export default function MessagesChat({
           <div className="flex-shrink-0 mr-3">
             {isLast ? (
               <Image
-                src={contact.avatarUrl || "/default-avatar.jpg"}
-                alt={contact.name}
+                src={displayAvatar}
+                alt={displayName}
                 width={36}
                 height={36}
                 className="object-cover rounded-full w-9 h-9"
@@ -279,8 +292,8 @@ export default function MessagesChat({
               )}
               <div className="flex-shrink-0">
                 <Image
-                  src={contact.avatarUrl || "/default-avatar.jpg"}
-                  alt={contact.name}
+                  src={displayAvatar}
+                  alt={displayName}
                   width={40}
                   height={40}
                   className="object-cover w-10 h-10 rounded-full cursor-pointer hover:opacity-80"
@@ -288,10 +301,10 @@ export default function MessagesChat({
               </div>
               <div>
                 <h2 className="text-sm font-semibold cursor-pointer">
-                  {contact.name}
+                  {displayName}
                 </h2>
                 <p className="text-xs text-gray-600 dark:text-gray-400">
-                  {contact.isOnline
+                  {displayIsOnline
                     ? "Đang hoạt động"
                     : `Hoạt động ${contact.lastSeen || "2 phút"} trước`}
                 </p>

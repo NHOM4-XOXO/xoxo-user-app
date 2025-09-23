@@ -17,20 +17,28 @@ export default function ChatBubble({
 }) {
   const [isHovered, setIsHovered] = useState(false);
 
-  // Fetch user data for avatar display
+  // Fetch user data for proper display like MessagesChat.jsx
   const { data: profileData } = useGetCurrentUserProfileQuery();
   const myId = profileData?.id;
   
-  // Get other participant ID from contact - prioritize contact.userId
+  // Get other participant ID from contact
   const otherId = contact?.userId || contact?.chatRoom?.participantIds?.find(id => id !== myId);
   const { data: otherUser } = useGetUserByIdQuery(otherId, { skip: !otherId });
+
+  // Get display data - prioritize API data, fallback to contact data
+  const displayAvatar = otherUser?.avatarUrl || contact?.avatarUrl || "/default-avatar.jpg";
+  const displayName = otherUser ? 
+    `${(otherUser.firstName || "")} ${(otherUser.lastName || "")}`.trim() || otherUser.username || otherUser.email
+    : contact?.name || `User ${otherId}`;
 
   // Debug logging
   console.log("ChatBubble Debug:", {
     contact: contact,
     otherId: otherId,
     otherUser: otherUser,
-    myId: myId
+    myId: myId,
+    displayName: displayName,
+    displayAvatar: displayAvatar
   });
 
   // Calculate position from bottom - each bubble is 70px apart
@@ -83,8 +91,8 @@ export default function ChatBubble({
         {/* Avatar */}
         <div className="relative w-14 h-14 bg-white dark:bg-fb-dark-secondary rounded-full border-2 border-white dark:border-gray-600 shadow-lg hover:shadow-xl transition-shadow duration-200">
           <Image
-            src={otherUser?.avatarUrl || "/default-avatar.jpg"}
-            alt={otherUser?.firstName || contact.name}
+            src={displayAvatar}
+            alt={displayName}
             width={56}
             height={56}
             className="w-full h-full object-cover rounded-full"
@@ -93,7 +101,7 @@ export default function ChatBubble({
           {/* Online/Offline Status */}
           <div
             className={`absolute -bottom-1 -right-1 w-4 h-4 ${
-              otherUser?.isOnline ? "bg-green-500" : "bg-gray-400"
+              otherUser?.isOnline || contact?.isOnline ? "bg-green-500" : "bg-gray-400"
             } border-2 border-white dark:border-fb-dark-secondary rounded-full`}
           />
         </div>
@@ -108,10 +116,7 @@ export default function ChatBubble({
         {/* Name Tooltip (show on hover) */}
         {isHovered && (
           <div className="absolute right-16 top-1/2 transform -translate-y-1/2 bg-black text-white text-sm px-3 py-2 rounded-lg shadow-lg whitespace-nowrap z-50">
-            {otherUser ? 
-              `${(otherUser.firstName || "")} ${(otherUser.lastName || "")}`.trim() || otherUser.username || otherUser.email
-              : contact.name
-            }
+            {displayName}
             <div className="absolute left-full top-1/2 transform -translate-y-1/2 w-0 h-0 border-l-4 border-l-black border-t-4 border-t-transparent border-b-4 border-b-transparent"></div>
           </div>
         )}
