@@ -21,10 +21,10 @@ const ProfilePost = () => {
   const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
-    const stored = localStorage.getItem("auth"); // key lưu localStorage
+    const stored = localStorage.getItem("profile"); // key lưu localStorage
     if (stored) {
       const parsed = JSON.parse(stored);
-      setCurrentUser(parsed.profile);
+      setCurrentUser(parsed);
     }
   }, []);
 

@@ -1,6 +1,7 @@
 "use client";
 
 import {
+    AtSign,
     CalendarDays,
     User,
 } from "lucide-react";
@@ -13,6 +14,7 @@ import {
 import { Modal, Form, Input, DatePicker, Button, Select } from "antd";
 import dayjs from "dayjs";
 import { ProfileContext } from "../layout";
+import toast from "react-hot-toast";
 
 // cấu hình các field
 const fieldsConfig = [
@@ -34,6 +36,12 @@ const fieldsConfig = [
             { value: "OTHER", label: "Khác" },
         ],
     },
+    {
+        label: "Username",
+        field: "username",
+        type: "textarea",
+        icon: <AtSign className="w-4 h-4" />
+    }
 ];
 
 export default function ProfileAbout() {
@@ -58,11 +66,11 @@ export default function ProfileAbout() {
     }, [isLoading])
 
     useEffect(() => {
-        const storedData = localStorage.getItem("auth");
+        const storedData = localStorage.getItem("profile");
         if (storedData) {
             try {
                 const parsed = JSON.parse(storedData);
-                setIdUser(parsed?.profile?.id);
+                setIdUser(parsed?.id);
             } catch (e) {
                 console.error("Error parsing localStorage data", e);
             }
@@ -113,9 +121,10 @@ export default function ProfileAbout() {
             // đóng modal, reset form, refetch profile
             form.resetFields();
             setIsModalOpen(false);
-            refetch();
+            toast.success("Cập nhật thông tin thành công")
         } catch (error) {
-            console.error("Lỗi khi update profile:", error);
+            const msg = error?.data?.message || "Có lỗi xảy ra";
+            toast.error(msg)
         }
     };
 
