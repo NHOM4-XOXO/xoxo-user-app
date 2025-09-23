@@ -35,6 +35,7 @@ export default function SearchPage() {
 
   const { data: sentPending } = useGetSentPendingQuery();
   const { data: receivedPending } = useGetReceivedPendingQuery();
+
   const router = useRouter();
 
   let profile = null;

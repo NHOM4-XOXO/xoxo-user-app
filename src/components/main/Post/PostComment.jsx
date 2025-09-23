@@ -52,7 +52,6 @@ function PostComment({ comment, level = 0, onReply, avatarUrl }) {
                 {/* Action */}
                 <div className="text-xs text-gray-500 dark:text-gray-400 flex gap-4 ml-2 mt-1">
                     <span>{new Date(comment.createdAt).toLocaleString()}</span>
-                    <button className="cursor-pointer hover:underline">Thích</button>
                     <button
                         className="cursor-pointer hover:underline"
                         onClick={() => setIsReplying(!isReplying)}

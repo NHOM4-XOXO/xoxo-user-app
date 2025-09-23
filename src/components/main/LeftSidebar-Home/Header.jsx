@@ -22,6 +22,7 @@ import { searchUsers } from "../../../features/searchApi";
 import useMergeState from "../../../hooks/useMergeState";
 import { useGetChatRoomsQuery } from "@/features/chatApi";
 import { useGetNotificationsQuery, useGetUnreadCountQuery } from "@/features/userApi";
+import { useGetFriendsQuery } from "@/features/friendshipApi";
 
 export default function Header({ onContactClick }) {
   const router = useRouter();
@@ -66,6 +67,8 @@ export default function Header({ onContactClick }) {
   const messageRef = useRef(null);
   const notiRef = useRef(null);
 
+  const { data: friends } = useGetFriendsQuery();
+
   const [profile, setProfile] = useState(null);
 
   useEffect(() => {
@@ -76,6 +79,8 @@ export default function Header({ onContactClick }) {
       console.error("Không đọc được localStorage:", e);
     }
   }, []);
+
+
 
   // Search functionality với API call
   useEffect(() => {
@@ -279,7 +284,15 @@ export default function Header({ onContactClick }) {
                 <>
                   {/* Users */}
                   {results.users.slice(0, 3).map((user) => {
-                    const isMe = user.username === profile?.username; // so sánh
+                    const isMe = user.username === profile?.username;
+                    const isFriend = friends?.find(
+                      (item) => item.id === user.id
+                    );
+                    const badge = isMe
+                      ? { text: "Bạn", color: "bg-blue-500" }
+                      : isFriend
+                        ? { text: "Bạn bè", color: "bg-green-500" }
+                        : { text: "Mọi người", color: "bg-gray-400" };
                     return (
                       <div
                         key={user.id}
@@ -294,11 +307,11 @@ export default function Header({ onContactClick }) {
                         <div>
                           <p className="font-medium text-gray-900 dark:text-white flex items-center gap-2">
                             {user.firstName} {user.lastName}
-                            {isMe && (
-                              <span className="text-xs bg-blue-500 text-white px-2 py-0.5 rounded-full">
-                                Bạn
-                              </span>
-                            )}
+                            <span
+                              className={`text-xs ${badge.color} text-white px-2 py-0.5 rounded-full`}
+                            >
+                              {badge.text}
+                            </span>
                           </p>
                           <p className="text-sm text-gray-500 dark:text-gray-400">
                             @{user.username}

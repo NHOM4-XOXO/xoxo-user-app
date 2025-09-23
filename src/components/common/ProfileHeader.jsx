@@ -33,6 +33,18 @@ function ProfileHeader({ userName, setIsLoading }) {
     const [avatarLoading, setAvatarLoading] = useState(false);
     const [coverLoading, setCoverLoading] = useState(false);
 
+    const [currentUser, setCurrentUser] = useState(null);
+
+    useEffect(() => {
+        const stored = localStorage.getItem("profile"); // key lưu localStorage
+        if (stored) {
+            const parsed = JSON.parse(stored);
+            setCurrentUser(parsed);
+        }
+    }, []);
+
+    const isMe = currentUser?.username === profile?.username;
+
     // Kích hoạt loading layout khi fetching / avatar / cover đang update
     const isFirstRender = useRef(true);
 
@@ -98,10 +110,14 @@ function ProfileHeader({ userName, setIsLoading }) {
             {/* Cover */}
             <div className="relative group">
                 <img className="w-full rounded-t-lg object-cover h-[20rem]" src={cover} alt="cover" />
-                <label htmlFor="coverUpload" className="absolute bottom-2 right-2 bg-black/50 text-white p-2 rounded-full cursor-pointer hover:bg-black/70 transition">
-                    <Camera className="w-4 h-4" />
-                </label>
-                <input type="file" id="coverUpload" accept="image/*" className="hidden" onChange={handleCoverChange} />
+                {isMe && (
+                    <>
+                        <label htmlFor="coverUpload" className="absolute bottom-2 right-2 bg-black/50 text-white p-2 rounded-full cursor-pointer hover:bg-black/70 transition">
+                            <Camera className="w-4 h-4" />
+                        </label>
+                        <input type="file" id="coverUpload" accept="image/*" className="hidden" onChange={handleCoverChange} />
+                    </>
+                )}
             </div>
 
             {/* Avatar + Info */}
@@ -113,19 +129,26 @@ function ProfileHeader({ userName, setIsLoading }) {
                         alt="avatar"
                     />
                     {/* Input file giả dạng button */}
-                    <label
-                        htmlFor="avatarUpload"
-                        className="absolute bottom-2 right-2 bg-black/50 text-white p-2 rounded-full cursor-pointer hover:bg-black/70 transition"
-                    >
-                        <Camera className="w-4 h-4" />
-                    </label>
-                    <input
-                        type="file"
-                        id="avatarUpload"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={handleAvatarChange}
-                    />
+                    {isMe && (
+                        <>
+                            <label
+                                htmlFor="avatarUpload"
+                                className="absolute bottom-2 right-2 bg-black/50 text-white p-2 rounded-full cursor-pointer hover:bg-black/70 transition"
+                            >
+                                <Camera className="w-4 h-4" />
+                            </label>
+
+                            <input
+                                type="file"
+                                id="avatarUpload"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={handleAvatarChange}
+                            />
+                        </>
+                    )}
+
+
                 </div>
                 <div className="sm:ml-4 text-center sm:text-left sm:mt-4 text-black dark:text-white">
                     <h1 className="font-bold text-lg">{`${displayName}`}</h1>
