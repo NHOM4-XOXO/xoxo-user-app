@@ -27,7 +27,12 @@ function PostModal({ post, isModalOpen, setIsModalOpen, reactionStats }) {
     const emojiPickerRef = useRef(null);
     const emojiButtonRef = useRef(null);
     const id = post?.post?.id;
-    const profile = useSelector((state) => state.auth.profile);
+    let profile;
+    try {
+        profile = JSON.parse(localStorage.getItem("profile"));
+    } catch (e) {
+        console.error("Không đọc được localStorage:", e);
+    }
     const avatarUrl = profile?.avatarUrl
 
     const { data: comments, isLoading, isFetching, refetch } = useGetPostCommentsQuery(id, {

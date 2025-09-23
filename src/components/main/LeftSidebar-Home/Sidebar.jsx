@@ -51,10 +51,20 @@ export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [userName, setUserName] = useState("User");
-  const [userAvatar, setUserAvatar] = useState("/image/georgina.jpg");
+  const [userAvatar, setUserAvatar] = useState("/default-avatar.jpg");
 
   const visibleItems = showAll ? items : items.slice(0, 4);
   const visibleShortcut = showAllShortCut ? shortcuts : shortcuts.slice(0, 4);
+  useEffect(() => {
+    try {
+      const profile = JSON.parse(localStorage.getItem("profile"));
+      setUserAvatar(profile?.avatarUrl)
+    } catch (e) {
+      console.error("Không đọc được localStorage:", e);
+    }
+  })
+
+
 
   // Load user data from localStorage on client-side only
   useEffect(() => {
