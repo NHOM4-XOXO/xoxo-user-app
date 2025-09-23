@@ -9,9 +9,11 @@ import {
 } from "react-icons/fi";
 import { searchUsers, searchPosts, searchGroups } from "@/features/searchApi";
 import { RootContext } from "../ClientProviders";
-import { useSendRequestMutation } from "@/features/friendshipApi";
-import toast from "react-hot-toast";
+import { useGetReceivedPendingQuery, useGetSentPendingQuery } from "@/features/friendshipApi";
+
 import Link from "next/link";
+import UserCard from "@/components/common/UserCardSearch";
+
 
 
 export default function SearchPage() {
@@ -30,9 +32,11 @@ export default function SearchPage() {
     totalResults: 0,
   });
 
-  const router = useRouter();
 
-  const [sendRequest] = useSendRequestMutation();
+  const { data: sentPending } = useGetSentPendingQuery();
+  const { data: receivedPending } = useGetReceivedPendingQuery();
+
+  const router = useRouter();
 
   let profile = null;
   try {
@@ -40,15 +44,6 @@ export default function SearchPage() {
   } catch (e) {
     console.error("Không đọc được localStorage:", e);
   }
-
-  const handleSendRequest = async (user) => {
-    try {
-      await sendRequest(user.id).unwrap();
-      toast.success(`Đã gửi lời mời kết bạn đến ${user.firstName} ${user.lastName}`);
-    } catch (err) {
-      toast.error(err?.data?.message || "Gửi lời mời kết bạn thất bại");
-    }
-  };
 
   useEffect(() => {
     setIsLoading(loading)
@@ -111,56 +106,14 @@ export default function SearchPage() {
   ];
 
   const renderUserCard = (user) => {
-    const isMe = profile && profile.id === user.id;
-
     return (
-      <div
+      <UserCard
         key={user.id}
-        className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
-      >
-        <div
-          onClick={() => router.push(`/profile/${user.username}`)}
-          className="flex items-center gap-3 hover:cursor-pointer"
-        >
-          <img
-            src={user.avatarUrl || "/default-avatar.jpg"}
-            alt={user.username}
-            className="w-16 h-16 rounded-full object-cover"
-          />
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <h3 className="font-semibold text-gray-900 dark:text-white hover:underline cursor-pointer">
-                <Link href={`/profile/${user.username}`}>
-                  {user.firstName} {user.lastName}
-                </Link>
-              </h3>
-              {isMe && (
-                <span className="text-xs bg-blue-500 text-white px-2 py-0.5 rounded-full">
-                  Bạn
-                </span>
-              )}
-            </div>
-            <p className="text-gray-500 dark:text-gray-400">@{user.username}</p>
-            {user.bio && (
-              <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 line-clamp-2">
-                {user.bio}
-              </p>
-            )}
-          </div>
-
-          {!isMe && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleSendRequest(user);
-              }}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
-            >
-              Kết bạn
-            </button>
-          )}
-        </div>
-      </div>
+        user={user}
+        profile={profile}
+        sentPending={sentPending}
+        receivedPending={receivedPending}
+      />
     );
   };
 

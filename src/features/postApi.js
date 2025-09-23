@@ -32,6 +32,18 @@ export const postApi = createApi({
             transformResponse: transform,
             providesTags: (r, e, id) => [{ type: "Comment", id }],
         }),
+        getPostCommentReplies:
+            builder.query({
+                query: (commentId) => `/comments/${commentId}/subtree`,
+                transformResponse: transform,
+                providesTags: (r, e, id) => [{ type: "Comment", id }],
+            }),
+        getPostCommentReplieCountAll:
+            builder.query({
+                query: (commentId) => `/comments/${commentId}/replies/count-all`,
+                transformResponse: transform,
+                providesTags: (r, e, id) => [{ type: "Comment", id }],
+            }),
         getPostLikes: builder.query({
             query: (postId) => `/${postId}/likes`,
             transformResponse: transform,
@@ -218,6 +230,8 @@ export const {
     useGetMyReactionQuery,
     useGetPostReactionsQuery,
     useGetReactionStatisticsQuery,
+    useGetPostCommentReplieCountAllQuery,
+    useLazyGetPostCommentRepliesQuery,
 
     useCreatePostMutation,
     useLikePostMutation,

@@ -36,7 +36,13 @@ const PostCreationModal = ({
   const [uploadMultipleMedia] = useUploadMultipleMediaMutation();
   const [createPost] = useCreatePostMutation();
   const [updatePost] = useUpdatePostMutation();
-  const { profile } = useSelector((state) => state.auth);
+  let profile;
+  try {
+    profile = JSON.parse(localStorage.getItem("profile"));
+  } catch (e) {
+    console.error("Không đọc được localStorage:", e);
+    profile = null;
+  }
   const displayName = `${profile?.firstName || ""} ${profile?.lastName || ""}`.trim() || profile?.username || "Người dùng";
 
   const privacyOptions = [
@@ -124,7 +130,7 @@ const PostCreationModal = ({
 
       const payload = {
         content: postContent,
-        status: "ACTIVE",
+        status: privacyOptions[privacyIndex] === "public" ? "ACTIVE" : "HIDDEN",
         type: "USER_POST",
         location: "",
         hashtags: "",

@@ -100,24 +100,11 @@ function PostModal({ post, isModalOpen, setIsModalOpen, reactionStats }) {
 
             {/* Bình luận */}
             {isLoading || isFetching ? (
-                <div className="space-y-3">
-                    {[...Array(3)].map((_, i) => (
-                        <div key={i} className="flex gap-2 animate-pulse">
-                            {/* Avatar skeleton */}
-                            <div className="w-9 h-9 bg-gray-300 dark:bg-gray-700 rounded-full"></div>
-
-                            {/* Text skeleton */}
-                            <div className="flex-1 space-y-2">
-                                <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-1/2"></div>
-                                <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-3/4"></div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                null
             ) : comments && comments.length > 0 ? (
-                <>
+                <div className=" pt-2">
                     {/* Dropdown filter */}
-                    <Dropdown
+                    {/* <Dropdown
                         menu={{ items: filterOptions, onClick: handleFilterChange }}
                         trigger={["click"]}
                         placement="bottomRight"
@@ -128,7 +115,7 @@ function PostModal({ post, isModalOpen, setIsModalOpen, reactionStats }) {
                         <button className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline flex items-center">
                             {commentFilter} <DownOutlined className="ml-1 text-xs" />
                         </button>
-                    </Dropdown>
+                    </Dropdown> */}
 
                     {/* Danh sách bình luận */}
                     {comments.map((c) => (
@@ -151,7 +138,7 @@ function PostModal({ post, isModalOpen, setIsModalOpen, reactionStats }) {
                         />
                     ))}
 
-                </>
+                </div>
             ) : (
                 <p className="text-sm text-gray-500 dark:text-gray-400 italic">
                     Chưa có bình luận nào.

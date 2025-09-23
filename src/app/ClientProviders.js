@@ -9,7 +9,6 @@ import StoreProvider from "@/store/StoreProvider";
 import { Toaster } from "react-hot-toast";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import { usePathname } from "next/navigation";
-import { useAuthInit } from "@/hooks/useAuthInit";
 
 
 // Fonts
@@ -32,7 +31,6 @@ export default function ClientProviders({ children }) {
 
   return (
     <StoreProvider>
-      {/* <AuthInitializer /> */}
       <RootContext.Provider value={{ setIsLoading }}>
         <ThemeProvider>
           <ClientLayout className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
@@ -44,9 +42,4 @@ export default function ClientProviders({ children }) {
       </RootContext.Provider>
     </StoreProvider>
   );
-
-  // function AuthInitializer() {
-  //   useAuthInit(); // chỉ chạy side-effects
-  //   return null;
-  // }
 }

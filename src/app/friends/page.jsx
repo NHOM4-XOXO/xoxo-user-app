@@ -49,9 +49,7 @@ export default function FriendsPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {sent?.map((item) => (
-              <FriendRequestCard key={item.id} friend={{
-                user: item.friend, // người bạn đã gửi lời mời
-              }} type={"SENT"} />
+              <FriendRequestCard key={item.id} friend={item} type={"SENT"} />
             ))}
           </div>
         )}
