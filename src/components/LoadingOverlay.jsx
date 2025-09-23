@@ -40,8 +40,7 @@ export default function LoadingOverlay({
               width={64}
               height={64}
               className="w-full h-full object-contain p-1"
-              priority
-              unoptimized
+              
             />
           </div>
         </div>

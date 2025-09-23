@@ -1,8 +1,12 @@
+"use client";
+"use client";
 import { useState, useMemo } from "react";
 import { Search, MoreHorizontal, Plus } from "lucide-react";
 import { useChatList } from "@/hooks/useChatList";
 import { useGetCurrentUserProfileQuery, useGetUserByIdQuery } from "@/features/chatApi";
 import Cookies from "js-cookie";
+
+export const dynamic = "force-dynamic";
 
 const RightSideBar = ({
   isSettingsOpen,

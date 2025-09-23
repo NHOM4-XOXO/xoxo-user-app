@@ -7,11 +7,12 @@ import {
   FiFileText,
   FiUsers as FiGroups,
 } from "react-icons/fi";
-import { searchUsers, searchPosts, searchGroups } from "@/features/searchApi";
+import { searchUsers, } from "@/features/searchApi";
 import { RootContext } from "../ClientProviders";
 import { useGetReceivedPendingQuery, useGetSentPendingQuery } from "@/features/friendshipApi";
 
-import Link from "next/link";
+export const dynamic = "force-dynamic";
+
 import UserCard from "@/components/common/UserCardSearch";
 
 

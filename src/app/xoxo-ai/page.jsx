@@ -6,6 +6,8 @@ import LoadingOverlay from "@/components/LoadingOverlay";
 const MAX_THREADS = 10;
 const WELCOME_MD = "Chào bạn, mình là trợ lý **XoXo AI**.";
 
+export const dynamic = "force-dynamic";
+
 // ====== UI helpers ======
 function Bubble({ role, children, innerRef }) {
   const mine = role === "user";

@@ -6,6 +6,7 @@ import { useChangePasswordMutation } from "@/features/auth/authApi";
 import { useDispatch } from "react-redux";
 import { logout } from "@/features/auth/authSlice";
 import { toast } from "react-hot-toast";
+export const dynamic = "force-dynamic";
 
 export default function ChangePassword() {
   const router = useRouter();

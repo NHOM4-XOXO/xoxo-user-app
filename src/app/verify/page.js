@@ -3,6 +3,8 @@
 import { useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
+export const dynamic = "force-dynamic";
+
 export default function VerifyPage() {
     const searchParams = useSearchParams();
     const token = searchParams.get("token");

@@ -54,7 +54,7 @@ export default function VerificationModal({ isOpen, onClose, method, user }) {
   const handleResendCode = () => {
     setResendCount((prev) => prev + 1);
 
-    alert(message);
+    alert(message||"Mã xác thực đã được gửi!");
   };
 
   if (!isOpen) return null;

@@ -13,6 +13,7 @@ import FeaturedBanner from "@/components/hero/FeaturedBanner";
 import { useSaved } from "@/utils/savedStore";
 import { bannerForTopic, coverForEvent } from "@/utils/imageSources";
 
+export const dynamic = "force-dynamic";
 const slidesByTopic = {
   esport: bannerForTopic("esport").map((url) => ({
     title: "E-Sports tuần này",

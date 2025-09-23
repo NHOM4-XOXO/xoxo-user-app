@@ -8,7 +8,7 @@ import MessagesChatInfo from "@/components/main/Messages/MessagesChatInfo";
 import { HEADER_HEIGHT } from "@/constants";
 import { checkDeviceByWidth } from "@/utils/checkDeviceByWidth";
 import { useGetOrCreateDirectChatMutation } from "@/features/chatApi";
-import DebugPanel from "@/components/debug/DebugPanel";
+
 import { ChatProvider } from "@/contexts/ChatContext";
 
 export default function CleanMessagesPage() {
@@ -162,8 +162,7 @@ export default function CleanMessagesPage() {
         </div>
       )}
 
-        {/* Debug Panel - Fixed position, only shows when needed */}
-        <DebugPanel />
+     
       </div>
     </ChatProvider>
   );

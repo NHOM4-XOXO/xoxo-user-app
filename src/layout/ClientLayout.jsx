@@ -1,7 +1,7 @@
 'use client'
-
-import ChatWidget from "@/components/main/Chat/ChatWidget";
-import ChatBubble from "@/components/main/Chat/ChatBubble";
+import dynamic from 'next/dynamic'
+const ChatWidget = dynamic(() => import('@/components/main/Chat/ChatWidget'), { ssr: false });
+const ChatBubble = dynamic(() => import('@/components/main/Chat/ChatBubble'), { ssr: false });
 import Header from "@/components/main/LeftSidebar-Home/Header";
 import MobileNavigation from "@/components/main/LeftSidebar-Home/MobileNavigation";
 import { UserProvider } from "@/contexts/UserContext";
