@@ -76,7 +76,7 @@ const ProfilePost = () => {
         </div>
 
         {/* Photos */}
-        <div className="rounded-lg bg-fb-light-primary dark:bg-fb-dark-secondary p-4 space-y-4 shadow-sm  dark:border-fb-dark-quaternary">
+        {/* <div className="rounded-lg bg-fb-light-primary dark:bg-fb-dark-secondary p-4 space-y-4 shadow-sm  dark:border-fb-dark-quaternary">
           <div className="flex justify-between items-center">
             <h1 className="text-xl font-bold text-gray-900 dark:text-white">
               Ảnh
@@ -98,7 +98,7 @@ const ProfilePost = () => {
               />
             ))}
           </div>
-        </div>
+        </div> */}
 
         {/* Friends */}
         <div className="rounded-lg bg-fb-light-primary dark:bg-fb-dark-secondary p-4 space-y-4 shadow-sm  dark:border-fb-dark-quaternary">
@@ -107,7 +107,7 @@ const ProfilePost = () => {
               Bạn bè
             </h1>
             <Link
-              href="/profile/profile-friends"
+              href={`/profile/${username?.username}/profile-friends`}
               className="text-sm text-blue-500 hover:underline"
             >
               Xem tất cả
@@ -126,7 +126,7 @@ const ProfilePost = () => {
                     className="w-full h-26 object-cover rounded-lg border-1"
                     src={
                       friend.avatarUrl ||
-                      "default-avatar.jpg"
+                      "/default-avatar.jpg"
                     }
                     alt={friend.username}
                   />
