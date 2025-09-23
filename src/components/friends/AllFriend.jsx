@@ -1,7 +1,7 @@
 "use client";
 
 import { RootContext } from "@/app/ClientProviders";
-import { useGetFriendsQuery } from "@/features/friendshipApi";
+import { useDeleteFriendMutation, useGetFriendsQuery } from "@/features/friendshipApi";
 import { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Search } from "lucide-react";
@@ -10,17 +10,8 @@ import FriendRequestCard from "@/components/friends/FriendRequestCard";
 export default function AllFriendsPage() {
     const { setIsLoading } = useContext(RootContext);
     const { data: friends = [], isLoading, error } = useGetFriendsQuery();
-    // const [removeFriend] = useRemoveFriendMutation();
     const [search, setSearch] = useState("");
 
-    const handleRemoveFriend = async (friend) => {
-        try {
-            await removeFriend(friend.id).unwrap();
-            toast.success(`Đã hủy kết bạn với ${friend.displayName || friend.username}`);
-        } catch (err) {
-            toast.error(err?.data?.message || "Không thể hủy kết bạn");
-        }
-    };
 
     useEffect(() => {
         setIsLoading(isLoading);
@@ -68,12 +59,7 @@ export default function AllFriendsPage() {
                         <FriendRequestCard
                             key={friend.id}
                             friend={{ user: friend }}
-                            customButton={{
-                                label: "Hủy kết bạn",
-                                onClick: () => handleRemoveFriend(friend),
-                                bgColor: "bg-red-500",
-                                hoverColor: "hover:bg-red-600",
-                            }}
+                            type={"DELETE"}
                         />
                     ))}
                 </div>

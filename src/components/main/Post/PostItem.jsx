@@ -35,8 +35,8 @@ const Post = ({ data }) => {
   const [isShareOpen, setIsShareOpen] = useState(false);
 
   // lấy user hiện tại từ localStorage
-  const profile = JSON.parse(localStorage.getItem("auth") || "{}");
-  const currentUserId = profile?.profile?.id;
+  const profile = JSON.parse(localStorage.getItem("profile") || "{}");
+  const currentUserId = profile?.id;
 
   // mapping reaction từ API
   useEffect(() => {
