@@ -59,8 +59,8 @@ export default function ProductionMessagesChat({
   const myId = profileData?.id;
   
   // Get all participant IDs for potential multiple users
-  const participantIds = currentChatRoom?.participantIds || [];
-  const otherParticipantIds = participantIds.filter(id => id !== myId);
+  const participantIds = (currentChatRoom?.participantIds || []).map((id) => Number(id));
+  const otherParticipantIds = participantIds.filter(id => id !== Number(myId));
   
   // Fetch user data for all other participants
   const participantQueries = otherParticipantIds.map(participantId => 

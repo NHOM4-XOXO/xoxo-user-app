@@ -59,13 +59,28 @@ const RightSideBar = ({
   }, [chatRooms, searchTerm]);
 
   const convertChatRoomToContact = (chatRoom) => {
+    // Resolve other participant id reliably
+    const ids = Array.isArray(chatRoom.participantIds)
+      ? chatRoom.participantIds.map((id) => Number(id))
+      : [];
+    const otherId = currentUserId != null
+      ? (ids.find((id) => id !== Number(currentUserId)) ?? ids[0])
+      : ids[0];
+
+    // Compute safe display name (avoid showing my own name)
+    const currentUserName = profile
+      ? `${profile.firstName || ''} ${profile.lastName || ''}`.trim() || profile.username || profile.email
+      : null;
+    let safeName = getDisplayName(chatRoom);
+    if (currentUserName && safeName === currentUserName) {
+      // Defer to ChatBubble API resolution; placeholder until user API returns
+      safeName = otherId != null ? `User ${otherId}` : safeName;
+    }
+
     return {
       id: chatRoom.id,
-      userId:
-        chatRoom.otherParticipantId ||
-        chatRoom.participantIds?.find((id) => id !== chatRoom.currentUserId) ||
-        chatRoom.id,
-      name: getDisplayName(chatRoom),
+      userId: otherId,
+      name: safeName,
       avatar: chatRoom.avatarUrl || "/default-avatar.jpg",
       isOnline: chatRoom.isOnline,
       chatRoom,

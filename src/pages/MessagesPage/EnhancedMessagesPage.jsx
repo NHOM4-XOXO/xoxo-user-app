@@ -7,7 +7,8 @@ import ProductionMessagesChat from "@/components/main/Messages/ProductionMessage
 import MessagesChatInfo from "@/components/main/Messages/MessagesChatInfo";
 import { HEADER_HEIGHT } from "@/constants";
 import { checkDeviceByWidth } from "@/utils/checkDeviceByWidth";
-import { useGetOrCreateDirectChatMutation } from "@/features/chatApi";
+import { useGetOrCreateDirectChatMutation, useGetChatRoomsQuery, useGetUserByIdQuery } from "@/features/chatApi";
+import DebugPanel from "@/components/debug/DebugPanel";
 import ErrorBoundary from "@/components/common/ErrorBoundary";
 import { ChatProvider } from "@/contexts/ChatContext";
 
@@ -19,6 +20,9 @@ export default function EnhancedMessagesPage() {
   const [isMobile, setIsMobile] = useState(false);
 
   const [getOrCreateDirectChat] = useGetOrCreateDirectChatMutation();
+
+  // Load chat rooms here to restore proper contact name from URL
+  const { data: rooms = [] } = useGetChatRoomsQuery({ page: 0, size: 50 });
 
   // Check if mobile
   useEffect(() => {
@@ -33,21 +37,36 @@ export default function EnhancedMessagesPage() {
 
   // Handle URL params for selected contact
   useEffect(() => {
-    const contactId = searchParams.get("contact");
-    const userId = searchParams.get("userId"); // For direct chat with user ID
+    const contactIdParam = searchParams.get("contact");
+    const userIdParam = searchParams.get("userId");
+    const contactId = contactIdParam ? parseInt(contactIdParam) : null;
 
-    if (contactId && selectedContact?.id !== parseInt(contactId)) {
-      // If we have a contactId, restore the selected contact
-      // Note: In a real app, you might need to fetch contact details here
-      setSelectedContact({
-        id: parseInt(contactId),
-        name: "Loading...", // This should be replaced with actual contact data
-      });
-    } else if (userId && !contactId) {
-      // If we have a userId but no contactId, create/get direct chat
-      handleCreateDirectChat(parseInt(userId));
+    if (contactId && selectedContact?.id !== contactId) {
+      const room = rooms.find((r) => r.id === contactId);
+      if (room) {
+        // Determine other participant
+        const myIdStr = typeof window !== 'undefined' ? (window.__currentUserId || localStorage.getItem('currentUserId')) : null;
+        const myId = myIdStr != null ? Number(myIdStr) : undefined;
+        const participantIds = Array.isArray(room.participantIds) ? room.participantIds.map((id) => Number(id)) : [];
+        const otherId = myId != null ? participantIds.find((id) => id !== myId) : participantIds[0];
+
+        // Optimistic contact (name will be refined by chat header via API)
+        setSelectedContact({
+          id: room.id,
+          name: room.name,
+          avatarUrl: room.avatarUrl || null,
+          isOnline: false,
+          chatRoom: room,
+          userId: otherId,
+        });
+      } else {
+        // Fallback minimal; chat will resolve header via API
+        setSelectedContact({ id: contactId, name: "" });
+      }
+    } else if (userIdParam && !contactId) {
+      handleCreateDirectChat(parseInt(userIdParam));
     }
-  }, [searchParams]);
+  }, [searchParams, rooms, selectedContact?.id]);
 
   const handleCreateDirectChat = async (userId) => {
     try {
