@@ -21,6 +21,11 @@ export const userApi = createApi({
             transformResponse: transform,
             providesTags: (r, e, username) => [{ type: "User", id: username }],
         }),
+        getUserById: builder.query({
+            query: (userId) => `/${userId}`,
+            transformResponse: transform,
+            providesTags: (r, e, userId) => [{ type: "User", id: userId }],
+        }),
         getNotifications: builder.query({
             query: ({ page = 0, size = 20 } = {}) => `/notifications?page=${page}&size=${size}`,
             transformResponse: transform,
@@ -94,6 +99,7 @@ export const userApi = createApi({
 export const {
     useGetMyProfileQuery,
     useGetUserByUsernameQuery,
+    useGetUserByIdQuery,
     useGetNotificationsQuery,
     useGetUnreadNotificationsQuery,
     useGetUnreadCountQuery,

@@ -156,7 +156,7 @@ export const chatApi = createApi({
         // Get user info by ID (for participant names)
         getUserById: builder.query({
             query: (userId) => ({
-                url: `/api/v1/chat/users/${userId}`,
+                url: `/api/user/${userId}`,
                 method: "GET",
             }),
             transformResponse: (response) => response.data,
