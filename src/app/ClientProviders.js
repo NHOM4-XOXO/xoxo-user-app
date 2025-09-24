@@ -22,12 +22,39 @@ export default function ClientProviders({ children }) {
 
   const pathname = usePathname();
 
-  useEffect(() => {
-    if (pathname !== "/" && pathname !== "/login" && pathname !== "/oauth2/success" && pathname !== "/games" && pathname !== "/xoxo-ai" && pathname !== "/events"
-      && pathname !== "/messages" && pathname !== "/saved" && pathname !== "/groups" && pathname !== "/friends" && pathname !== "/videos" && pathname !== "/musics" && pathname !== "/events" && pathname !== "/forgot-password" && pathname !== "/reset-password" && pathname !== "/change-password") {
-      setIsLoading(true);
-    }
-  }, [children, pathname]);
+  // useEffect(() => {
+  //   if (pathname !== "/" && pathname !== "/login" && pathname !== "/oauth2/success" && pathname !== "/games" && pathname !== "/xoxo-ai" && pathname !== "/events"
+  //     && pathname !== "/messages" && pathname !== "/saved" && pathname !== "/groups" && pathname !== "/friends" && pathname !== "/videos"
+  //     && pathname !== "/musics" && pathname !== "/events" && pathname !== "/forgot-password" && pathname !== "/reset-password" && pathname !== "/change-password" && pathname !== "/profile") {
+  //     setIsLoading(true);
+  //   }
+  // }, [children, pathname]);
+
+  // useEffect(() => {
+  //   const allowedPaths = [
+  //     "/login",
+  //     "/oauth2/success",
+  //     "/games",
+  //     "/xoxo-ai",
+  //     "/events",
+  //     "/messages",
+  //     "/saved",
+  //     "/groups",
+  //     "/friends",
+  //     "/videos",
+  //     "/musics",
+  //     "/forgot-password",
+  //     "/reset-password",
+  //     "/change-password",
+  //   ];
+
+  //   if (allowedPaths.includes(pathname)) {
+  //     setIsLoading(false);
+  //   } else {
+  //     setIsLoading(true);
+  //   }
+  // }, [children, pathname]);
+
 
   return (
     <StoreProvider>

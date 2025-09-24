@@ -51,6 +51,8 @@ export default function ProfileAbout() {
     const [idUser, setIdUser] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [form] = Form.useForm();
+    console.log(profile);
+
 
     const mappedInfo = useMemo(() => {
         if (!profile) return [];

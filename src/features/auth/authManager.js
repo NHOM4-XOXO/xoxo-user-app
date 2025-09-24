@@ -29,6 +29,8 @@ const setTokenCookie = (token) => {
 
         const now = Date.now();
         const expiryMs = expiry - now - 60000;
+        // const expiryMs = 180000; // 3 phút
+
 
         if (expiryMs <= 0) return;
 
@@ -81,7 +83,7 @@ export const scheduleTokenRefresh = (token) => {
     refreshTimeout = setTimeout(() => {
         console.log("[AuthManager] Auto refreshing token");
         refreshTokenFlow();
-    }, 8 * 60 * 1000); // 2 phút
+    }, 9 * 60 * 1000); // 2 phút
 
     console.log(`[AuthManager] Refresh scheduled in 9 minutes`);
 };
