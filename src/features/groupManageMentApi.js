@@ -1,23 +1,13 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import Cookies from "js-cookie";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { createBaseQueryWithReauth } from "./auth/baseQueryWithReauth ";
 
-// Helper: thêm token
-const prepareHeaders = (headers) => {
-    const token = Cookies.get("token");
-    if (token) headers.set("Authorization", `Bearer ${token}`);
-    return headers;
-};
 
 // Helper: lấy luôn data
 const transform = (response) => response.data.content;
 
 export const groupApi = createApi({
     reducerPath: "groupApi",
-    baseQuery: fetchBaseQuery({
-        baseUrl: `${process.env.NEXT_PUBLIC_API_URL}/api/v1`,
-        prepareHeaders,
-        credentials: "include",
-    }),
+    baseQuery: createBaseQueryWithReauth(`${process.env.NEXT_PUBLIC_API_URL}/api/v1`),
     tagTypes: ["Group"],
 
     endpoints: (builder) => ({

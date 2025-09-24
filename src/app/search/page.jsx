@@ -1,14 +1,21 @@
 "use client";
 import React, { useState, useEffect, useContext } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   FiSearch,
   FiUsers,
   FiFileText,
   FiUsers as FiGroups,
 } from "react-icons/fi";
-import { searchUsers, searchPosts, searchGroups } from "@/features/searchApi";
+import { searchUsers, } from "@/features/searchApi";
 import { RootContext } from "../ClientProviders";
+import { useGetReceivedPendingQuery, useGetSentPendingQuery } from "@/features/friendshipApi";
+
+export const dynamic = "force-dynamic";
+
+import UserCard from "@/components/common/UserCardSearch";
+
+
 
 export default function SearchPage() {
   const { setIsLoading } = useContext(RootContext);
@@ -25,6 +32,19 @@ export default function SearchPage() {
     totalGroups: 0,
     totalResults: 0,
   });
+
+
+  const { data: sentPending } = useGetSentPendingQuery();
+  const { data: receivedPending } = useGetReceivedPendingQuery();
+
+  const router = useRouter();
+
+  let profile = null;
+  try {
+    profile = JSON.parse(localStorage.getItem("profile"));
+  } catch (e) {
+    console.error("Không đọc được localStorage:", e);
+  }
 
   useEffect(() => {
     setIsLoading(loading)
@@ -86,34 +106,17 @@ export default function SearchPage() {
     },
   ];
 
-  const renderUserCard = (user) => (
-    <div
-      key={user.id}
-      className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
-    >
-      <div className="flex items-center gap-3">
-        <img
-          src={user.avatarUrl || "/default-avatar.jpg"}
-          alt={user.username}
-          className="w-16 h-16 rounded-full object-cover"
-        />
-        <div className="flex-1">
-          <h3 className="font-semibold text-gray-900 dark:text-white">
-            {user.firstName} {user.lastName}
-          </h3>
-          <p className="text-gray-500 dark:text-gray-400">@{user.username}</p>
-          {user.bio && (
-            <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 line-clamp-2">
-              {user.bio}
-            </p>
-          )}
-        </div>
-        <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
-          Kết bạn
-        </button>
-      </div>
-    </div>
-  );
+  const renderUserCard = (user) => {
+    return (
+      <UserCard
+        key={user.id}
+        user={user}
+        profile={profile}
+        sentPending={sentPending}
+        receivedPending={receivedPending}
+      />
+    );
+  };
 
   const renderPostCard = (post) => (
     <div

@@ -3,8 +3,84 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useGetUserByIdQuery, useGetCurrentUserProfileQuery } from "@/features/chatApi";
 
-export default function MessageDropdown({ messages, onClose, onContactClick }) {
+// Component for individual message item with proper avatar
+function MessageItem({ chatRoom, onContactClick, onClose }) {
+  const { data: profileData } = useGetCurrentUserProfileQuery();
+  const myId = profileData?.id;
+  
+  // Get other participant ID from chat room
+  const otherId = chatRoom?.participantIds?.find(id => id !== myId);
+  const { data: otherUser } = useGetUserByIdQuery(otherId, { skip: !otherId });
+
+  // Get display data
+  const displayAvatar = otherUser?.avatarUrl || "/default-avatar.jpg";
+  const displayName = otherUser ? 
+    `${(otherUser.firstName || "")} ${(otherUser.lastName || "")}`.trim() || otherUser.username || otherUser.email
+    : chatRoom.name;
+
+  // Format last message preview
+  const lastMessage = typeof chatRoom.lastMessage === 'string' 
+    ? chatRoom.lastMessage 
+    : chatRoom.lastMessage?.content || "No messages yet";
+
+  // Format time
+  const lastMessageTime = chatRoom.lastMessageAt 
+    ? new Date(chatRoom.lastMessageAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+    : "";
+
+  const handleClick = () => {
+    if (onContactClick) {
+      // Create contact object with proper structure
+      const contact = {
+        id: chatRoom.id,
+        name: displayName, // Use the computed displayName instead of chatRoom.name
+        avatarUrl: displayAvatar, // Use the computed displayAvatar
+        isOnline: otherUser?.isOnline || false,
+        userId: otherId,
+        chatRoom: chatRoom,
+      };
+      onContactClick(contact);
+    }
+    onClose();
+  };
+
+  return (
+    <div
+      className={`flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer ${
+        !chatRoom.unreadCount ? "opacity-70" : "bg-blue-50 dark:bg-gray-700"
+      }`}
+      onClick={handleClick}
+    >
+      <Image
+        src={displayAvatar}
+        alt={displayName}
+        width={50}
+        height={40}
+        className="rounded-full w-10 h-10 mr-3 object-cover"
+      />
+      <div className="flex-1">
+        <p className="font-medium text-black dark:text-white">
+          {displayName}
+        </p>
+        <p className="text-sm text-gray-900 dark:text-gray-400 truncate">
+          {lastMessage}
+        </p>
+      </div>
+      <div className="flex flex-col items-end">
+        <span className="text-xs text-gray-400 ml-2">{lastMessageTime}</span>
+        {chatRoom.unreadCount > 0 && (
+          <span className="bg-blue-500 text-white text-xs rounded-full px-2 py-1 mt-1">
+            {chatRoom.unreadCount}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default function MessageDropdown({ messages, isLoading, onClose, onContactClick }) {
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -31,42 +107,24 @@ export default function MessageDropdown({ messages, onClose, onContactClick }) {
         className="w-full px-3 py-1 mb-2 text-sm rounded-full bg-gray-100 dark:bg-gray-700 text-black outline-none dark:placeholder:text-gray-400"
       />
       <div className="max-h-72 overflow-y-auto space-y-2">
-        {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer ${
-              msg.isRead ? "opacity-70" : "bg-blue-50 dark:bg-gray-700"
-            }`}
-            onClick={() => {
-              if (onContactClick) {
-                onContactClick({
-                  id: msg.id,
-                  name: msg.name,
-                  avatar: msg.avatar,
-                  isOnline: Math.random() > 0.5, // Random online status for demo
-                });
-              }
-              onClose();
-            }}
-          >
-            <Image
-              src={msg.avatar}
-              alt={msg.name}
-              width={50}
-              height={40}
-              className="rounded-full w-10 h-10 mr-3"
-            />
-            <div className="flex-1">
-              <p className="font-medium text-black dark:text-white">
-                {msg.name}
-              </p>
-              <p className="text-sm text-gray-900 dark:text-gray-400 truncate">
-                {msg.preview}
-              </p>
-            </div>
-            <span className="text-xs text-gray-400 ml-2">{msg.time}</span>
+        {isLoading ? (
+          <div className="flex items-center justify-center p-4">
+            <div className="text-sm text-gray-500">Đang tải tin nhắn...</div>
           </div>
-        ))}
+        ) : messages.length === 0 ? (
+          <div className="flex items-center justify-center p-4">
+            <div className="text-sm text-gray-500">Chưa có cuộc trò chuyện nào</div>
+          </div>
+        ) : (
+          messages.map((chatRoom) => (
+            <MessageItem
+              key={chatRoom.id}
+              chatRoom={chatRoom}
+              onContactClick={onContactClick}
+              onClose={onClose}
+            />
+          ))
+        )}
       </div>
       <Link
         href="/messages"

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Footer from "../common/Footer";
 
+export const dynamic = "force-dynamic";
 export default function ForgotPassword() {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);

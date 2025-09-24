@@ -23,8 +23,9 @@ export default function ClientProviders({ children }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (pathname !== "/login" && pathname !== "/oauth2/success" && pathname !== "/games"&& pathname !== "/xoxo-ai"&& pathname !== "/events"
-      && pathname !== "/messages"&& pathname !== "/saved"&& pathname !== "/groups"&& pathname !== "/friends"&& pathname !== "/videos"&& pathname !== "/musics"&& pathname !== "/events"&& pathname !== "/forgot-password"&& pathname !== "/reset-password"&& pathname !== "/change-password") {
+    if (pathname !== "/" && pathname !== "/login" && pathname !== "/oauth2/success" && pathname !== "/games" && pathname !== "/xoxo-ai" && pathname !== "/events"
+      && pathname !== "/messages" && pathname !== "/saved" && pathname !== "/groups" && pathname !== "/friends" && pathname !== "/videos"
+      && pathname !== "/musics" && pathname !== "/events" && pathname !== "/forgot-password" && pathname !== "/reset-password" && pathname !== "/change-password") {
       setIsLoading(true);
     }
   }, [children, pathname]);

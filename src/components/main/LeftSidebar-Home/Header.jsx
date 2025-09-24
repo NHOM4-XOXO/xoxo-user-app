@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { FaUserFriends, FaStore } from "react-icons/fa";
 import { FiSearch, FiMessageCircle, FiRefreshCw } from "react-icons/fi";
 import { IoMdHome, IoMdNotifications } from "react-icons/io";
@@ -10,10 +10,7 @@ import Image from "next/image";
 import MessageDropdown from "./MessageDropdown";
 import NotificationDropdown from "./NotiDropDown";
 import SearchBar from "../../Search/SearchBar";
-import {
-  
-  sampleNotifications,
-} from "../../../data/asideHeaderSampleData";
+// sampleNotifications removed: now using API
 import sampleFriends from "../../../data/sampleFriends";
 import NavItem from "../../../components/Navbar/NavItem";
 import ThemeToggle from "../../ThemeToggle";
@@ -24,6 +21,8 @@ import { useRouter } from "next/navigation";
 import { searchUsers } from "../../../features/searchApi";
 import useMergeState from "../../../hooks/useMergeState";
 import { useGetChatRoomsQuery } from "@/features/chatApi";
+import { useGetNotificationsQuery, useGetUnreadCountQuery } from "@/features/userApi";
+import { useGetFriendsQuery } from "@/features/friendshipApi";
 
 export default function Header({ onContactClick }) {
   const router = useRouter();
@@ -45,6 +44,13 @@ export default function Header({ onContactClick }) {
     showResults: false,
   });
 
+  // Fetch chat rooms from API
+  const { data: chatRooms = [], isLoading: isLoadingChatRooms } = useGetChatRoomsQuery({ page: 0, size: 10 });
+  const { data: notificationsResp, isLoading: isLoadingNotifications } = useGetNotificationsQuery({ page: 0, size: 20 });
+  const notifications = notificationsResp?.content || [];
+  const { data: unreadCountData } = useGetUnreadCountQuery();
+  const unreadCount = typeof unreadCountData === "number" ? unreadCountData : unreadCountData?.data ?? 0;
+
   const {
     showMessages,
     showNotifications,
@@ -60,6 +66,21 @@ export default function Header({ onContactClick }) {
   const searchWrapperRef = useRef(null);
   const messageRef = useRef(null);
   const notiRef = useRef(null);
+
+  const { data: friends } = useGetFriendsQuery();
+
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    try {
+      const profile = JSON.parse(localStorage.getItem("profile"));
+      setProfile(profile || null);
+    } catch (e) {
+      console.error("Không đọc được localStorage:", e);
+    }
+  }, []);
+
+
 
   // Search functionality với API call
   useEffect(() => {
@@ -262,34 +283,43 @@ export default function Header({ onContactClick }) {
               ) : (
                 <>
                   {/* Users */}
-                  {results.users && results.users.length > 0 && (
-                    <div className="mb-3">
-                      <h4 className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-2 px-2">
-                        Mọi người
-                      </h4>
-                      {results.users.slice(0, 3).map((user) => (
-                        <div
-                          key={user.id}
-                          onClick={() => handleUserClick(user)}
-                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer flex items-center gap-3"
-                        >
-                          <img
-                            src={user.avatarUrl || "/default-avatar.jpg"}
-                            alt={user.username}
-                            className="w-8 h-8 rounded-full object-cover"
-                          />
-                          <div>
-                            <p className="font-medium text-gray-900 dark:text-white">
-                              {user.firstName} {user.lastName}
-                            </p>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                              @{user.username}
-                            </p>
-                          </div>
+                  {results.users.slice(0, 3).map((user) => {
+                    const isMe = user.username === profile?.username;
+                    const isFriend = friends?.find(
+                      (item) => item.id === user.id
+                    );
+                    const badge = isMe
+                      ? { text: "Bạn", color: "bg-blue-500" }
+                      : isFriend
+                        ? { text: "Bạn bè", color: "bg-green-500" }
+                        : { text: "Mọi người", color: "bg-gray-400" };
+                    return (
+                      <div
+                        key={user.id}
+                        onClick={() => !isMe && handleUserClick(user)}
+                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer flex items-center gap-3"
+                      >
+                        <img
+                          src={user.avatarUrl || "/default-avatar.jpg"}
+                          alt={user.username}
+                          className="w-8 h-8 rounded-full object-cover"
+                        />
+                        <div>
+                          <p className="font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                            {user.firstName} {user.lastName}
+                            <span
+                              className={`text-xs ${badge.color} text-white px-2 py-0.5 rounded-full`}
+                            >
+                              {badge.text}
+                            </span>
+                          </p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            @{user.username}
+                          </p>
                         </div>
-                      ))}
-                    </div>
-                  )}
+                      </div>
+                    );
+                  })}
 
                   {/* Posts */}
                   {results.posts && results.posts.length > 0 && (
@@ -435,7 +465,11 @@ export default function Header({ onContactClick }) {
           onClick={toggleNotificationDropdown}
         >
           <IoMdNotifications className="text-2xl" />
-          {/* <span className="absolute top-1 -right-1 bg-red-500 text-white rounded-full w-3 h-3" /> */}
+          {unreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full min-w-[18px] h-[18px] text-[11px] leading-[18px] text-center px-1">
+              {unreadCount > 99 ? "99+" : unreadCount}
+            </span>
+          )}
         </button>
 
         <ProfileDropdown />
@@ -466,7 +500,8 @@ export default function Header({ onContactClick }) {
       {showMessages && (
         <div className="absolute top-2 right-2 z-50 sm:right-4 mt-2">
           <MessageDropdown
-            messages={[]}
+            messages={chatRooms}
+            isLoading={isLoadingChatRooms}
             onClose={() => setState({ showMessages: false })}
             onContactClick={onContactClick}
           />
@@ -476,8 +511,9 @@ export default function Header({ onContactClick }) {
       {showNotifications && (
         <div className="absolute top-3 -right-15 z-50 sm:-right-15 mt-2">
           <NotificationDropdown
-            rel={notiRef}
-            notifications={sampleNotifications}
+            ref={notiRef}
+            notifications={notifications}
+            isLoading={isLoadingNotifications}
             onClose={() => setState({ showNotifications: false })}
           />
         </div>

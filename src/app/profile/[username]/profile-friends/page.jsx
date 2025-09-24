@@ -3,7 +3,7 @@ import { useContext, useEffect, useState } from "react";
 import { Search, MoreHorizontal, UserX, User, SquareX } from "lucide-react";
 import { Dropdown, Menu } from "antd";
 import { useTheme } from "next-themes";
-import { useGetFriendsByIduserQuery, useSendRequestMutation, } from "@/features/friendshipApi";
+import { useGetFriendsByIduserQuery, useIsFriendQuery, useSendRequestMutation, } from "@/features/friendshipApi";
 import { ProfileContext } from "../layout";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -54,23 +54,9 @@ const ProfileFriend = () => {
     const [loadingId, setLoadingId] = useState(null);
 
     const [currentUser, setCurrentUser] = useState(null);
-    const [sendRequest, { isLoading: sendRequestLoading }] = useSendRequestMutation();
     const { data: friends = [], isLoading: isLoadingFriends } = useGetFriendsByIduserQuery(profile?.id, { skip: !profile?.id });
 
     const isMyProfile = currentUser?.id === profile?.id;
-
-    const handleSendRequest = async (friendId) => {
-        setLoadingId(friendId);
-
-        try {
-            await sendRequest(friendId).unwrap();
-            toast.success("Đã gửi lời mời kết bạn!");
-        } catch (err) {
-            toast.error(err?.data?.message || "Gửi lời mời kết bạn thất bại!");
-        } finally {
-            setLoadingId(null);
-        }
-    };
 
     useEffect(() => {
         setIsLoading(isLoadingFriends)
@@ -78,8 +64,8 @@ const ProfileFriend = () => {
 
     useEffect(() => {
         try {
-            const auth = JSON.parse(localStorage.getItem("auth"));
-            setCurrentUser(auth?.profile || null);
+            const profile = JSON.parse(localStorage.getItem("profile"));
+            setCurrentUser(profile || null);
         } catch (e) {
             console.error("Không đọc được auth:", e);
         }
@@ -196,25 +182,7 @@ const ProfileFriend = () => {
                                             <MoreHorizontal className="cursor-pointer text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-fb-dark-quaternary w-8 h-8 p-[0.4rem] rounded-full" />
                                         </button>
                                     </Dropdown>
-                                ) : (
-                                    <button
-                                        onClick={() => handleSendRequest(friend.id)}
-                                        disabled={loadingId === friend.id}
-                                        className={`ml-auto bg-blue-600 hover:bg-blue-700 text-white 
-    px-4 py-1.5 rounded-md text-sm font-medium transition-colors cursor-pointer 
-    flex items-center justify-center gap-2
-    ${loadingId === friend.id ? "opacity-70 cursor-not-allowed" : ""}`}
-                                    >
-                                        {loadingId === friend.id ? (
-                                            <>
-                                                <Spinner />
-                                                <span>Đang gửi</span>
-                                            </>
-                                        ) : (
-                                            "Thêm bạn bè"
-                                        )}
-                                    </button>
-
+                                ) : (""
                                 )}
                             </div>
                         </div>

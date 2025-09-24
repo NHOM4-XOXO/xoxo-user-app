@@ -1,21 +1,12 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import Cookies from "js-cookie";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { createBaseQueryWithReauth } from "./auth/baseQueryWithReauth ";
 
-const prepareHeaders = (headers) => {
-    const token = Cookies.get("token");
-    if (token) headers.set("Authorization", `Bearer ${token}`);
-    return headers;
-};
 
 const transform = (response) => response.data;
 
 export const friendshipApi = createApi({
     reducerPath: "friendshipApi",
-    baseQuery: fetchBaseQuery({
-        baseUrl: `${process.env.NEXT_PUBLIC_API_URL}/api/friendships`,
-        prepareHeaders,
-        credentials: "include",
-    }),
+    baseQuery: createBaseQueryWithReauth(`${process.env.NEXT_PUBLIC_API_URL}/api/friendships`),
     tagTypes: ["Friendship"],
 
     endpoints: (builder) => ({
@@ -45,6 +36,11 @@ export const friendshipApi = createApi({
             transformResponse: transform,
             providesTags: ["Friendship"],
         }),
+        isFriend: builder.query({
+            query: (userId) => `/${userId}/is-friend`,
+            transformResponse: transform,
+            providesTags: ["Friendship"],
+        }),
 
         /* -------------------- MUTATION -------------------- */
         sendRequest: builder.mutation({
@@ -53,6 +49,7 @@ export const friendshipApi = createApi({
                 method: "POST",
                 body: { friendId: friendId },
             }),
+            invalidatesTags: ["Friendship"],
         }),
         rejectRequest: builder.mutation({
             query: (friendshipId) => ({
@@ -70,6 +67,21 @@ export const friendshipApi = createApi({
             invalidatesTags: ["Friendship"],
         }),
 
+        /* -------------------- DELETE -------------------- */
+        deleteFriend: builder.mutation({
+            query: (friendshipId) => ({
+                url: `/${friendshipId}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: ["Friendship"],
+        }),
+        deleteRequest: builder.mutation({
+            query: (friendshipId) => ({
+                url: `/${friendshipId}/request`,
+                method: "DELETE",
+            }),
+            invalidatesTags: ["Friendship"],
+        }),
     }),
 });
 
@@ -79,8 +91,12 @@ export const {
     useGetReceivedPendingQuery,
     useGetFriendsQuery,
     useGetFriendsByIduserQuery,
+    useIsFriendQuery,
 
     useSendRequestMutation,
     useRejectRequestMutation,
     useAcceptRequestMutation,
+
+    useDeleteFriendMutation,
+    useDeleteRequestMutation,
 } = friendshipApi;

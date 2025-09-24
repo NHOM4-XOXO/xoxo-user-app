@@ -28,7 +28,7 @@ const setTokenCookie = (token) => {
         if (!expiry) return;
 
         const now = Date.now();
-        const expiryMs = expiry - now-60000;
+        const expiryMs = expiry - now - 60000;
 
         if (expiryMs <= 0) return;
 
@@ -52,25 +52,38 @@ const setTokenCookie = (token) => {
 /**
  * Lên lịch auto refresh token trước khi hết hạn 1 phút
  */
+// export const scheduleTokenRefresh = (token) => {
+//     setTokenCookie(token);
+//     const expiry = getTokenExpiry(token);
+//     if (!expiry) return;
+
+//     const now = Date.now();
+//     const refreshTime = expiry - now - 60 * 1000; // refresh trước 1 phút
+
+//     if (refreshTimeout) clearTimeout(refreshTimeout);
+
+//     refreshTimeout = setTimeout(() => {
+//         console.log("[AuthManager] Auto refreshing token...");
+//         refreshTokenFlow();
+//     }, refreshTime);
+//     console.log(
+//         `[AuthManager] Refresh scheduled in ${(refreshTime / 1000).toFixed(0)}s`
+//     );
+// };
+
 export const scheduleTokenRefresh = (token) => {
-    setTokenCookie(token);
-    const expiry = getTokenExpiry(token);
-    if (!expiry) return;
+    setTokenCookie(token); // vẫn lưu token vào cookie
 
-    const now = Date.now();
-    const refreshTime = expiry - now - 60 * 1000; // refresh trước 1 phút
-
+    // Clear timeout cũ nếu có
     if (refreshTimeout) clearTimeout(refreshTimeout);
 
-    if (refreshTime > 0) {
-        refreshTimeout = setTimeout(() => {
-            console.log("[AuthManager] Auto refreshing token...");
-            refreshTokenFlow();
-        }, refreshTime);
-        console.log(
-            `[AuthManager] Refresh scheduled in ${(refreshTime / 1000).toFixed(0)}s`
-        );
-    }
+    // Test: refresh sau 3 phút
+    refreshTimeout = setTimeout(() => {
+        console.log("[AuthManager] Auto refreshing token");
+        refreshTokenFlow();
+    }, 5 * 60 * 1000); // 2 phút
+
+    console.log(`[AuthManager] Refresh scheduled in 9 minutes`);
 };
 
 /**
@@ -89,8 +102,6 @@ export const refreshTokenFlow = async () => {
             // Lưu token vào Redux
             store.dispatch({ type: "auth/setToken", payload: newToken });
 
-            // Lưu token vào Cookie
-            setTokenCookie(newToken);
 
             // Lên lịch lại auto refresh
             scheduleTokenRefresh(newToken);

@@ -1,26 +1,37 @@
 import { NextResponse } from "next/server";
 
-export function middleware(request) {
-  const url = request.nextUrl;
-  const isLoggedIn = request.cookies.get("token"); // hoặc token/session
+const isProduction = process.env.NEXT_PUBLIC_IS_PRODUCTION === "true";
 
-  // Nếu chưa đăng nhập, chặn truy cập các route cần bảo vệ
-  if (
-    !isLoggedIn &&
-    url.pathname !== "/login" &&
-    !url.pathname.startsWith("/api")
-  ) {
+export function middleware(request) {
+  console.log("Cookies in middleware:", request.cookies.getAll());
+
+  const url = request.nextUrl;
+  const hasSession = request.cookies.get("token");
+
+  // Chỉ redirect khi production, local thì bỏ qua
+  if (!hasSession && url.pathname !== "/login" && !url.pathname.startsWith("/api")) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // Nếu đã đăng nhập, không cho vào lại trang login
-  if (isLoggedIn && url.pathname === "/login") {
+  if (hasSession && url.pathname === "/login") {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
   return NextResponse.next();
 }
 
+
+
 export const config = {
-  matcher: ["/", "/profile/:path*", "/groups/:path*", "/friends/:path*", "/"], // các route cần bảo vệ
+  matcher: [
+    "/",
+    "/profile/:path*",
+    "/groups/:path*",
+    "/friends/:path*",
+    "/messages/:path*",
+    "/saved/:path*",
+    "/videos/:path*",
+    "/musics/:path*",
+    "/events/:path*",
+  ], // các route cần bảo vệ
 };

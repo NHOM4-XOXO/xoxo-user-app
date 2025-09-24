@@ -1,9 +1,11 @@
+"use client";
+"use client";
 import { useState } from "react";
 import SettingReadReceiptsView from "./SettingReadReceiptsView";
 import SettingEncryptedChatsView from "./SettingEncryptedChatsView";
 import SettingMainView from "./SettingMainView";
 import SettingPrivacyView from "./SettingPrivacyView";
-
+export const dynamic = "force-dynamic";
 const SettingsDropdown = ({ isOpen, onClose }) => {
   const [settings, setSettings] = useState({
     incomingCallSounds: true,

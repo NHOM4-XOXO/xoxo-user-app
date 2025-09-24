@@ -3,8 +3,8 @@ export const getProfileMenuItems = () => {
     let username = "";
 
     try {
-        const auth = JSON.parse(localStorage.getItem("auth"));
-        username = auth?.profile?.username || "";
+        const profile = JSON.parse(localStorage.getItem("profile"));
+        username = profile?.username || "";
     } catch (e) {
         console.error("Không đọc được localStorage:", e);
     }

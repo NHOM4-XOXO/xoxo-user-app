@@ -2,24 +2,13 @@
 
 import { RootContext } from "@/app/ClientProviders";
 import FriendCard from "@/components/friends/FriendRequestCard";
-import { useGetSuggestionsQuery, useSendRequestMutation } from "@/features/friendshipApi";
+import { useGetSuggestionsQuery } from "@/features/friendshipApi";
 import { useContext, useEffect } from "react";
 import toast from "react-hot-toast";
 
 export default function FriendSuggestionsPage() {
     const { setIsLoading } = useContext(RootContext);
     const { data: suggestions = [], isLoading } = useGetSuggestionsQuery();
-    const [sendRequest] = useSendRequestMutation();
-
-    const handleSendRequest = async (friend) => {
-        try {
-            await sendRequest(friend.id).unwrap();
-            toast.success(`Đã gửi lời mời kết bạn đến ${friend.displayName || friend.username}`);
-        } catch (err) {
-            toast.error(err?.data?.message || "Gửi lời mời kết bạn thất bại");
-        }
-    };
-
     useEffect(() => {
         setIsLoading(isLoading);
     }, [isLoading]);
@@ -40,12 +29,7 @@ export default function FriendSuggestionsPage() {
                         <FriendCard
                             key={friend.id}
                             friend={{ user: friend }} // cần match cấu trúc FriendRequestCard
-                            customButton={{
-                                label: "Thêm bạn",
-                                onClick: () => handleSendRequest(friend),
-                                bgColor: "bg-blue-600",
-                                hoverColor: "hover:bg-blue-700",
-                            }}
+                            type={"SUGGESTION"}
                         />
                     ))}
                 </div>

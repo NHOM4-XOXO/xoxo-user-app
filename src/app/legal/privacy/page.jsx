@@ -1,10 +1,12 @@
-// src/app/legal/privacy/page.jsx
+
 import LegalLayout from "@/components/legal/LegalLayout";
 
 export const metadata = {
   title: "Quyền riêng tư || XOXO",
   description: "Chính sách quyền riêng tư của XOXO",
 };
+
+export const dynamic = "force-dynamic";
 
 export default function Page() {
   return (

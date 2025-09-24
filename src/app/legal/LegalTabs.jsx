@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import clsx from "clsx";
 import { ShieldCheck, FileText, Megaphone } from "lucide-react";
@@ -7,6 +8,8 @@ const tabs = [
   { href: "/legal/terms", label: "Điều khoản", Icon: FileText },
   { href: "/legal/ads", label: "Lựa chọn quảng cáo", Icon: Megaphone },
 ];
+
+export const dynamic = "force-dynamic";
 
 export default function LegalTabs({
   activePath = "",

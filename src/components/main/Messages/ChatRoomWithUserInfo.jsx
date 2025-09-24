@@ -70,7 +70,22 @@ export default function ChatRoomWithUserInfo({
   console.log('ChatRoomWithUserInfo - User error:', userError);
 
   const handleClick = () => {
-    onSelect(chatRoom);
+    // Create contact object with proper user data
+    const contact = {
+      id: chatRoom.id,
+      name: getDisplayName(),
+      avatarUrl: getAvatar(),
+      isOnline: getOnlineStatus(),
+      lastSeen: chatRoom.lastMessageAt,
+      lastMessage: typeof chatRoom.lastMessage === 'string' 
+        ? chatRoom.lastMessage 
+        : chatRoom.lastMessage?.content || "",
+      unreadCount: chatRoom.unreadCount || 0,
+      chatRoom: chatRoom,
+      userId: otherParticipantId,
+    };
+    
+    onSelect(contact);
     if (chatRoom.unreadCount > 0) {
       onMarkAsRead(chatRoom.id);
     }

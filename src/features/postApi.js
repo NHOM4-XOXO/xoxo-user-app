@@ -1,22 +1,13 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import Cookies from "js-cookie";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { createBaseQueryWithReauth } from "./auth/baseQueryWithReauth ";
 
-// Helper
-const prepareHeaders = (headers) => {
-    const token = Cookies.get("token");
-    if (token) headers.set("Authorization", `Bearer ${token}`);
-    return headers;
-};
+
 
 const transform = (response) => response.data;
 
 export const postApi = createApi({
     reducerPath: "postApi",
-    baseQuery: fetchBaseQuery({
-        baseUrl: `${process.env.NEXT_PUBLIC_API_URL}/api/posts`,
-        prepareHeaders,
-        credentials: "include",
-    }),
+    baseQuery: createBaseQueryWithReauth(`${process.env.NEXT_PUBLIC_API_URL}/api/posts`),
     tagTypes: ["Post", "Comment", "Like", "Share", "Media"],
 
     endpoints: (builder) => ({
@@ -41,6 +32,18 @@ export const postApi = createApi({
             transformResponse: transform,
             providesTags: (r, e, id) => [{ type: "Comment", id }],
         }),
+        getPostCommentReplies:
+            builder.query({
+                query: (commentId) => `/comments/${commentId}/subtree`,
+                transformResponse: transform,
+                providesTags: (r, e, id) => [{ type: "Comment", id }],
+            }),
+        getPostCommentReplieCountAll:
+            builder.query({
+                query: (commentId) => `/comments/${commentId}/replies/count-all`,
+                transformResponse: transform,
+                providesTags: (r, e, id) => [{ type: "Comment", id }],
+            }),
         getPostLikes: builder.query({
             query: (postId) => `/${postId}/likes`,
             transformResponse: transform,
@@ -227,6 +230,8 @@ export const {
     useGetMyReactionQuery,
     useGetPostReactionsQuery,
     useGetReactionStatisticsQuery,
+    useGetPostCommentReplieCountAllQuery,
+    useLazyGetPostCommentRepliesQuery,
 
     useCreatePostMutation,
     useLikePostMutation,

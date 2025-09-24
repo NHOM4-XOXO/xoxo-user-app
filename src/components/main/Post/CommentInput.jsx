@@ -18,6 +18,8 @@ function CommentInput({
         onSubmit(value.trim());
         setValue(""); // reset sau khi gửi
     };
+    console.log(avatarUrl);
+
 
     return (
         <div className="flex gap-2 items-center w-full">

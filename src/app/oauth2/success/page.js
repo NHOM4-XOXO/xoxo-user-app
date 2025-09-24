@@ -1,10 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "@/features/auth/authSlice";
-import Cookies from "js-cookie";
+import { scheduleTokenRefresh } from "@/features/auth/authManager";
+
+// Ensure this page isn't prerendered at build time
+export const dynamic = "force-dynamic";
 
 // Spinner component đơn giản
 export function Spinner({ className = "" }) {
@@ -15,7 +18,7 @@ export function Spinner({ className = "" }) {
     );
 }
 
-export default function OAuth2Success() {
+function OAuth2SuccessInner() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const dispatch = useDispatch();
@@ -27,9 +30,8 @@ export default function OAuth2Success() {
         if (token) {
             try {
                 // Lưu token vào cookie (tuổi ngắn) và Redux store
-                Cookies.set("token", token, { expires: 1 / 144, secure: true, sameSite: "strict" });
+                scheduleTokenRefresh(token)
                 dispatch(setCredentials({ token }));
-
                 setStatus("success");
 
                 // Delay 1s để người dùng thấy trạng thái success trước khi redirect
@@ -60,5 +62,19 @@ export default function OAuth2Success() {
                 <p className="text-lg font-semibold text-red-600 animate-pulse">Đăng nhập thất bại. Chuyển về trang đăng nhập...</p>
             )}
         </div>
+    );
+}
+
+export default function OAuth2Success() {
+    return (
+        <Suspense
+            fallback={
+                <div className="flex items-center justify-center min-h-screen">
+                    <Spinner className="w-12 h-12 text-blue-500" />
+                </div>
+            }
+        >
+            <OAuth2SuccessInner />
+        </Suspense>
     );
 }

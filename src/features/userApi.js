@@ -1,23 +1,12 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import Cookies from "js-cookie";
-
-// Helper: thêm token
-const prepareHeaders = (headers) => {
-    const token = Cookies.get("token");
-    if (token) headers.set("Authorization", `Bearer ${token}`);
-    return headers;
-};
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { createBaseQueryWithReauth } from "./auth/baseQueryWithReauth ";
 
 // Helper: lấy luôn data
 const transform = (response) => response.data;
 
 export const userApi = createApi({
     reducerPath: "userApi",
-    baseQuery: fetchBaseQuery({
-        baseUrl: `${process.env.NEXT_PUBLIC_API_URL}/api/user`,
-        prepareHeaders,
-        credentials: "include", // gửi refreshToken cookie
-    }),
+    baseQuery: createBaseQueryWithReauth(`${process.env.NEXT_PUBLIC_API_URL}/api/user`),
     tagTypes: ["User", "Notification"],
 
     endpoints: (builder) => ({
@@ -32,8 +21,13 @@ export const userApi = createApi({
             transformResponse: transform,
             providesTags: (r, e, username) => [{ type: "User", id: username }],
         }),
+        getUserById: builder.query({
+            query: (userId) => `/${userId}`,
+            transformResponse: transform,
+            providesTags: (r, e, userId) => [{ type: "User", id: userId }],
+        }),
         getNotifications: builder.query({
-            query: () => "/notifications",
+            query: ({ page = 0, size = 20 } = {}) => `/notifications?page=${page}&size=${size}`,
             transformResponse: transform,
             providesTags: ["Notification"],
         }),
@@ -83,14 +77,14 @@ export const userApi = createApi({
                 url: `/notifications/${id}/read`,
                 method: "PUT",
             }),
-            invalidatesTags: (r, e, id) => [{ type: "Notification", id }],
+            invalidatesTags: ["Notification"],
         }),
         deleteNotification: builder.mutation({
             query: (id) => ({
                 url: `/notifications/${id}/delete`,
                 method: "PUT",
             }),
-            invalidatesTags: (r, e, id) => [{ type: "Notification", id }],
+            invalidatesTags: ["Notification"],
         }),
         markAllRead: builder.mutation({
             query: () => ({
@@ -105,6 +99,7 @@ export const userApi = createApi({
 export const {
     useGetMyProfileQuery,
     useGetUserByUsernameQuery,
+    useGetUserByIdQuery,
     useGetNotificationsQuery,
     useGetUnreadNotificationsQuery,
     useGetUnreadCountQuery,

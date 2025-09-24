@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { X } from "lucide-react";
+import { useGetUserByIdQuery, useGetCurrentUserProfileQuery } from "@/features/chatApi";
 
 export default function ChatBubble({
   contact,
@@ -15,6 +16,36 @@ export default function ChatBubble({
   onShowMore,
 }) {
   const [isHovered, setIsHovered] = useState(false);
+
+  // Fetch user data for proper display like MessagesChat.jsx
+  const { data: profileData } = useGetCurrentUserProfileQuery();
+  const myId = profileData?.id != null ? Number(profileData.id) : undefined;
+  const myFullName = `${profileData?.firstName || ''} ${profileData?.lastName || ''}`.trim();
+  
+  // Get other participant ID from contact
+  const participantIds = Array.isArray(contact?.chatRoom?.participantIds)
+    ? contact.chatRoom.participantIds.map((id) => Number(id))
+    : [];
+  const computedOtherId =
+    contact?.userId != null
+      ? Number(contact.userId)
+      : (myId != null
+          ? (participantIds.find((id) => id !== myId) ?? participantIds[0])
+          : participantIds[0]);
+  const otherId = Number.isFinite(computedOtherId) ? computedOtherId : undefined;
+  const { data: otherUser } = useGetUserByIdQuery(otherId, { skip: !otherId });
+
+  // Get display data - prioritize API data, fallback to contact data
+  const displayAvatar = otherUser?.avatarUrl || contact?.avatarUrl || "/default-avatar.jpg";
+  let displayName;
+  if (otherUser) {
+    displayName = (`${(otherUser.firstName || "")} ${(otherUser.lastName || "")}`.trim() || otherUser.username || otherUser.email);
+  } else {
+    // While loading/no API data, avoid showing my own name or room name; use placeholder by otherId
+    displayName = Number.isFinite(otherId) ? `User ${otherId}` : (contact?.name || "Unknown");
+  }
+
+  // Debug logs removed
 
   // Calculate position from bottom - each bubble is 70px apart
   const bottomPosition = 16 + positionOffset * 70;
@@ -66,8 +97,8 @@ export default function ChatBubble({
         {/* Avatar */}
         <div className="relative w-14 h-14 bg-white dark:bg-fb-dark-secondary rounded-full border-2 border-white dark:border-gray-600 shadow-lg hover:shadow-xl transition-shadow duration-200">
           <Image
-            src={contact.avatar || "/placeholder.svg?height=56&width=56"}
-            alt={contact.name}
+            src={displayAvatar}
+            alt={displayName}
             width={56}
             height={56}
             className="w-full h-full object-cover rounded-full"
@@ -76,7 +107,7 @@ export default function ChatBubble({
           {/* Online/Offline Status */}
           <div
             className={`absolute -bottom-1 -right-1 w-4 h-4 ${
-              contact.isOnline ? "bg-green-500" : "bg-gray-400"
+              otherUser?.isOnline || contact?.isOnline ? "bg-green-500" : "bg-gray-400"
             } border-2 border-white dark:border-fb-dark-secondary rounded-full`}
           />
         </div>
@@ -91,7 +122,7 @@ export default function ChatBubble({
         {/* Name Tooltip (show on hover) */}
         {isHovered && (
           <div className="absolute right-16 top-1/2 transform -translate-y-1/2 bg-black text-white text-sm px-3 py-2 rounded-lg shadow-lg whitespace-nowrap z-50">
-            {contact.name}
+            {displayName}
             <div className="absolute left-full top-1/2 transform -translate-y-1/2 w-0 h-0 border-l-4 border-l-black border-t-4 border-t-transparent border-b-4 border-b-transparent"></div>
           </div>
         )}

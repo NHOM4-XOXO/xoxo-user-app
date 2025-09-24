@@ -1,114 +1,220 @@
-import React from "react";
+import React, { useMemo } from "react";
 import Image from "next/image";
-import { useAcceptRequestMutation, useRejectRequestMutation } from "@/features/friendshipApi";
+import {
+  useAcceptRequestMutation,
+  useDeleteFriendMutation,
+  useDeleteRequestMutation,
+  useGetSentPendingQuery,
+  useIsFriendQuery,
+  useRejectRequestMutation,
+  useSendRequestMutation,
+} from "@/features/friendshipApi";
 import { useGetUserByUsernameQuery } from "@/features/userApi";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import { skipToken } from "@reduxjs/toolkit/query";
 
-const FriendRequestCard = ({ friend, customButton, type = null }) => {
-  const [acceptRequest, { isLoading: isAcceptting }] = useAcceptRequestMutation();
+const FriendRequestCard = ({ friend, type = null }) => {
+  const [acceptRequest, { isLoading: isAccepting }] = useAcceptRequestMutation();
   const [rejectRequest, { isLoading: isRejecting }] = useRejectRequestMutation();
+  const [deleteFriend, { isLoading: isDeletingFriend }] = useDeleteFriendMutation();
+  const [deleteRequest, { isLoading: isDeletingRequest }] = useDeleteRequestMutation();
+  const [sendRequest, { isLoading: isSentRequest }] = useSendRequestMutation();
 
-  const { data: userData, isLoading: isUserLoading } = useGetUserByUsernameQuery(friend.user.username, { skip: !friend.user.username });
 
+
+  const isUserType = ["DELETE", "RECEIVED", "SUGGESTION"].includes(type);
+  const username = isUserType ? friend?.user?.username : friend?.friend?.username;
+
+  const { data: userData, isLoading: isUserLoading } = useGetUserByUsernameQuery(
+    username,
+    { skip: !username }
+  );
+
+  const { data: sentPending, isLoading: isLoadingSent, } = useGetSentPendingQuery(
+    undefined,
+    { skip: type !== "SUGGESTION" }
+  );
+
+  // kiểm tra đã gửi lời mời chưa (trường hợp SUGGESTION)
+  const isSentPending = useMemo(() => {
+    if (type !== "SUGGESTION") return false;
+    return sentPending?.find(
+      (item) => item.friend.id === userData?.id && item.status === "PENDING"
+    );
+  }, [sentPending, type, userData?.id]);
+
+  const { data: checkIsFriend } = useIsFriendQuery(
+    type === "DELETE" ? friend?.user?.id : skipToken
+  );
+
+  // ================== HANDLERS ==================
   const handleAccept = async () => {
-    if (customButton?.onClick) return customButton.onClick();
     try {
       await acceptRequest(friend.id).unwrap();
-      toast.success(`Đã chấp nhận lời mời kết bạn từ ${friend.user.displayName || friend.user.username}`);
+      toast.success(
+        `Đã chấp nhận lời mời kết bạn từ ${friend.user.displayName || friend.user.username}`
+      );
     } catch (err) {
       toast.error(err?.data?.message || "Chấp nhận lời mời kết bạn thất bại");
     }
   };
 
   const handleReject = async () => {
-    if (!customButton) {
-      try {
-        await rejectRequest(friend.id).unwrap();
-      } catch (err) {
-        console.error("Reject failed:", err);
-      }
+    try {
+      await rejectRequest(friend.id).unwrap();
+      toast.success("Đã xóa lời mời kết bạn");
+    } catch (err) {
+      toast.error("Xóa lời mời thất bại");
     }
   };
 
-  // Nếu userData đang load, hiển thị skeleton
+  const handleDeleteRequest = async () => {
+    try {
+      console.log(isSentPending);
+
+      await deleteRequest(type === "SUGGESTION" ? isSentPending?.id : friend.id).unwrap();
+      toast.success("Đã hủy lời mời kết bạn");
+    } catch (err) {
+      toast.error("Hủy lời mời thất bại");
+    }
+  };
+
+  const handleRemoveFriend = async () => {
+    if (!checkIsFriend?.friendshipId) {
+      toast.error("Không tìm thấy quan hệ bạn bè");
+      return;
+    }
+    try {
+      await deleteFriend(checkIsFriend.friendshipId).unwrap();
+      toast.success(
+        `Đã hủy kết bạn với ${userData?.firstName} ${userData?.lastName}`
+      );
+    } catch (err) {
+      toast.error(err?.data?.message || "Hủy kết bạn thất bại");
+    }
+  };
+
+  const handleSendRequest = async () => {
+    try {
+      await sendRequest(userData.id).unwrap();
+
+      toast.success(`Đã gửi lời mời kết bạn đến ${userData?.firstName} ${userData?.lastName}`);
+    } catch (err) {
+      toast.error(err?.data?.message || "Gửi lời mời kết bạn thất bại");
+    }
+  };
+
+  const LoadingSpinner = () => (
+    <svg
+      className="animate-spin h-4 w-4 text-white mx-auto"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+      />
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"
+      />
+    </svg>
+  );
+
+  // ================== UI ==================
   if (isUserLoading) {
     return (
-      <div className="rounded-lg overflow-hidden dark:bg-[#242526] shadow-md border border-gray-300 dark:border-gray-700 animate-pulse">
-        <div className="w-full h-40 bg-gray-300 dark:bg-gray-700"></div>
-        <div className="p-3 space-y-2">
-          <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-3/4 mx-auto"></div>
-          <div className="h-8 bg-gray-300 dark:bg-gray-600 rounded w-full"></div>
-        </div>
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 flex flex-col items-center text-center animate-pulse">
+        <div className="w-24 h-24 bg-gray-300 dark:bg-gray-700 rounded-full mb-3"></div>
+        <div className="h-4 w-3/4 bg-gray-300 dark:bg-gray-600 rounded mb-2"></div>
+        <div className="h-3 w-1/2 bg-gray-300 dark:bg-gray-600 rounded"></div>
       </div>
     );
   }
 
   return (
-    <div className="rounded-lg overflow-hidden dark:bg-[#242526] shadow-md border border-gray-300 dark:border-gray-700 cursor-pointer">
-      {/* Avatar top full */}
-      <div className="relative w-full h-40 sm:h-48 md:h-52 lg:h-56">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition p-4 flex flex-col items-center text-center">
+      {/* Avatar */}
+      <div className="relative w-24 h-24 mb-3">
         <Image
           src={userData?.avatarUrl || "/default-avatar.jpg"}
           alt={userData?.username || "Avatar người dùng"}
           fill
-          sizes="(max-width: 768px) 50vw, 33vw"
-          priority
+          className="rounded-full object-cover border"
+          sizes="96px"
         />
       </div>
 
-      {/* Info + Button */}
-      <div className="p-3 text-center text-black dark:text-white">
-        <p className="font-semibold truncate hover:underline cursor-pointer">
-          <Link href={`/profile/${userData?.username}`}>
-            {userData?.firstName} {userData?.lastName}
-          </Link>
-        </p>
-        {customButton && (
-          <p>
-            Có {friend?.user?.mutualFriendsCount} bạn chung
-          </p>
-        )}
+      {/* Tên */}
+      <h3 className="font-semibold text-lg dark:text-white">
+        <Link href={`/profile/${userData?.username}`}>
+          {userData?.firstName} {userData?.lastName}
+        </Link>
+      </h3>
 
-        <div className="mt-3 flex flex-col space-y-2">
-          {customButton ? (
+      {/* Bạn chung */}
+      {friend?.user?.mutualFriendsCount && (
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          {`${friend?.user?.mutualFriendsCount} bạn chung`}
+        </p>
+      )}
+
+      {/* Nút */}
+      <div className="mt-4 w-full space-y-2">
+        {type === "RECEIVED" && (
+          <>
             <button
               onClick={handleAccept}
-              disabled={isAcceptting || isRejecting}
-              className={`${customButton.bgColor} ${customButton.hoverColor} text-white py-1.5 rounded font-medium`}
+              disabled={isAccepting}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm px-5 py-2 rounded-full transition-colors cursor-pointer"
             >
-              {customButton.label}
+              {isAccepting ? <LoadingSpinner /> : "Xác nhận"}
             </button>
-          ) : (
-            <>
-              {type === "RECEIVED" ? (
-                <>
-                  <button
-                    onClick={handleAccept}
-                    disabled={isAcceptting || isRejecting}
-                    className="bg-blue-600 hover:bg-blue-700 text-white py-1.5 rounded font-medium"
-                  >
-                    Xác nhận
-                  </button>
-                  <button
-                    onClick={handleReject}
-                    disabled={isAcceptting || isRejecting}
-                    className="bg-gray-500 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 text-white py-1.5 rounded font-medium"
-                  >
-                    Xóa
-                  </button>
-                </>
-              ) : type === "SENT" ? (
-                <button
-                  className="bg-green-500 text-white py-1.5 rounded font-medium cursor-not-allowed"
-                  disabled
-                >
-                  Đã gửi lời mời
-                </button>
-              ) : null}
-            </>
-          )}
-        </div>
+            <button
+              onClick={handleReject}
+              disabled={isRejecting}
+              className="w-full bg-gray-500 hover:bg-gray-400 text-white text-sm px-5 py-2 rounded-full transition-colors cursor-pointer"
+            >
+              {isRejecting ? <LoadingSpinner /> : "Xóa"}
+            </button>
+          </>
+        )}
+
+        {(type === "SENT" || isSentPending) && (
+          <button
+            onClick={handleDeleteRequest}
+            disabled={isDeletingRequest}
+            className="w-full bg-red-500 hover:bg-red-400 text-white text-sm px-5 py-2 rounded-full transition-colors cursor-pointer"
+          >
+            {isDeletingRequest ? <LoadingSpinner /> : "Hủy lời mời"}
+          </button>
+        )}
+
+        {type === "DELETE" && (
+          <button
+            onClick={handleRemoveFriend}
+            disabled={isDeletingFriend}
+            className="w-full bg-red-500 hover:bg-red-600 text-white text-sm px-5 py-2 rounded-full transition-colors"
+          >
+            {isDeletingFriend ? <LoadingSpinner /> : "Hủy kết bạn"}
+          </button>
+        )}
+
+        {type === "SUGGESTION" && !isSentPending && (
+          <button
+            onClick={handleSendRequest}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm px-5 py-2 rounded-full transition-colors"
+          >
+            {isSentRequest ? <LoadingSpinner /> : "Thêm bạn"}
+          </button>
+        )}
       </div>
     </div>
   );

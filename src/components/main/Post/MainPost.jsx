@@ -20,7 +20,7 @@ const MainPost = ({ data, reactionStats, currentUserId }) => {
   const [editingPost, setEditingPost] = useState(null);
   const [postContent, setPostContent] = useState("");
   const [selectedFiles, setSelectedFiles] = useState([]);
-  const [showReportModal, setShowReportModal] = useState(false); 
+  const [showReportModal, setShowReportModal] = useState(false);
 
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files || []);
@@ -30,8 +30,8 @@ const MainPost = ({ data, reactionStats, currentUserId }) => {
       type: file.type.startsWith("video/")
         ? "video"
         : file.type.startsWith("audio/")
-        ? "audio"
-        : "image",
+          ? "audio"
+          : "image",
     }));
     setSelectedFiles((prev) => [...prev, ...mapped]);
   };
@@ -86,39 +86,39 @@ const MainPost = ({ data, reactionStats, currentUserId }) => {
     items:
       currentUserId === author.id
         ? [
-            {
-              key: "edit",
-              icon: <Edit size={16} />,
-              label: (
-                <p className="text-sm font-semibold">Chỉnh sửa bài viết</p>
-              ),
-            },
-            {
-              key: "delete",
-              icon: <Trash2 size={16} />,
-              label: (
-                <p className="text-sm font-semibold text-red-500">
-                  Xóa bài viết
-                </p>
-              ),
-            },
-          ]
+          {
+            key: "edit",
+            icon: <Edit size={16} />,
+            label: (
+              <p className="text-sm font-semibold">Chỉnh sửa bài viết</p>
+            ),
+          },
+          {
+            key: "delete",
+            icon: <Trash2 size={16} />,
+            label: (
+              <p className="text-sm font-semibold text-red-500">
+                Xóa bài viết
+              </p>
+            ),
+          },
+        ]
         : [
-            {
-              key: "report",
-              icon: <Flag size={16} />,
-              label: (
-                <p className="text-sm font-semibold text-red-500">
-                  Báo cáo bài viết
-                </p>
-              ),
-            },
-            {
-              key: "hide",
-              icon: <EyeOff size={16} />,
-              label: <p className="text-sm font-semibold">Ẩn bài viết</p>,
-            },
-          ],
+          {
+            key: "report",
+            icon: <Flag size={16} />,
+            label: (
+              <p className="text-sm font-semibold text-red-500">
+                Báo cáo bài viết
+              </p>
+            ),
+          },
+          // {
+          //   key: "hide",
+          //   icon: <EyeOff size={16} />,
+          //   label: <p className="text-sm font-semibold">Ẩn bài viết</p>,
+          // },
+        ],
     onClick: handleMenuClick,
   };
 
@@ -129,7 +129,7 @@ const MainPost = ({ data, reactionStats, currentUserId }) => {
         <div className="flex gap-2">
           <img
             className="w-10 h-10 rounded-full border border-gray-300 dark:border-fb-dark-quaternary"
-            src={author.avatar}
+            src={author.avatar || "/default-avatar.jpg"}
             alt="Avatar"
           />
           <div>

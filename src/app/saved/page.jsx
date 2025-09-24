@@ -7,6 +7,7 @@ import { useSaved } from "@/utils/savedStore";
 import MonthCalendar from "@/components/ux/MonthCalendar";
 import { ChevronDown } from "lucide-react";
 
+export const dynamic = "force-dynamic";
 function groupKey(ts) {
   const d = new Date(ts);
   const yyyy = d.getFullYear();

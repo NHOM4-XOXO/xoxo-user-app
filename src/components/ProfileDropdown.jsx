@@ -8,7 +8,7 @@ export default function ProfileDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [userName, setUserName] = useState("User");
-  const [userAvatar, setUserAvatar] = useState("/image/georgina.jpg");
+  const [userAvatar, setUserAvatar] = useState("/default-avatar.jpg");
   const menuRef = useRef(null);
   const items = getProfileMenuItems();
 
@@ -27,20 +27,20 @@ export default function ProfileDropdown() {
   };
   useEffect(() => {
     try {
-      const authData = localStorage.getItem("auth");
-      if (authData) {
-        const parsedUser = JSON.parse(authData);
+      const profile = localStorage.getItem("profile");
+      if (profile) {
+        const parsedUser = JSON.parse(profile);
         setUser(parsedUser);
 
-        if (parsedUser && parsedUser.profile) {
-          setUserName(parsedUser.profile.firstName + " " + parsedUser.profile.lastName);
-          setUserAvatar(parsedUser.profile.avatarUrl || "/image/georgina.jpg");
+        if (parsedUser) {
+          setUserName(parsedUser.firstName + " " + parsedUser.lastName);
+          setUserAvatar(parsedUser.avatarUrl || "/default-avatar.jpg");
         }
       }
     } catch (error) {
       console.error("Error loading user data:", error);
       setUserName("User");
-      setUserAvatar("/image/georgina.jpg");
+      setUserAvatar("/default-avatar.jpg");
     }
   }, []);
   useEffect(() => {
@@ -55,7 +55,7 @@ export default function ProfileDropdown() {
         onClick={() => setIsOpen(!isOpen)}
       >
         <Image
-          src={userAvatar || "/image/georgina.jpg"}
+          src={userAvatar || "/default-avatar.jpg"}
           alt="Avatar"
           className="w-6 h-6 sm:w-9 sm:h-9 rounded-full object-cover"
           width={32}

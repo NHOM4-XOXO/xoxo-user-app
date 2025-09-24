@@ -20,7 +20,7 @@ import {
 } from "@/utils/ContentMultipleLines";
 import ImagePreviewModal from "@/components/common/ImagePreviewModal";
 import Cookies from "js-cookie";
-import { useGetCurrentUserProfileQuery } from "@/features/chatApi";
+import { useGetCurrentUserProfileQuery, useGetUserByIdQuery } from "@/features/chatApi";
 
 export default function MessagesChat({
   contact,
@@ -28,67 +28,28 @@ export default function MessagesChat({
   onToggleChatInfo,
   showBackButton,
 }) {
-  const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      sender: "other",
-      content: `Chào bạn, tôi là ${contact.name}!`,
-      timestamp: "10:00 AM",
-      type: "text",
-    },
-    {
-      id: 2,
-      sender: "other",
-      content: "Bạn có khỏe không?",
-      timestamp: "10:00 AM",
-      type: "text",
-    },
-    {
-      id: 3,
-      sender: "other",
-      content: "Tôi hy vọng bạn đang ổn",
-      timestamp: "10:01 AM",
-      type: "text",
-    },
-    {
-      id: 4,
-      sender: "me",
-      content: "Chào bạn!",
-      timestamp: "10:02 AM",
-      type: "text",
-    },
-    {
-      id: 5,
-      sender: "me",
-      content: "Mình khỏe, cảm ơn bạn!",
-      timestamp: "10:02 AM",
-      type: "text",
-    },
-    {
-      id: 6,
-      sender: "me",
-      content: "Bạn thì sao?",
-      timestamp: "10:03 AM",
-      type: "text",
-    },
-    {
-      id: 7,
-      sender: "other",
-      content: "Mình cũng ổn. Hôm nay bạn có rảnh không?",
-      timestamp: "10:05 AM",
-      type: "text",
-    },
-  ]);
 
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [previewImageUrl, setPreviewImageUrl] = useState("");
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState([]);
 
   // Fetch current user profile to obtain reliable current user id
   const { data: currentProfile } = useGetCurrentUserProfileQuery();
+  
+  // Fetch other user data for proper display
+  const otherUserId = contact?.userId || contact?.id;
+  const { data: otherUser } = useGetUserByIdQuery(otherUserId, { skip: !otherUserId });
+
+  // Get display data - prioritize API data, fallback to contact data
+  const displayAvatar = otherUser?.avatarUrl || contact?.avatarUrl || "/default-avatar.jpg";
+  const displayName = otherUser ? 
+    `${(otherUser.firstName || "")} ${(otherUser.lastName || "")}`.trim() || otherUser.username || otherUser.email
+    : contact?.name || `User ${otherUserId}`;
+  const displayIsOnline = otherUser?.isOnline ?? contact?.isOnline ?? false;
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -189,12 +150,8 @@ export default function MessagesChat({
   };
 
   const renderMessage = (msg, index) => {
-    const senderId = msg.senderId ?? msg.userId ?? msg.sender?.id ?? null;
-    const isMe = senderId != null && currentUserId != null
-      ? Number(senderId) === Number(currentUserId)
-      : msg.sender === "me";
-    // minimal debug to verify alignment input values
-    console.debug('align', { senderId, currentUserId, isMe });
+    // Check if message is from current user (me)
+    const isMe = msg.senderId === currentUserId || msg.sender === "me";
     const isFirst = isFirstInGroup(index);
     const isLast = isLastInGroup(index);
 
@@ -207,8 +164,8 @@ export default function MessagesChat({
           <div className="flex-shrink-0 mr-3">
             {isLast ? (
               <Image
-                src={contact.avatar || "/placeholder.svg"}
-                alt={contact.name}
+                src={displayAvatar}
+                alt={displayName}
                 width={36}
                 height={36}
                 className="object-cover rounded-full w-9 h-9"
@@ -335,8 +292,8 @@ export default function MessagesChat({
               )}
               <div className="flex-shrink-0">
                 <Image
-                  src={contact.avatar || "/placeholder.svg"}
-                  alt={contact.name}
+                  src={displayAvatar}
+                  alt={displayName}
                   width={40}
                   height={40}
                   className="object-cover w-10 h-10 rounded-full cursor-pointer hover:opacity-80"
@@ -344,10 +301,10 @@ export default function MessagesChat({
               </div>
               <div>
                 <h2 className="text-sm font-semibold cursor-pointer">
-                  {contact.name}
+                  {displayName}
                 </h2>
                 <p className="text-xs text-gray-600 dark:text-gray-400">
-                  {contact.isOnline
+                  {displayIsOnline
                     ? "Đang hoạt động"
                     : `Hoạt động ${contact.lastSeen || "2 phút"} trước`}
                 </p>

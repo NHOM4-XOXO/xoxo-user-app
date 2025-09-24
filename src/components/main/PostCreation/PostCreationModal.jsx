@@ -36,12 +36,20 @@ const PostCreationModal = ({
   const [uploadMultipleMedia] = useUploadMultipleMediaMutation();
   const [createPost] = useCreatePostMutation();
   const [updatePost] = useUpdatePostMutation();
-  const { profile } = useSelector((state) => state.auth);
+  let profile;
+  try {
+    profile = JSON.parse(localStorage.getItem("profile"));
+  } catch (e) {
+    console.error("Không đọc được localStorage:", e);
+    profile = null;
+  }
   const displayName = `${profile?.firstName || ""} ${profile?.lastName || ""}`.trim() || profile?.username || "Người dùng";
+
+
 
   const privacyOptions = [
     { value: "public", label: "Công khai", icon: <Globe className="w-5 h-5" /> },
-    { value: "onlyMe", label: "Chỉ mình tôi", icon: <Lock className="w-5 h-5" /> },
+    { value: "private", label: "Chỉ mình tôi", icon: <Lock className="w-5 h-5" /> },
   ];
 
   // Khi mở modal với bài viết cũ → đổ dữ liệu vào state
@@ -121,10 +129,9 @@ const PostCreationModal = ({
 
       const uploadedIds = await handleUploadFiles(selectedFiles);
       console.log(uploadedIds);
-
       const payload = {
         content: postContent,
-        status: "ACTIVE",
+        status: privacyOptions[privacyIndex].value === "public" ? "ACTIVE" : "HIDDEN",
         type: "USER_POST",
         location: "",
         hashtags: "",

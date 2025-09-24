@@ -1,28 +1,23 @@
 // Home.jsx
 "use client";
 
-import { scheduleTokenRefresh } from "@/features/auth/authManager";
-
-import HomePage from "@/pages/HomePage";
-import Cookies from "js-cookie";
-import { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { setCredentials } from "@/features/auth/authSlice";
 import { useGetMyProfileQuery } from "@/features/userApi";
+import HomePage from "@/pages/HomePage";
+import { useEffect } from "react";
+
 
 export default function Home() {
-  const dispatch = useDispatch();
-
-  const token = Cookies.get("token");
-
   // Lấy profile từ API
   const { data: profile, isSuccess } = useGetMyProfileQuery();
 
   useEffect(() => {
     if (isSuccess && profile) {
-      dispatch(setCredentials({ profile, token })); // dùng setCredentials
+      // Lưu profile vào localStorage để lần sau reload vẫn còn
+      if (profile) {
+        localStorage.setItem("profile", JSON.stringify(profile));
+      }
     }
-  }, [isSuccess, profile, dispatch, token]);
+  }, [isSuccess, profile]);
 
   return (
     <main>
