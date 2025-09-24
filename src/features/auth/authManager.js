@@ -81,7 +81,7 @@ export const scheduleTokenRefresh = (token) => {
     refreshTimeout = setTimeout(() => {
         console.log("[AuthManager] Auto refreshing token");
         refreshTokenFlow();
-    }, 8 * 60 * 1000); // 2 phút
+    }, 5 * 60 * 1000); // 2 phút
 
     console.log(`[AuthManager] Refresh scheduled in 9 minutes`);
 };
