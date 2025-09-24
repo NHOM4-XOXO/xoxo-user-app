@@ -6,7 +6,6 @@ import { useChangePasswordMutation } from "@/features/auth/authApi";
 import { useDispatch } from "react-redux";
 import { logout } from "@/features/auth/authSlice";
 import { toast } from "react-hot-toast";
-// import { set } from "react-hook-form";
 import { Eye, EyeOff } from "lucide-react";
 
 export default function ChangePassword() {
@@ -271,7 +270,7 @@ export default function ChangePassword() {
               <button
                 type="button"
                 onClick={() => router.back()}
-                className="flex-1 py-3 px-4 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium"
+                className="flex-1 py-3 px-4 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium cursor-pointer"
                 disabled={isLoading}
               >
                 Hủy
@@ -279,7 +278,7 @@ export default function ChangePassword() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`flex-1 py-3 px-4 rounded-lg text-white font-medium ${
+                className={`flex-1 py-3 px-4 rounded-lg text-white font-medium cursor-pointer ${
                   isLoading
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-blue-600 hover:bg-blue-700"
