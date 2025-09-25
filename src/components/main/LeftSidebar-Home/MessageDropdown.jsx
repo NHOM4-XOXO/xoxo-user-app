@@ -12,25 +12,13 @@ function MessageItem({ chatRoom, onContactClick, onClose }) {
   
   // Get other participant ID from chat room
   const otherId = chatRoom?.participantIds?.find(id => id !== myId);
-  const { data: otherUser, isLoading: isLoadingUser, error: userError } = useGetUserByIdQuery(otherId, { skip: !otherId });
-
-  // Debug logging
-  useEffect(() => {
-    console.log("MessageDropdown Debug:", {
-      chatRoom: chatRoom,
-      myId: myId,
-      otherId: otherId,
-      otherUser: otherUser,
-      isLoadingUser: isLoadingUser,
-      userError: userError
-    });
-  }, [chatRoom, myId, otherId, otherUser, isLoadingUser, userError]);
+  const { data: otherUser } = useGetUserByIdQuery(otherId, { skip: !otherId });
 
   // Get display data
   const displayAvatar = otherUser?.avatarUrl || "/default-avatar.jpg";
   const displayName = otherUser ? 
     `${(otherUser.firstName || "")} ${(otherUser.lastName || "")}`.trim() || otherUser.username || otherUser.email
-    : chatRoom.name || `User ${otherId}`;
+    : chatRoom.name;
 
   // Format last message preview
   const lastMessage = typeof chatRoom.lastMessage === 'string' 

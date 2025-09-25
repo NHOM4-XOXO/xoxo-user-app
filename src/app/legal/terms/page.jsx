@@ -1,9 +1,12 @@
+
 import LegalLayout from "@/components/legal/LegalLayout";
 
 export const metadata = {
   title: "Điều khoản || XOXO",
   description: "Điều khoản sử dụng dịch vụ XOXO",
 };
+
+export const dynamic = "force-dynamic";
 
 export default function Page() {
   return (

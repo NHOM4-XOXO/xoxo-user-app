@@ -19,27 +19,33 @@ export default function ChatBubble({
 
   // Fetch user data for proper display like MessagesChat.jsx
   const { data: profileData } = useGetCurrentUserProfileQuery();
-  const myId = profileData?.id;
+  const myId = profileData?.id != null ? Number(profileData.id) : undefined;
+  const myFullName = `${profileData?.firstName || ''} ${profileData?.lastName || ''}`.trim();
   
   // Get other participant ID from contact
-  const otherId = contact?.userId || contact?.chatRoom?.participantIds?.find(id => id !== myId);
+  const participantIds = Array.isArray(contact?.chatRoom?.participantIds)
+    ? contact.chatRoom.participantIds.map((id) => Number(id))
+    : [];
+  const computedOtherId =
+    contact?.userId != null
+      ? Number(contact.userId)
+      : (myId != null
+          ? (participantIds.find((id) => id !== myId) ?? participantIds[0])
+          : participantIds[0]);
+  const otherId = Number.isFinite(computedOtherId) ? computedOtherId : undefined;
   const { data: otherUser } = useGetUserByIdQuery(otherId, { skip: !otherId });
 
   // Get display data - prioritize API data, fallback to contact data
   const displayAvatar = otherUser?.avatarUrl || contact?.avatarUrl || "/default-avatar.jpg";
-  const displayName = otherUser ? 
-    `${(otherUser.firstName || "")} ${(otherUser.lastName || "")}`.trim() || otherUser.username || otherUser.email
-    : contact?.name || `User ${otherId}`;
+  let displayName;
+  if (otherUser) {
+    displayName = (`${(otherUser.firstName || "")} ${(otherUser.lastName || "")}`.trim() || otherUser.username || otherUser.email);
+  } else {
+    // While loading/no API data, avoid showing my own name or room name; use placeholder by otherId
+    displayName = Number.isFinite(otherId) ? `User ${otherId}` : (contact?.name || "Unknown");
+  }
 
-  // Debug logging
-  console.log("ChatBubble Debug:", {
-    contact: contact,
-    otherId: otherId,
-    otherUser: otherUser,
-    myId: myId,
-    displayName: displayName,
-    displayAvatar: displayAvatar
-  });
+  // Debug logs removed
 
   // Calculate position from bottom - each bubble is 70px apart
   const bottomPosition = 16 + positionOffset * 70;

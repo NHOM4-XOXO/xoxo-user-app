@@ -1,3 +1,6 @@
+"use client";
+export const dynamic = "force-dynamic";
+
 export default function Footer() {
   return (
     <footer className="bg-white border-t border-gray-200 mt-auto">

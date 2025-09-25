@@ -39,11 +39,11 @@ export default function ChatWidget({
 
   // Fetch user data for avatar display
   const { data: profileData } = useGetCurrentUserProfileQuery();
-  const myId = profileData?.id;
+  const myId = profileData?.id != null ? Number(profileData.id) : undefined;
   
   // Get all participant IDs for potential multiple users
-  const participantIds = currentChatRoom?.participantIds || [];
-  const otherParticipantIds = participantIds.filter(id => id !== myId);
+  const participantIds = (currentChatRoom?.participantIds || []).map((id) => Number(id));
+  const otherParticipantIds = participantIds.filter((id) => id !== myId);
   
   // Fetch user data for all other participants
   const participantQueries = otherParticipantIds.map(participantId => 
@@ -63,7 +63,7 @@ export default function ChatWidget({
   }, [participantQueries, otherParticipantIds]);
   
   // Get the correct other user ID - prioritize contact.userId if available
-  const otherId = contact?.userId || otherParticipantIds[0];
+  const otherId = (contact?.userId != null ? Number(contact.userId) : undefined) ?? otherParticipantIds[0];
   const { data: otherUser } = useGetUserByIdQuery(otherId, { skip: !otherId });
   
   // Function to get user data by sender ID
@@ -77,17 +77,7 @@ export default function ChatWidget({
   // Get the display user data for header - prioritize otherUser, fallback to participantsMap
   const displayUser = otherUser || (otherId ? participantsMap[otherId] : null);
 
-  // Debug logging
-  useEffect(() => {
-    console.log("ChatWidget Debug:", {
-      contact: contact,
-      otherId: otherId,
-      otherUser: otherUser,
-      participantsMap: participantsMap,
-      displayUser: displayUser,
-      myId: myId
-    });
-  }, [contact, otherId, otherUser, participantsMap, displayUser, myId]);
+  // Debug logs removed for production
 
   // Calculate dynamic max height
   const dynamicMaxHeight = windowHeight
@@ -101,13 +91,11 @@ export default function ChatWidget({
   // Initialize chat when contact changes
   useEffect(() => {
     if (contact?.chatRoom?.id) {
-      console.log("ChatWidget - Using existing chat room:", contact.chatRoom.id);
-    } else if (contact?.userId) {
-      console.log("ChatWidget - Initializing chat with user ID:", contact.userId);
-      initializeChat(contact.userId);
-    } else if (contact?.id && !contact?.chatRoom) {
-      console.log("ChatWidget - Fallback: using contact.id as user ID:", contact.id);
-      initializeChat(contact.id);
+      return;
+    }
+    const targetUserId = contact?.userId ?? contact?.id;
+    if (targetUserId) {
+      initializeChat(Number(targetUserId));
     }
   }, [contact?.userId, contact?.id, contact?.chatRoom, initializeChat]);
 
