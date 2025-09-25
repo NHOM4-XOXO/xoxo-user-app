@@ -9,7 +9,7 @@ import ReportModal from "@/components/report/ReportModal";
 import { useDeletePostMutation } from "@/features/postApi";
 import toast from "react-hot-toast";
 
-const MainPost = ({ data, reactionStats, currentUserId }) => {
+const MainPost = ({ data, reactionStats, currentUserId, localCommentCount = null }) => {
   const [showFullCaption, setShowFullCaption] = useState(false);
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
@@ -175,8 +175,9 @@ const MainPost = ({ data, reactionStats, currentUserId }) => {
 
       {/* Reactions */}
       <PostFooter
-        post={{ ...post, commentCount: data?.post.commentCount }}
+        post={{ ...post, commentCount: localCommentCount ? localCommentCount : data?.post.commentCount }}
         reactionStats={reactionStats}
+      // localReactionStats={localReactionStats}
       />
 
       {/*Modal */}
