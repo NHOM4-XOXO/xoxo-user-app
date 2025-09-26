@@ -74,7 +74,7 @@ export default function ReportModal({
           </h2>
           <button
             onClick={handleClose}
-            className="text-gray-500 hover:text-gray-700"
+            className="text-gray-500 hover:text-gray-700 cursor-pointer"
           >
             ✕
           </button>
@@ -91,7 +91,7 @@ export default function ReportModal({
                 <button
                   key={reason.value}
                   onClick={() => setSelectedReason(reason.value)}
-                  className={`w-full p-3 text-left rounded-lg border transition-colors ${
+                  className={`w-full p-3 text-left rounded-lg border transition-colors  cursor-pointer ${
                     selectedReason === reason.value
                       ? "border-blue-500 bg-blue-50"
                       : "border-gray-200 hover:bg-gray-50"
@@ -108,7 +108,7 @@ export default function ReportModal({
               <button
                 onClick={() => setStep(2)}
                 disabled={!selectedReason}
-                className={`px-6 py-2 rounded-lg font-medium ${
+                className={`px-6 py-2 rounded-lg font-medium cursor-pointer ${
                   selectedReason
                     ? "bg-blue-600 text-white hover:bg-blue-700"
                     : "bg-gray-200 text-gray-400 cursor-not-allowed"
@@ -131,7 +131,7 @@ export default function ReportModal({
             </div>
 
             <div className="mb-4">
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium mb-2 ">
                 Thông tin bổ sung (tùy chọn)
               </label>
               <textarea
@@ -146,14 +146,14 @@ export default function ReportModal({
             <div className="flex justify-between">
               <button
                 onClick={() => setStep(1)}
-                className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
               >
                 Quay lại
               </button>
               <button
                 onClick={handleSubmit}
                 disabled={isLoading}
-                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
+                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 cursor-pointer"
               >
                 {isLoading ? "Đang gửi..." : "Gửi báo cáo"}
               </button>
@@ -173,7 +173,7 @@ export default function ReportModal({
             </p>
             <button
               onClick={handleClose}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer"
             >
               Đóng
             </button>

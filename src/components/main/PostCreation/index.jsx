@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Video, ImageIcon, Smile } from "lucide-react";
 import PostCreationModal from "./PostCreationModal";
 import { useSelector } from "react-redux";
@@ -8,6 +8,7 @@ const PostCreation = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [postContent, setPostContent] = useState("");
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const [isClient, setIsClient] = useState(false);
   const fileInputRef = useRef(null);
   let profile;
   try {
@@ -17,6 +18,10 @@ const PostCreation = () => {
     profile = null;
   }
   const lastName = profile?.lastName;
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files).map((file) => ({
@@ -40,6 +45,21 @@ const PostCreation = () => {
     setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
+  if (!isClient) {
+    return (
+      <div className="bg-fb-light-primary dark:bg-fb-dark-secondary rounded-lg p-3 md:p-4 mb-4 md:mb-6 border-gray-700">
+        <div className="flex items-center space-x-3 mb-3 md:mb-4">
+          <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gray-300 animate-pulse flex-shrink-0"></div>
+          <div className="flex-1 bg-gray-300 animate-pulse h-10 rounded-full"></div>
+        </div>
+        <div className="border-t border-gray-300 dark:border-gray-700 pt-4 flex items-center justify-between space-x-1 md:space-x-0">
+          <div className="flex-1 bg-gray-300 animate-pulse h-10 rounded-lg"></div>
+          <div className="flex-1 bg-gray-300 animate-pulse h-10 rounded-lg"></div>
+          <div className="flex-1 bg-gray-300 animate-pulse h-10 rounded-lg hidden lg:block"></div>
+        </div>
+      </div>
+    );
+  }
 
   if (lastName) {
     return (
@@ -114,6 +134,7 @@ const PostCreation = () => {
       </>
     );
   }
+  return null;
 };
 
 export default PostCreation;
