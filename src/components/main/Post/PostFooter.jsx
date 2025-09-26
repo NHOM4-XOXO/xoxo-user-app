@@ -3,28 +3,26 @@ import { reactionIcons } from "./ReactionIcon";
 import ReactionModal from "./ReactionModal"; // modal hiển thị danh sách reactions
 
 export default function PostFooter({ post, reactionStats }) {
-    const { reactionBreakdown, totalReactions } = reactionStats || {};
+    const { reactionBreakdown, totalReactions, topReactions } = reactionStats || {};
     const [showModal, setShowModal] = useState(false);
-    // Lấy tối đa 3 loại reaction nhiều nhất
-    const topReactions = reactionBreakdown
-        ? Object.entries(reactionBreakdown)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 3)
-        : [];
-
     return (
         <>
             <div className="flex justify-between items-center text-sm text-gray-600 dark:text-gray-400 px-2 py-2 border-b">
                 <div className="flex items-center">
                     {/* Icon nổi bật */}
-                    {topReactions.map(([type], idx) => {
-                        const reaction = reactionIcons.find((r) => r.type === type);
-                        return reaction ? (
-                            <span key={idx} className={reaction.colorName}>
-                                {reaction.icon}
-                            </span>
-                        ) : null;
-                    })}
+                    {reactionBreakdown &&
+                        Object.entries(reactionBreakdown)
+                            .sort((a, b) => b[1] - a[1]) // sắp xếp giảm dần theo số lượng
+                            .slice(0, 3) // lấy 3 reaction nhiều nhất
+                            .map(([type, count], idx) => {
+                                const reaction = reactionIcons.find((r) => r.type === type);
+                                return reaction ? (
+                                    <span key={idx} className={reaction.colorName}>
+                                        {reaction.icon}
+                                    </span>
+                                ) : null;
+                            })}
+
 
                     {/* Tổng reactions (click mở modal) */}
                     <span

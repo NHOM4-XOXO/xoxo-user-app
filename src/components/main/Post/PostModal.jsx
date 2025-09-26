@@ -21,8 +21,8 @@ const filterOptions = [
 
 function PostModal({ post, isModalOpen, setIsModalOpen, reactionStats }) {
     const [comment, setComment] = useState("");
-    const [commentFilter, setCommentFilter] = useState("Phù hợp nhất");
     const [commentPost] = useCommentPostMutation();
+    const [localCommentCount, setLocalCommentCount] = useState(post?.post?.commentCount || 0);
     const [selectedFiles, setSelectedFiles] = useState([]);
     const emojiPickerRef = useRef(null);
     const emojiButtonRef = useRef(null);
@@ -35,17 +35,10 @@ function PostModal({ post, isModalOpen, setIsModalOpen, reactionStats }) {
     }
     const avatarUrl = profile?.avatarUrl
 
-    const { data: comments, isLoading, isFetching, refetch } = useGetPostCommentsQuery(id, {
+    const { data: comments, isLoading, isFetching } = useGetPostCommentsQuery(id, {
         skip: !id
     });
 
-    const { resolvedTheme } = useTheme();
-    const isDark = resolvedTheme === "dark";
-
-    const handleFilterChange = ({ key }) => {
-        const selected = { relevant: "Phù hợp nhất", newest: "Mới nhất", all: "Tất cả bình luận" }[key];
-        setCommentFilter(selected);
-    };
 
     useEffect(() => {
         const handleClickOutside = (e) => {
@@ -63,23 +56,30 @@ function PostModal({ post, isModalOpen, setIsModalOpen, reactionStats }) {
     };
 
     const authorName = `${post?.authorFirstName || ""} ${post?.authorLastName || ""}`.trim() || "Người dùng";
-    const handleSendComment = async () => {
-        if (!comment.trim()) return;
+
+    const handleSendComment = async (content, parentCommentId = null) => {
+        if (!content.trim()) return;
+        setLocalCommentCount((prev) => prev + 1);
 
         try {
             await commentPost({
                 postId: id,
-                content: comment.trim(),
-                parentCommentId: null,
+                content: content.trim(),
+                parentCommentId,
             }).unwrap();
-            setComment("");
-            if (post?.post.commentCount === 0) {
-                refetch();
+
+            if (!parentCommentId) {
+                setComment(""); // clear input cho comment gốc
             }
         } catch (error) {
             console.error("Gửi comment thất bại:", error);
+            // Rollback nếu là comment gốc
+            if (!parentCommentId) {
+                setLocalCommentCount((prev) => Math.max(prev - 1, 0));
+            }
         }
-    }
+    };
+
 
     return (
         <Modal
@@ -89,7 +89,6 @@ function PostModal({ post, isModalOpen, setIsModalOpen, reactionStats }) {
             footer={null}
             width={700}
             centered
-            className={isDark ? "custom-dark-modal" : ""}
             styles={{
                 body: {
                     maxHeight: "70vh",
@@ -100,45 +99,22 @@ function PostModal({ post, isModalOpen, setIsModalOpen, reactionStats }) {
 
         >
             {/* Post chính */}
-            <MainPost data={post} reactionStats={reactionStats} />
+            <MainPost data={post} reactionStats={reactionStats} localCommentCount={localCommentCount} />
 
 
             {/* Bình luận */}
-            {isLoading || isFetching ? (
+            {isLoading ? (
                 null
             ) : comments && comments.length > 0 ? (
                 <div className=" pt-2">
-                    {/* Dropdown filter */}
-                    {/* <Dropdown
-                        menu={{ items: filterOptions, onClick: handleFilterChange }}
-                        trigger={["click"]}
-                        placement="bottomRight"
-                        arrow={{ pointAtCenter: true }}
-                        overlayStyle={{ maxWidth: 400 }}
-                        overlayClassName={isDark ? "custom-dropdown" : ""}
-                    >
-                        <button className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline flex items-center">
-                            {commentFilter} <DownOutlined className="ml-1 text-xs" />
-                        </button>
-                    </Dropdown> */}
-
                     {/* Danh sách bình luận */}
                     {comments.map((c) => (
                         <PostComment
                             key={c.id}
                             comment={c}
-                            onReply={async (parentCommentId, content) => {
-                                try {
-                                    await commentPost({
-                                        postId: id,
-                                        content,
-                                        parentCommentId,
-                                    }).unwrap();
-                                    refetch();
-                                } catch (err) {
-                                    console.error("Reply thất bại", err);
-                                }
-                            }}
+                            onReply={(parentCommentId, content) =>
+                                handleSendComment(content, parentCommentId)
+                            }
                             avatarUrl={avatarUrl}
                         />
                     ))}
@@ -155,9 +131,7 @@ function PostModal({ post, isModalOpen, setIsModalOpen, reactionStats }) {
             <div className="absolute bottom-0 left-0 w-full bg-white dark:bg-fb-dark-secondary p-3 border-t border-gray-200 dark:border-gray-600">
                 <CommentInput
                     avatarUrl={avatarUrl}
-                    onSubmit={(content) =>
-                        commentPost({ postId: id, content, parentCommentId: null })
-                    }
+                    onSubmit={(content) => handleSendComment(content, null)}
                 />
             </div>
 
