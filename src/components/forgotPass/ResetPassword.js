@@ -70,7 +70,7 @@ export default function ResetPassword() {
     }
     setIsLoading(true);
     try {
-      const res = await fetch("https://xoxo.id.vn/api/auth/reset-password", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/forgot-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -115,9 +115,8 @@ export default function ResetPassword() {
               placeholder="Mật khẩu mới"
               value={passwords.newPassword}
               onChange={handleChange}
-              className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg placeholder:text-gray-700 placeholder:font-medium ${
-                errors.newPassword ? "border-red-500" : "border-gray-300"
-              }`}
+              className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg placeholder:text-gray-700 placeholder:font-medium ${errors.newPassword ? "border-red-500" : "border-gray-300"
+                }`}
               disabled={isLoading}
             />
             {errors.newPassword && (
@@ -131,9 +130,8 @@ export default function ResetPassword() {
               placeholder="Nhập lại mật khẩu mới"
               value={passwords.confirmPassword}
               onChange={handleChange}
-              className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg placeholder:text-gray-700 placeholder:font-medium ${
-                errors.confirmPassword ? "border-red-500" : "border-gray-300"
-              }`}
+              className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg placeholder:text-gray-700 placeholder:font-medium ${errors.confirmPassword ? "border-red-500" : "border-gray-300"
+                }`}
               disabled={isLoading}
             />
             {errors.confirmPassword && (
@@ -148,11 +146,10 @@ export default function ResetPassword() {
             <button
               type="submit"
               disabled={isLoading}
-              className={`px-6 py-2 rounded-md font-medium cursor-pointer ${
-                isLoading
+              className={`px-6 py-2 rounded-md font-medium cursor-pointer ${isLoading
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                   : "bg-blue-600 text-white hover:bg-blue-700"
-              }`}
+                }`}
             >
               {isLoading ? "Đang lưu..." : "Lưu thay đổi"}
             </button>
