@@ -8,7 +8,6 @@ export function middleware(request) {
   const url = request.nextUrl;
   const hasSession = request.cookies.get("token");
 
-  // Chỉ redirect khi production, local thì bỏ qua
   if (!hasSession && url.pathname !== "/login" && !url.pathname.startsWith("/api")) {
     return NextResponse.redirect(new URL("/login", request.url));
   }

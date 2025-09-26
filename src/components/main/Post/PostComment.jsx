@@ -1,4 +1,4 @@
-import { Avatar } from "antd";
+import { Avatar, Spin } from "antd";
 import { useState } from "react";
 import CommentInput from "./CommentInput";
 import { useGetPostCommentReplieCountAllQuery, useLazyGetPostCommentRepliesQuery } from "@/features/postApi";
@@ -6,46 +6,59 @@ import { useGetPostCommentReplieCountAllQuery, useLazyGetPostCommentRepliesQuery
 function PostComment({ comment, level = 0, onReply, avatarUrl }) {
     const [showReplies, setShowReplies] = useState(false);
     const [isReplying, setIsReplying] = useState(false);
-    const { data: commentReplieCount, isLoading: isLoadingCommentCount } = useGetPostCommentReplieCountAllQuery(comment.id);
-    const [getCommentReplies, { data: commentReplies, isLoading, error }] = useLazyGetPostCommentRepliesQuery();
+    const [isSending, setIsSending] = useState(false); // loading khi reply
+
+    const { data: commentReplieCount, isLoading: isLoadingCommentCount } =
+        useGetPostCommentReplieCountAllQuery(comment.id);
+    const [getCommentReplies, { data: commentReplies, isLoading, error }] =
+        useLazyGetPostCommentRepliesQuery();
 
     const hasReplies = commentReplieCount > 0;
 
-    const handleSendReply = (content) => {
-        onReply(comment.id, content); // gọi callback từ cha
-        setIsReplying(false);
+    const handleSendReply = async (content) => {
+        setIsSending(true);
+        try {
+            await onReply(comment.id, content); // callback từ cha
+            setIsReplying(false);
+            handleShowReplies(comment.id);
+        } finally {
+            setIsSending(false);
+        }
     };
 
     const handleShowReplies = async (commentId) => {
-        setShowReplies(true)
+        setShowReplies(true);
         await getCommentReplies(commentId);
-    }
+    };
 
     if (isLoadingCommentCount) {
-        return <div className="space-y-3">
-            <div className="flex gap-2 animate-pulse">
-                {/* Avatar skeleton */}
-                <div className="w-9 h-9 bg-gray-300 dark:bg-gray-700 rounded-full"></div>
+        return (
+            <div className="space-y-3">
+                <div className="flex gap-2 animate-pulse">
+                    {/* Avatar skeleton */}
+                    <div className="w-9 h-9 bg-gray-300 dark:bg-gray-700 rounded-full"></div>
 
-                {/* Text skeleton */}
-                <div className="flex-1 space-y-2">
-                    <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-1/2"></div>
-                    <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-3/4"></div>
+                    {/* Text skeleton */}
+                    <div className="flex-1 space-y-2">
+                        <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-1/2"></div>
+                        <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-3/4"></div>
+                    </div>
                 </div>
             </div>
-        </div>
+        );
     }
 
     return (
-        <div
-            className="flex items-start gap-3 mb-4 ml-1 relative"
-        >
+        <div className="flex items-start gap-3 mt-2 mb-2 ml-1 relative">
             {/* Avatar */}
             <Avatar src={comment.authorAvatarUrl} size={28} />
+
             {/* Nội dung */}
             <div className="flex-1 min-w-0">
                 <div className="bg-gray-100 px-3 py-2 w-fit rounded-2xl max-w-full break-words">
-                    <span className="font-semibold">{comment.authorFirstName} {comment.authorLastName}</span>
+                    <span className="font-semibold">
+                        {comment.authorFirstName} {comment.authorLastName}
+                    </span>
                     <p>{comment.content}</p>
                 </div>
 
@@ -68,7 +81,13 @@ function PostComment({ comment, level = 0, onReply, avatarUrl }) {
                             placeholder="Viết phản hồi..."
                             autoFocus
                             onSubmit={handleSendReply}
+                            disabled={isSending}
                         />
+                        {isSending && (
+                            <div className="ml-2 mt-1 text-xs text-gray-400 flex items-center gap-1">
+                                <Spin size="small" /> Đang gửi...
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -92,7 +111,7 @@ function PostComment({ comment, level = 0, onReply, avatarUrl }) {
                             comment={reply}
                             level={level + 1}
                             onReply={onReply}
-                            currentUser={avatarUrl}
+                            avatarUrl={avatarUrl}
                         />
                     ))}
             </div>

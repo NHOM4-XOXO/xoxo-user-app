@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import {
   useAcceptRequestMutation,
@@ -48,62 +48,68 @@ const FriendRequestCard = ({ friend, type = null }) => {
     type === "DELETE" ? friend?.user?.id : skipToken
   );
 
-  // ================== HANDLERS ==================
-  const handleAccept = async () => {
-    try {
-      await acceptRequest(friend.id).unwrap();
-      toast.success(
-        `Đã chấp nhận lời mời kết bạn từ ${friend.user.displayName || friend.user.username}`
-      );
-    } catch (err) {
-      toast.error(err?.data?.message || "Chấp nhận lời mời kết bạn thất bại");
-    }
-  };
+  const [localRelation, setLocalRelation] = useState(type);
 
-  const handleReject = async () => {
+  useEffect(() => {
+    if (type === "SUGGESTION" && isSentPending) {
+      setLocalRelation("SENT");
+    } else {
+      setLocalRelation(type);
+    }
+  }, [type, isSentPending]);
+
+
+
+  // ================== HANDLERS ==================
+  const handleSendRequest = async () => {
     try {
-      await rejectRequest(friend.id).unwrap();
-      toast.success("Đã xóa lời mời kết bạn");
+      await sendRequest(userData.id).unwrap();
+      toast.success(`Đã gửi lời mời kết bạn đến ${userData?.firstName} ${userData?.lastName}`);
+      setLocalRelation("SENT");
     } catch (err) {
-      toast.error("Xóa lời mời thất bại");
+      toast.error(err?.data?.message || "Gửi lời mời kết bạn thất bại");
     }
   };
 
   const handleDeleteRequest = async () => {
     try {
-      console.log(isSentPending);
-
       await deleteRequest(type === "SUGGESTION" ? isSentPending?.id : friend.id).unwrap();
       toast.success("Đã hủy lời mời kết bạn");
+      setLocalRelation("SUGGESTION");
     } catch (err) {
       toast.error("Hủy lời mời thất bại");
     }
   };
 
-  const handleRemoveFriend = async () => {
-    if (!checkIsFriend?.friendshipId) {
-      toast.error("Không tìm thấy quan hệ bạn bè");
-      return;
+  const handleAccept = async () => {
+    try {
+      await acceptRequest(friend.id).unwrap();
+      toast.success(`Đã chấp nhận lời mời kết bạn từ ${friend.user.displayName || friend.user.username}`);
+      setLocalRelation("DELETE");
+    } catch (err) {
+      toast.error(err?.data?.message || "Chấp nhận lời mời kết bạn thất bại");
     }
+  };
+  const handleReject = async () => {
+    try {
+      await rejectRequest(friend.id).unwrap();
+      toast.success(`Xóa lời mời kết bạn từ ${friend.user.displayName || friend.user.username}`);
+      setLocalRelation("DELETE");
+    } catch (err) {
+      toast.error(err?.data?.message || "Xóa lời mời kết bạn thất bại");
+    }
+  };
+
+  const handleRemoveFriend = async () => {
     try {
       await deleteFriend(checkIsFriend.friendshipId).unwrap();
-      toast.success(
-        `Đã hủy kết bạn với ${userData?.firstName} ${userData?.lastName}`
-      );
+      toast.success(`Đã hủy kết bạn với ${userData?.firstName} ${userData?.lastName}`);
+      setLocalRelation("SUGGESTION");
     } catch (err) {
       toast.error(err?.data?.message || "Hủy kết bạn thất bại");
     }
   };
 
-  const handleSendRequest = async () => {
-    try {
-      await sendRequest(userData.id).unwrap();
-
-      toast.success(`Đã gửi lời mời kết bạn đến ${userData?.firstName} ${userData?.lastName}`);
-    } catch (err) {
-      toast.error(err?.data?.message || "Gửi lời mời kết bạn thất bại");
-    }
-  };
 
   const LoadingSpinner = () => (
     <svg
@@ -168,7 +174,7 @@ const FriendRequestCard = ({ friend, type = null }) => {
 
       {/* Nút */}
       <div className="mt-4 w-full space-y-2">
-        {type === "RECEIVED" && (
+        {localRelation === "RECEIVED" && (
           <>
             <button
               onClick={handleAccept}
@@ -187,7 +193,7 @@ const FriendRequestCard = ({ friend, type = null }) => {
           </>
         )}
 
-        {(type === "SENT" || isSentPending) && (
+        {(localRelation === "SENT") && (
           <button
             onClick={handleDeleteRequest}
             disabled={isDeletingRequest}
@@ -197,7 +203,7 @@ const FriendRequestCard = ({ friend, type = null }) => {
           </button>
         )}
 
-        {type === "DELETE" && (
+        {localRelation === "DELETE" && (
           <button
             onClick={handleRemoveFriend}
             disabled={isDeletingFriend}
@@ -207,9 +213,10 @@ const FriendRequestCard = ({ friend, type = null }) => {
           </button>
         )}
 
-        {type === "SUGGESTION" && !isSentPending && (
+        {localRelation === "SUGGESTION" && (
           <button
             onClick={handleSendRequest}
+            disabled={isSentRequest}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm px-5 py-2 rounded-full transition-colors"
           >
             {isSentRequest ? <LoadingSpinner /> : "Thêm bạn"}

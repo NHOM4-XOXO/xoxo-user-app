@@ -9,6 +9,8 @@ import StoreProvider from "@/store/StoreProvider";
 import { Toaster } from "react-hot-toast";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import { usePathname } from "next/navigation";
+import Cookies from "js-cookie";
+import { scheduleTokenRefresh } from "@/features/auth/authManager";
 
 
 // Fonts
@@ -19,16 +21,23 @@ export const RootContext = createContext();
 
 export default function ClientProviders({ children }) {
   const [isLoading, setIsLoading] = useState(false);
+  useEffect(() => {
+    const token = Cookies.get("token");
+    if (token) {
+      scheduleTokenRefresh(token); // setup lại khi reload
+    }
+  }, []);
 
   const pathname = usePathname();
 
-  useEffect(() => {
-    if (pathname !== "/" && pathname !== "/login" && pathname !== "/oauth2/success" && pathname !== "/games" && pathname !== "/xoxo-ai" && pathname !== "/events"
-      && pathname !== "/messages" && pathname !== "/saved" && pathname !== "/groups" && pathname !== "/friends" && pathname !== "/videos"
-      && pathname !== "/musics" && pathname !== "/events" && pathname !== "/forgot-password" && pathname !== "/reset-password" && pathname !== "/change-password") {
-      setIsLoading(true);
-    }
-  }, [children, pathname]);
+  // useEffect(() => {
+  //   if (pathname !== "/" && pathname !== "/login" && pathname !== "/oauth2/success" && pathname !== "/games" && pathname !== "/xoxo-ai" && pathname !== "/events"
+  //     && pathname !== "/messages" && pathname !== "/saved" && pathname !== "/groups" && pathname !== "/friends" && pathname !== "/videos"
+  //     && pathname !== "/musics" && pathname !== "/events" && pathname !== "/forgot-password" && pathname !== "/reset-password" && pathname !== "/change-password" && pathname !== "/profile") {
+  //     setIsLoading(true);
+  //   }
+  // }, [children, pathname]);
+
 
   return (
     <StoreProvider>

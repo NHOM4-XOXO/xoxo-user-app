@@ -30,8 +30,15 @@ export const postApi = createApi({
         getPostComments: builder.query({
             query: (postId) => `/${postId}/comments`,
             transformResponse: transform,
-            providesTags: (r, e, id) => [{ type: "Comment", id }],
+            providesTags: (result, error, postId) =>
+                result
+                    ? [
+                        ...result.map(({ id }) => ({ type: "Comment", id })),
+                        { type: "CommentList", id: postId },
+                    ]
+                    : [{ type: "CommentList", id: postId }],
         }),
+
         getPostCommentReplies:
             builder.query({
                 query: (commentId) => `/comments/${commentId}/subtree`,
@@ -143,11 +150,15 @@ export const postApi = createApi({
                     params,
                 };
             },
-            invalidatesTags: (r, e, { postId }) => [
-                { type: "Comment", id: postId },
-                { type: "Post", id: postId },
-                { type: "Post", id: "LIST" },
-            ],
+            invalidatesTags: (r, e, { postId, parentCommentId }) => {
+                if (parentCommentId) {
+                    return [{ type: "Comment", id: parentCommentId }]; // chỉ reload replies của comment cha
+                }
+                return [
+                    { type: "CommentList", id: postId },
+                    { type: "Post", id: "LIST" },
+                ];
+            },
         }),
         addMediaToPost: builder.mutation({
             query: ({ postId, formData }) => ({

@@ -59,34 +59,12 @@ export default function Sidebar() {
     try {
       const profile = JSON.parse(localStorage.getItem("profile"));
       setUserAvatar(profile?.avatarUrl)
+      setUserName(`${profile?.firstName} ${profile?.lastName}`)
     } catch (e) {
       console.error("Không đọc được localStorage:", e);
     }
   })
 
-
-
-  // Load user data from localStorage on client-side only
-  useEffect(() => {
-    try {
-      const authData = localStorage.getItem("auth");
-      if (authData) {
-        const parsedUser = JSON.parse(authData);
-        setUser(parsedUser);
-
-        if (parsedUser && parsedUser.profile) {
-          setUserName(
-            parsedUser.profile.firstName + " " + parsedUser.profile.lastName
-          );
-          setUserAvatar(parsedUser.profile.avatarUrl || "/image/georgina.jpg");
-        }
-      }
-    } catch (error) {
-      console.error("Error loading user data:", error);
-      setUserName("User");
-      setUserAvatar("/image/georgina.jpg");
-    }
-  }, []);
 
   useEffect(() => {
     const handleToggleSidebar = (event) => setIsOpen(event.detail);

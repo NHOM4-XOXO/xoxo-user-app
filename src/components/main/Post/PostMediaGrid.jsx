@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import MediaViewer from "./MediaViewer";
 
-const PostMediaGrid = ({ media, postId }) => {
+const PostMediaGrid = ({ media }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -117,22 +118,7 @@ const PostMediaGrid = ({ media, postId }) => {
                         <ChevronLeft size={32} />
                     </button>
 
-                    <div className="max-h-[90vh] max-w-[90vw] flex items-center justify-center">
-                        {media[currentIndex].mediaType === "IMAGE" ? (
-                            <img
-                                src={media[currentIndex].mediaUrl}
-                                alt={media[currentIndex].originalFilename || ""}
-                                className="max-h-[90vh] max-w-[90vw] object-contain"
-                            />
-                        ) : (
-                            <video
-                                src={media[currentIndex].mediaUrl}
-                                controls
-                                className="max-h-[90vh] max-w-[90vw] object-contain"
-                                poster={media[currentIndex].thumbnail || undefined}
-                            />
-                        )}
-                    </div>
+                    <MediaViewer media={media} currentIndex={currentIndex} />
 
                     <button
                         className="absolute right-5 text-white p-2 rounded-full hover:bg-white/20"
