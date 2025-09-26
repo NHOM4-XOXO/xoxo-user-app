@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Dropdown } from "antd";
 import { useTheme } from "next-themes";
-import { MoreHorizontal, Users, Edit, Trash2, Flag, EyeOff } from "lucide-react";
+import { MoreHorizontal, Users, Edit, Trash2, Flag, EyeOff, Lock, Globe } from "lucide-react";
 import PostMediaGrid from "./PostMediaGrid";
 import PostFooter from "./PostFooter";
 import PostCreationModal from "../PostCreation/PostCreationModal";
@@ -138,7 +138,11 @@ const MainPost = ({ data, reactionStats, currentUserId, localCommentCount = null
             </h1>
             <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
               {post?.createdAt ? new Date(post.createdAt).toLocaleString() : ""}
-              <Users className="w-3 h-3" />
+              {post?.status === "ACTIVE" ? (
+                <Globe className="w-3 h-3" />
+              ) : (
+                <Lock className="w-3 h-3" />
+              )}
             </p>
           </div>
         </div>

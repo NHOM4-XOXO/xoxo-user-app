@@ -19,7 +19,7 @@ export const createBaseQueryWithReauth = (baseUrl) => {
         if (result.error && result.error.status === 401) {
             const refreshResult = await rawBaseQuery(
                 {
-                    url: "https://xoxo.id.vn/api/auth/refresh-token",
+                    url: `${process.env.NEXT_PUBLIC_API_URL}/api/auth/refresh-token`,
                     method: "POST",
                 },
                 api,
