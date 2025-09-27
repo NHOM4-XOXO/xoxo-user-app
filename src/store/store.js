@@ -9,6 +9,7 @@ import { chatApi } from "@/features/chatApi";
 import { friendshipApi } from "@/features/friendshipApi";
 import { groupApi } from "@/features/groupManageMentApi";
 import { reportsApi } from "@/features/reportApi";
+import { newsfeedApi } from "@/features/newsfeedApi";
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -21,6 +22,7 @@ export const store = configureStore({
     [friendshipApi.reducerPath]: friendshipApi.reducer,
     [groupApi.reducerPath]: groupApi.reducer,
     [reportsApi.reducerPath]: reportsApi.reducer,
+    [newsfeedApi.reducerPath]: newsfeedApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -32,6 +34,7 @@ export const store = configureStore({
       chatApi.middleware,
       friendshipApi.middleware,
       groupApi.middleware,
-      reportsApi.middleware
+      reportsApi.middleware,
+      newsfeedApi.middleware,
     ),
 });

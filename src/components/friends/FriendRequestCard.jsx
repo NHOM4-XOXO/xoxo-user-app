@@ -4,6 +4,7 @@ import {
   useAcceptRequestMutation,
   useDeleteFriendMutation,
   useDeleteRequestMutation,
+  useGetCountMutualFriendQuery,
   useGetSentPendingQuery,
   useIsFriendQuery,
   useRejectRequestMutation,
@@ -35,6 +36,8 @@ const FriendRequestCard = ({ friend, type = null }) => {
     undefined,
     { skip: type !== "SUGGESTION" }
   );
+  const { data: countMutualFriend, isLoading: isMutualLoading } =
+    useGetCountMutualFriendQuery(userData?.id, { skip: !userData?.id });
 
   // kiểm tra đã gửi lời mời chưa (trường hợp SUGGESTION)
   const isSentPending = useMemo(() => {
@@ -135,7 +138,7 @@ const FriendRequestCard = ({ friend, type = null }) => {
   );
 
   // ================== UI ==================
-  if (isUserLoading) {
+  if (isUserLoading || isMutualLoading) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 flex flex-col items-center text-center animate-pulse">
         <div className="w-24 h-24 bg-gray-300 dark:bg-gray-700 rounded-full mb-3"></div>
@@ -159,18 +162,19 @@ const FriendRequestCard = ({ friend, type = null }) => {
       </div>
 
       {/* Tên */}
-      <h3 className="font-semibold text-lg dark:text-white">
+      <h3 className="font-semibold text-lg dark:text-white cursor-pointer hover:underline">
         <Link href={`/profile/${userData?.username}`}>
           {userData?.firstName} {userData?.lastName}
         </Link>
       </h3>
 
       {/* Bạn chung */}
-      {friend?.user?.mutualFriendsCount && (
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          {`${friend?.user?.mutualFriendsCount} bạn chung`}
+      {!isMutualLoading && (
+        <p className="text-sm text-gray-500 dark:text-gray-400 min-h-[20px]">
+          {countMutualFriend > 0 ? `${countMutualFriend} bạn chung` : ""}
         </p>
       )}
+
 
       {/* Nút */}
       <div className="mt-4 w-full space-y-2">
@@ -193,7 +197,7 @@ const FriendRequestCard = ({ friend, type = null }) => {
           </>
         )}
 
-        {(localRelation === "SENT") && (
+        {localRelation === "SENT" && (
           <button
             onClick={handleDeleteRequest}
             disabled={isDeletingRequest}

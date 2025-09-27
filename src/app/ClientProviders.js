@@ -20,6 +20,7 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 export const RootContext = createContext();
 
 export default function ClientProviders({ children }) {
+
   const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     const token = Cookies.get("token");

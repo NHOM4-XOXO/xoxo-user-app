@@ -14,6 +14,8 @@ const NotificationDropdown = forwardRef((props, ref) => {
   const [markRead] = useMarkNotificationReadMutation();
   const [deleteNoti] = useDeleteNotificationMutation();
   const [markAllRead] = useMarkAllReadMutation();
+  console.log(props);
+
 
   const formatTimeAgo = (isoString) => {
     if (!isoString) return "";
@@ -47,7 +49,7 @@ const NotificationDropdown = forwardRef((props, ref) => {
         <div className="flex items-center gap-3">
           <button
             onClick={async () => {
-              try { await markAllRead().unwrap(); } catch {}
+              try { await markAllRead().unwrap(); } catch { }
             }}
             className="text-sm text-blue-600 hover:underline"
           >
@@ -72,9 +74,8 @@ const NotificationDropdown = forwardRef((props, ref) => {
           {notifications.map((item) => (
             <li
               key={item.id}
-              className={`flex items-start gap-3 p-2 rounded-lg ${
-                item.isRead ? "bg-transparent" : "bg-blue-50 dark:bg-blue-900"
-              } hover:bg-gray-100 dark:hover:bg-gray-700`}
+              className={`flex items-start gap-3 p-2 rounded-lg ${item.isRead ? "bg-transparent" : "bg-blue-50 dark:bg-blue-900"
+                } hover:bg-gray-100 dark:hover:bg-gray-700`}
             >
               <Image
                 src={"/default-avatar.jpg"}
@@ -92,14 +93,14 @@ const NotificationDropdown = forwardRef((props, ref) => {
               <div className="flex flex-col items-end gap-1">
                 {!item.isRead && (
                   <button
-                    onClick={async (e) => { e.stopPropagation(); try { await markRead(item.id).unwrap(); } catch {} }}
+                    onClick={async (e) => { e.stopPropagation(); try { await markRead(item.id).unwrap(); } catch { } }}
                     className="text-xs text-blue-600 hover:underline"
                   >
                     Đánh dấu đã đọc
                   </button>
                 )}
                 <button
-                  onClick={async (e) => { e.stopPropagation(); try { await deleteNoti(item.id).unwrap(); } catch {} }}
+                  onClick={async (e) => { e.stopPropagation(); try { await deleteNoti(item.id).unwrap(); } catch { } }}
                   className="text-xs text-gray-500 hover:underline"
                 >
                   Xóa

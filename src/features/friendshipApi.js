@@ -41,6 +41,11 @@ export const friendshipApi = createApi({
             transformResponse: transform,
             providesTags: ["Friendship"],
         }),
+        getCountMutualFriend: builder.query({
+            query: (userId) => `/${userId}/count-mutual-friends`,
+            transformResponse: transform,
+            providesTags: ["Friendship"],
+        }),
 
         /* -------------------- MUTATION -------------------- */
         sendRequest: builder.mutation({
@@ -92,6 +97,7 @@ export const {
     useGetFriendsQuery,
     useGetFriendsByIduserQuery,
     useIsFriendQuery,
+    useGetCountMutualFriendQuery,
 
     useSendRequestMutation,
     useRejectRequestMutation,

@@ -4,8 +4,6 @@
 import { useGetMyProfileQuery } from "@/features/userApi";
 import HomePage from "@/pages/HomePage";
 import { useEffect } from "react";
-
-
 export default function Home() {
   // Lấy profile từ API
   const { data: profile, isSuccess } = useGetMyProfileQuery();
@@ -18,7 +16,6 @@ export default function Home() {
       }
     }
   }, [isSuccess, profile]);
-
   return (
     <main>
       <HomePage />

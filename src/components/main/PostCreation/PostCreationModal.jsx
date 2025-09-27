@@ -15,6 +15,7 @@ import {
 import { useUploadMediaMutation, useUploadMultipleMediaMutation } from "@/features/mediaApi";
 import { useCreatePostMutation, useUpdatePostMutation } from "@/features/postApi";
 import { useSelector } from "react-redux";
+import toast from "react-hot-toast";
 
 const PostCreationModal = ({
   isOpen,
@@ -51,6 +52,14 @@ const PostCreationModal = ({
     { value: "public", label: "Công khai", icon: <Globe className="w-5 h-5" /> },
     { value: "private", label: "Chỉ mình tôi", icon: <Lock className="w-5 h-5" /> },
   ];
+  const textareaRef = useRef(null);
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = textareaRef.current.scrollHeight + "px";
+    }
+  }, [postContent]);
 
   // Khi mở modal với bài viết cũ → đổ dữ liệu vào state
   useEffect(() => {
@@ -144,8 +153,10 @@ const PostCreationModal = ({
 
       if (editingPost) {
         await updatePost({ postId: editingPost?.post.id, body: payload }).unwrap();
+        toast.success("Chỉnh sửa bài viết thành công")
       } else {
         await createPost(payload).unwrap();
+        toast.success("Đăng bài viết thành công")
       }
 
 
@@ -167,7 +178,7 @@ const PostCreationModal = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 mb-0">
-      <div className="relative bg-fb-light-primary dark:bg-fb-dark-secondary rounded-lg w-full max-w-lg max-h-[90vh] overflow-y-auto">
+      <div className="relative flex flex-col bg-fb-light-primary  dark:bg-fb-dark-secondary rounded-lg w-full max-w-lg max-h-[90vh]">
         {/* Overlay loading toàn modal */}
         {loading && (
           <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-50 rounded-lg">
@@ -232,8 +243,9 @@ const PostCreationModal = ({
         </div>
 
         {/* Content Input */}
-        <div className="p-4">
+        <div className="flex-1 overflow-y-auto p-4">
           <textarea
+            ref={textareaRef}
             value={postContent}
             onChange={(e) => setPostContent(e.target.value)}
             placeholder={`${profile?.lastName} ơi, bạn đang nghĩ gì thế?`}
@@ -270,8 +282,8 @@ const PostCreationModal = ({
               ))}
             </div>
           )}
-
         </div>
+
 
         {/* Add to Post Section */}
         <div className="px-4 pb-4">

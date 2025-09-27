@@ -1,13 +1,12 @@
 "use client";
 import { useContext, useEffect, useState } from "react";
-import { Search, MoreHorizontal, UserX, User, SquareX } from "lucide-react";
-import { Dropdown, Menu } from "antd";
-import { useTheme } from "next-themes";
-import { useGetFriendsByIduserQuery, useIsFriendQuery, useSendRequestMutation, } from "@/features/friendshipApi";
+import { Search, MoreHorizontal, UserX, SquareX } from "lucide-react";
+import { Dropdown } from "antd";
+import { useGetFriendsByIduserQuery, useGetCountMutualFriendQuery } from "@/features/friendshipApi";
 import { ProfileContext } from "../layout";
 import Link from "next/link";
-import toast from "react-hot-toast";
 
+// Menu dropdown
 const menu = {
     items: [
         {
@@ -23,44 +22,90 @@ const menu = {
     ],
 };
 
-const Spinner = () => (
-    <svg
-        className="animate-spin h-4 w-4 text-white"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-    >
-        <circle
-            className="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            strokeWidth="4"
-        />
-        <path
-            className="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-        />
-    </svg>
-);
+// Component con cho từng friend
+const FriendCard = ({ friend, isMyProfile }) => {
+    const { data: countMutualFriend, isLoading } = useGetCountMutualFriendQuery(friend.id);
+
+    if (isLoading) {
+        return (
+            <div
+                className="flex gap-3 items-center bg-fb-light-primary dark:bg-fb-dark-tertiary 
+        p-6 rounded-lg shadow-sm border border-gray-100 dark:border-fb-dark-tertiary animate-pulse"
+            >
+                {/* Avatar fake */}
+                <div className="w-16 h-16 rounded-full bg-gray-300 dark:bg-fb-dark-quaternary"></div>
+
+                {/* Text fake */}
+                <div className="flex-1 space-y-2">
+                    <div className="h-4 w-28 bg-gray-300 dark:bg-fb-dark-quaternary rounded"></div>
+                    <div className="h-3 w-20 bg-gray-200 dark:bg-fb-dark-quaternary rounded"></div>
+                </div>
+
+                {/* Action button fake */}
+                {isMyProfile && (
+                    <div className="w-8 h-8 bg-gray-300 dark:bg-fb-dark-quaternary rounded-full"></div>
+                )}
+            </div>
+        );
+    }
+
+    return (
+        <div
+            key={friend.id}
+            className="flex gap-3 items-center bg-fb-light-primary dark:bg-fb-dark-tertiary 
+      p-6 rounded-lg shadow-sm border border-gray-100 dark:border-fb-dark-tertiary"
+        >
+            <img
+                src={friend.avatarUrl || "/default-avatar.jpg"}
+                alt={friend.username}
+                className="w-16 h-16 rounded-full object-cover"
+            />
+
+            <div>
+                <h2 className="font-medium hover:underline cursor-pointer">
+                    <Link href={`/profile/${friend.username}`}>
+                        {friend.firstName} {friend.lastName}
+                    </Link>
+                </h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {countMutualFriend || 0} bạn chung
+                </p>
+            </div>
+
+            {/* Action */}
+            <div className="ml-auto">
+                {isMyProfile && (
+                    <Dropdown
+                        menu={menu}
+                        placement="bottomRight"
+                        trigger={["click"]}
+                        arrow={{ pointAtCenter: true }}
+                    >
+                        <button type="button">
+                            <MoreHorizontal className="cursor-pointer text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-fb-dark-quaternary w-8 h-8 p-[0.4rem] rounded-full" />
+                        </button>
+                    </Dropdown>
+                )}
+            </div>
+        </div>
+    );
+};
 
 
 const ProfileFriend = () => {
     const { profile, setIsLoading } = useContext(ProfileContext);
-    const tabs = ["Tất cả bạn bè", "Đang theo dõi"];
+    const tabs = ["Tất cả bạn bè"];
     const [activeTab, setActiveTab] = useState(tabs[0]);
-    const [loadingId, setLoadingId] = useState(null);
-
     const [currentUser, setCurrentUser] = useState(null);
-    const { data: friends = [], isLoading: isLoadingFriends } = useGetFriendsByIduserQuery(profile?.id, { skip: !profile?.id });
+
+    const { data: friends = [], isLoading: isLoadingFriends } =
+        useGetFriendsByIduserQuery(profile?.id, { skip: !profile?.id });
 
     const isMyProfile = currentUser?.id === profile?.id;
 
     useEffect(() => {
-        setIsLoading(isLoadingFriends)
-    }, [isLoadingFriends])
+        setIsLoading(isLoadingFriends);
+    }, [isLoadingFriends, setIsLoading]);
 
     useEffect(() => {
         try {
@@ -70,15 +115,6 @@ const ProfileFriend = () => {
             console.error("Không đọc được auth:", e);
         }
     }, []);
-
-
-    const handleMenuClick = (e, friend) => {
-        if (e.key === "unfriend") {
-            console.log(`Hủy kết bạn với ${friend.name}`);
-        } else if (e.key === "hide") {
-            console.log(`Ẩn ${friend.name} khỏi trang cá nhân`);
-        }
-    };
 
     if (isLoadingFriends) return "";
 
@@ -114,83 +150,11 @@ const ProfileFriend = () => {
             </ul>
 
             {/* Friend List */}
-            {isLoadingFriends ? (
-                <div className="grid grid-cols-2 gap-4 px-4">
-                    {(() => {
-                        const skeletons = [];
-                        for (let i = 0; i < 6; i++) {
-                            skeletons.push(
-                                <div
-                                    key={i}
-                                    className="flex gap-3 items-center bg-fb-light-primary dark:bg-fb-dark-tertiary 
-              p-6 rounded-lg shadow-sm border border-gray-100 dark:border-fb-dark-tertiary animate-pulse"
-                                >
-                                    {/* Avatar fake */}
-                                    <div className="w-12 h-12 rounded-full bg-gray-300 dark:bg-fb-dark-quaternary"></div>
-
-                                    {/* Text fake */}
-                                    <div className="flex-1 space-y-2">
-                                        <div className="h-4 w-32 bg-gray-300 dark:bg-fb-dark-quaternary rounded"></div>
-                                        <div className="h-3 w-20 bg-gray-200 dark:bg-fb-dark-quaternary rounded"></div>
-                                    </div>
-
-                                    {/* Action button fake */}
-                                    <div className="w-6 h-6 bg-gray-300 dark:bg-fb-dark-quaternary rounded-full"></div>
-                                </div>
-                            );
-                        }
-                        return skeletons;
-                    })()}
-                </div>
-            ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-4">
-                    {friends.map((friend) => (
-                        <div
-                            key={friend.id}
-                            className="flex gap-3 items-center bg-fb-light-primary dark:bg-fb-dark-tertiary p-6 rounded-lg shadow-sm border border-gray-100 dark:border-fb-dark-tertiary"
-                        >
-                            <img
-                                src={
-                                    friend.avatarUrl ||
-                                    "/default-avatar.jpg"
-                                }
-                                alt={friend.username}
-                                className="w-16 h-16 rounded-full object-cover"
-                            />
-
-                            <div>
-                                <h2 className="font-medium hover:underline cursor-pointer">
-                                    <Link href={`/profile/${friend.username}`}>
-                                        {friend.firstName} {friend.lastName}
-                                    </Link>
-                                </h2>
-                                {/* <p className="text-sm text-gray-500 dark:text-gray-400">
-                                        {friend.mutualFriends || 0} Bạn chung
-                                    </p> */}
-                            </div>
-
-                            {/* Action */}
-                            <div className="ml-auto">
-                                {isMyProfile ? (
-                                    <Dropdown
-                                        menu={menu}
-                                        placement="bottomRight"
-                                        trigger={["click"]}
-                                        arrow={{ pointAtCenter: true }}
-                                    >
-                                        <button type="button">
-                                            <MoreHorizontal className="cursor-pointer text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-fb-dark-quaternary w-8 h-8 p-[0.4rem] rounded-full" />
-                                        </button>
-                                    </Dropdown>
-                                ) : (""
-                                )}
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-            )}
-
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-4">
+                {friends.map((friend) => (
+                    <FriendCard key={friend.id} friend={friend} isMyProfile={isMyProfile} />
+                ))}
+            </div>
         </div>
     );
 };

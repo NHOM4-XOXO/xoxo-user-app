@@ -1,6 +1,7 @@
 import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 import { useLogoutMutation } from "@/features/auth/authApi";
+import Cookies from "js-cookie";
 export default function LogoutButton() {
   const router = useRouter();
   const [logoutRequest] = useLogoutMutation();
@@ -14,6 +15,7 @@ export default function LogoutButton() {
     }
     // Xóa localStorage nếu muốn
     localStorage.removeItem("profile");
+    Cookies.remove("token")
     // Chuyển hướng về trang login
     router.push("/login");
   };
