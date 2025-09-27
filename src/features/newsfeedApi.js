@@ -54,8 +54,8 @@ export const newsfeedApi = createApi({
 
         // Xóa cache feed
         clearCache: builder.mutation({
-            query: ({ userId, page = 0, size = 20 }) => ({
-                url: `/newsfeed/cache?userId=${userId}&page=${page}&size=${size}`,
+            query: () => ({
+                url: `/newsfeed/cache`,
                 method: "DELETE",
             }),
             invalidatesTags: [{ type: "NewsFeed", id: "LIST" }],
@@ -65,6 +65,15 @@ export const newsfeedApi = createApi({
         initialize: builder.mutation({
             query: () => ({
                 url: "/newsfeed/initialize",
+                method: "POST",
+            }),
+            invalidatesTags: [{ type: "NewsFeed", id: "LIST" }],
+        }),
+
+        // Cập nhật độ ưu tiên của feed
+        updatepriorities: builder.mutation({
+            query: () => ({
+                url: "/newsfeed/update-priorities",
                 method: "POST",
             }),
             invalidatesTags: [{ type: "NewsFeed", id: "LIST" }],
@@ -103,6 +112,7 @@ export const {
     useRefreshFeedMutation,
     useClearCacheMutation,
     useInitializeMutation,
+    useUpdateprioritiesMutation,
     useAdminInitializeUserMutation,
     useAdminPopulateAllUsersMutation,
     useAdminCleanupFriendshipItemsMutation,

@@ -14,6 +14,7 @@ import { useGetUserByUsernameQuery } from "@/features/userApi";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { skipToken } from "@reduxjs/toolkit/query";
+import ConfirmModal from "../common/confirmModal";
 
 const FriendRequestCard = ({ friend, type = null }) => {
   const [acceptRequest, { isLoading: isAccepting }] = useAcceptRequestMutation();
@@ -60,6 +61,8 @@ const FriendRequestCard = ({ friend, type = null }) => {
       setLocalRelation(type);
     }
   }, [type, isSentPending]);
+  const [showConfirm, setShowConfirm] = useState(false);
+
 
 
 
@@ -106,11 +109,12 @@ const FriendRequestCard = ({ friend, type = null }) => {
   const handleRemoveFriend = async () => {
     try {
       await deleteFriend(checkIsFriend.friendshipId).unwrap();
-      toast.success(`Đã hủy kết bạn với ${userData?.firstName} ${userData?.lastName}`);
+      toast.success(`Đã hủy kết bạn với ${friend?.user?.firstName || friend?.friend?.firstName}`);
       setLocalRelation("SUGGESTION");
     } catch (err) {
       toast.error(err?.data?.message || "Hủy kết bạn thất bại");
     }
+    setShowConfirm(false);
   };
 
 
@@ -209,7 +213,7 @@ const FriendRequestCard = ({ friend, type = null }) => {
 
         {localRelation === "DELETE" && (
           <button
-            onClick={handleRemoveFriend}
+            onClick={() => setShowConfirm(true)}
             disabled={isDeletingFriend}
             className="w-full bg-red-500 hover:bg-red-600 text-white text-sm px-5 py-2 rounded-full transition-colors"
           >
@@ -227,6 +231,15 @@ const FriendRequestCard = ({ friend, type = null }) => {
           </button>
         )}
       </div>
+
+      {/* Confirm Modal */}
+      <ConfirmModal
+        isOpen={showConfirm}
+        title={`Hủy kết bạn với ${friend.user?.firstName} ${friend.user?.lastName}?`}
+        content="Bạn có chắc chắn muốn hủy kết bạn không?"
+        onCancel={() => setShowConfirm(false)}
+        onConfirm={handleRemoveFriend}
+      />
     </div>
   );
 };

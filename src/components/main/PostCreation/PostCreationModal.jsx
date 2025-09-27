@@ -27,6 +27,7 @@ const PostCreationModal = ({
   handleFileSelect,
   removeFile,
   editingPost = null,
+  onPosted,
 }) => {
   const [privacyIndex, setPrivacyIndex] = useState(0);
   const [showPrivacyDropdown, setShowPrivacyDropdown] = useState(false);
@@ -155,7 +156,8 @@ const PostCreationModal = ({
         await updatePost({ postId: editingPost?.post.id, body: payload }).unwrap();
         toast.success("Chỉnh sửa bài viết thành công")
       } else {
-        await createPost(payload).unwrap();
+        const res = await createPost(payload).unwrap();
+        onPosted(res?.data);
         toast.success("Đăng bài viết thành công")
       }
 

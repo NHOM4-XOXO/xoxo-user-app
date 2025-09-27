@@ -47,7 +47,7 @@ function updateLocalReactionStats(prev, oldType, newType) {
   };
 }
 
-const Post = ({ data }) => {
+const Post = ({ data, onLike }) => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { id, commentCount } = data?.post || {};
@@ -168,6 +168,7 @@ const Post = ({ data }) => {
     try {
       if (newType) {
         await addReactToPost({ postId: id, reactionType: "LIKE" }).unwrap();
+        onLike();
       } else {
         await deleteReactionPost(id).unwrap();
       }
@@ -254,6 +255,7 @@ const Post = ({ data }) => {
 
                 try {
                   await addReactToPost({ postId: id, reactionType: newType }).unwrap();
+                  onLike();
                 } catch (err) {
                   console.error("Reaction failed:", err);
                   // rollback

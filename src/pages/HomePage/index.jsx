@@ -6,6 +6,8 @@ import {
   useInteractMutation,
   useClearCacheMutation,
   newsfeedApi,
+  useUpdateprioritiesMutation,
+  useRefreshFeedMutation,
 } from "@/features/newsfeedApi";
 
 import Post from "@/components/main/Post/PostItem";
@@ -18,7 +20,8 @@ import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 
 const PAGE_SIZE_DEFAULT = 5;
-const SEEN_FLUSH_MS = 1500;
+const SEEN_FLUSH_MS = 1500; // sau 1.5s mới gửi markSeen
+const STALE_TIME_MS = 2 * 60 * 1000; // TTL Redis 30 phút
 
 function PostWithVisibility({ item, onLike, onVisible }) {
   const visRef = useVisibilityRef(item.id, onVisible);
@@ -31,11 +34,9 @@ function PostWithVisibility({ item, onLike, onVisible }) {
 
 function useVisibilityRef(itemId, onVisible) {
   const nodeRef = useRef(null);
-
   useEffect(() => {
     const node = nodeRef.current;
     if (!node) return;
-
     const io = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
@@ -47,7 +48,6 @@ function useVisibilityRef(itemId, onVisible) {
     io.observe(node);
     return () => io.disconnect();
   }, [itemId, onVisible]);
-
   return nodeRef;
 }
 
@@ -59,6 +59,8 @@ export default function HomePage() {
   const pageSizeRef = useRef(PAGE_SIZE_DEFAULT);
   const loadingRef = useRef(false);
   const nextPageRef = useRef(0);
+  const hasMoreRef = useRef(true);
+  const lastFetchTimeRef = useRef(0);
 
   const seenSetRef = useRef(new Set());
   const seenTimerRef = useRef(null);
@@ -69,11 +71,12 @@ export default function HomePage() {
 
   const {
     data: firstData,
-    isLoading: firstLoading,
     isFetching: firstFetching,
     error: firstError,
     refetch: refetchPage0,
   } = useGetNewsFeedQuery({ page: 0, size: pageSizeRef.current });
+  const [updatepriorities] = useUpdateprioritiesMutation();
+  const [refreshFeed] = useRefreshFeedMutation();
 
   // Load trang đầu tiên
   useEffect(() => {
@@ -85,13 +88,11 @@ export default function HomePage() {
           : [...prev, firstData].sort(
             (a, b) => parseInt(a.page ?? 0, 10) - parseInt(b.page ?? 0, 10)
           );
-
-        const maxPageRaw =
+        nextPageRef.current =
           newPages.length > 0
-            ? Math.max(...newPages.map((p) => parseInt(p.page ?? 0, 10)))
-            : 0;
-        nextPageRef.current = maxPageRaw + 1;
-
+            ? Math.max(...newPages.map((p) => parseInt(p.page ?? 0, 10))) + 1
+            : 1;
+        lastFetchTimeRef.current = Date.now();
         return newPages;
       });
     }
@@ -103,6 +104,7 @@ export default function HomePage() {
     }
   }, [firstError]);
 
+  // Prefetch page
   const prefetchPage = useCallback(
     (page) => {
       dispatch(
@@ -115,67 +117,55 @@ export default function HomePage() {
     [dispatch]
   );
 
-  const loadPage = useCallback(
-    async () => {
-      if (loadingRef.current) return;
-      loadingRef.current = true;
-
-      const currentPage = nextPageRef.current;
-      nextPageRef.current += 1; // tăng ngay khi gọi để không lặp lại page
-
-      try {
-        const resultAction = await dispatch(
-          newsfeedApi.endpoints.getNewsFeed.initiate(
-            { page: currentPage, size: pageSizeRef.current },
-            { forceRefetch: false }
-          )
-        );
-        const payload = resultAction.data ?? resultAction.payload;
-        if (!payload) return;
-
-        setPages((prev) => {
-          const pageIndex = prev.findIndex((p) => p.page === payload.page);
-          if (pageIndex === -1) {
-            // page chưa có → append
-            return [...prev, payload].sort(
-              (a, b) => parseInt(a.page ?? 0, 10) - parseInt(b.page ?? 0, 10)
-            );
-          } else {
-            // page đã có → merge items
-            const oldItems = prev[pageIndex].items ?? [];
-            const newItems = payload.items ?? [];
-            const mergedPage = { ...payload, items: [...oldItems, ...newItems] };
-            const newPages = [...prev];
-            newPages[pageIndex] = mergedPage;
-            return newPages.sort(
-              (a, b) => parseInt(a.page ?? 0, 10) - parseInt(b.page ?? 0, 10)
-            );
-          }
-        });
-      } catch (e) {
-        console.error("loadPage error", e);
-        nextPageRef.current = Math.max(0, nextPageRef.current - 1); // rollback nếu lỗi
-      } finally {
-        loadingRef.current = false;
+  // Load page
+  const loadPage = useCallback(async () => {
+    if (loadingRef.current || !hasMoreRef.current) return;
+    loadingRef.current = true;
+    const currentPage = nextPageRef.current;
+    nextPageRef.current += 1;
+    try {
+      const resultAction = await dispatch(
+        newsfeedApi.endpoints.getNewsFeed.initiate(
+          { page: currentPage, size: pageSizeRef.current },
+          { forceRefetch: false }
+        )
+      );
+      const payload = resultAction.data ?? resultAction.payload;
+      if (!payload?.items || payload.items.length === 0) {
+        hasMoreRef.current = false;
+        return;
       }
-    },
-    [dispatch]
-  );
+      setPages((prev) => {
+        const pageIndex = prev.findIndex((p) => p.page === payload.page);
+        if (pageIndex === -1) {
+          return [...prev, payload].sort(
+            (a, b) => parseInt(a.page ?? 0, 10) - parseInt(b.page ?? 0, 10)
+          );
+        } else {
+          const oldItems = prev[pageIndex].items ?? [];
+          const mergedPage = { ...payload, items: [...oldItems, ...payload.items] };
+          const newPages = [...prev];
+          newPages[pageIndex] = mergedPage;
+          return newPages.sort(
+            (a, b) => parseInt(a.page ?? 0, 10) - parseInt(b.page ?? 0, 10)
+          );
+        }
+      });
+    } catch (e) {
+      console.error("loadPage error", e);
+      nextPageRef.current = Math.max(0, nextPageRef.current - 1);
+    } finally {
+      loadingRef.current = false;
+    }
+  }, [dispatch]);
 
-  // Khi user tạo bài mới, prepend vào page 0
-  const onPostCreated = (newPost) => {
-    setPages((prev) => {
-      const p0Index = prev.findIndex((p) => parseInt(p.page ?? 0, 10) === 0);
-      if (p0Index === -1) {
-        return [{ page: 0, items: [newPost] }, ...prev];
-      }
-      const p0 = prev[p0Index];
-      const newItems = [newPost, ...(p0.items ?? [])];
-      const newPage0 = { ...p0, items: newItems };
-      const newPages = [...prev];
-      newPages[p0Index] = newPage0;
-      return newPages;
-    });
+  // Khi user tạo bài mới
+  const onPostCreated = async (newPost) => {
+    try {
+      await clearCache();
+    } catch (e) {
+      console.warn("Clear cache page 0 failed", e);
+    }
   };
 
   // Infinite scroll observer
@@ -183,7 +173,6 @@ export default function HomePage() {
   useEffect(() => {
     const el = loadMoreRef.current;
     if (!el) return;
-
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -194,7 +183,6 @@ export default function HomePage() {
       },
       { threshold: 0.7 }
     );
-
     observer.observe(el);
     return () => observer.disconnect();
   }, [pages, loadPage]);
@@ -215,10 +203,7 @@ export default function HomePage() {
 
   // Mark seen batching
   const markSeenFlush = useCallback(async () => {
-    if (seenTimerRef.current) {
-      clearTimeout(seenTimerRef.current);
-      seenTimerRef.current = null;
-    }
+    if (seenTimerRef.current) clearTimeout(seenTimerRef.current);
     const ids = Array.from(seenSetRef.current);
     if (!ids.length) return;
     seenSetRef.current.clear();
@@ -233,12 +218,12 @@ export default function HomePage() {
     if (seenTimerRef.current) clearTimeout(seenTimerRef.current);
     seenTimerRef.current = setTimeout(markSeenFlush, SEEN_FLUSH_MS);
   }
-
   function onItemVisible(itemId) {
     seenSetRef.current.add(itemId);
     scheduleSeenFlush();
   }
 
+  // Optimistic interact
   const optimisticInteract = async (itemId) => {
     try {
       setPages((prev) =>
@@ -252,20 +237,40 @@ export default function HomePage() {
         }))
       );
       await interact({ itemId }).unwrap();
+      await updatepriorities();
     } catch (e) {
       toast.error("Tương tác thất bại, đã hoàn tác");
       refetchPage0();
     }
   };
 
+  // Pull-to-refresh
   const handleRefresh = async () => {
     try {
       await refetchPage0();
+      lastFetchTimeRef.current = Date.now();
       toast.success("Đã làm mới bảng tin");
     } catch (e) {
       toast.error("Làm mới thất bại");
     }
   };
+
+  // TTL stale check
+  const tryRefreshIfStale = useCallback(async () => {
+    if (Date.now() - lastFetchTimeRef.current > STALE_TIME_MS) {
+      try {
+        await refetchPage0();
+        lastFetchTimeRef.current = Date.now();
+        toast.success("Bảng tin đã được làm mới (tự động sau 30 phút)");
+      } catch (e) {
+        toast.error("Làm mới bảng tin thất bại");
+      }
+    }
+  }, [refetchPage0]);
+
+  useEffect(() => {
+    tryRefreshIfStale(); // check khi mount
+  }, [tryRefreshIfStale]);
 
   const flatItems = pages
     .slice()
@@ -281,9 +286,16 @@ export default function HomePage() {
       <ScrollableContainer className="flex-1 h-full">
         <div className="p-2 px-10 bg-fb-light-secondary dark:bg-fb-dark-primary">
           <div className="max-w-xl mx-auto">
+            {/* <div className="flex justify-between mb-4">
+              <button
+                className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                onClick={handleRefresh}
+              >
+                Làm mới
+              </button>
+            </div> */}
+
             <PostCreation onPosted={onPostCreated} />
-
-
 
             <div className="space-y-4">
               {flatItems.map((item) => (
@@ -297,9 +309,8 @@ export default function HomePage() {
             </div>
 
             <div ref={loadMoreRef} className="mt-6 mb-10 text-center">
-              {firstFetching || loadingRef.current && (
-                <div>Đang tải thêm...</div>
-              )}
+              {(firstFetching || loadingRef.current) && <div>Đang tải bài viết...</div>}
+              {!hasMoreRef.current && <div>Không còn bài viết</div>}
             </div>
           </div>
         </div>
