@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback, useContext } from "react";
 import {
   useGetNewsFeedQuery,
   useMarkSeenMutation,
@@ -18,6 +18,7 @@ import RightSideBar from "@/components/main/RightSidebar-Home/RightSideBar";
 import SettingsDropdown from "@/components/main/RightSidebar-Home/SettingsDropdown";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
+import { RootContext } from "@/app/ClientProviders";
 
 const PAGE_SIZE_DEFAULT = 5;
 const SEEN_FLUSH_MS = 1500; // sau 1.5s mới gửi markSeen
@@ -52,6 +53,7 @@ function useVisibilityRef(itemId, onVisible) {
 }
 
 export default function HomePage() {
+  const { setIsLoading } = useContext(RootContext);
   const dispatch = useDispatch();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
@@ -77,6 +79,20 @@ export default function HomePage() {
   } = useGetNewsFeedQuery({ page: 0, size: pageSizeRef.current });
   const [updatepriorities] = useUpdateprioritiesMutation();
   const [refreshFeed] = useRefreshFeedMutation();
+
+  // Loading toàn trang lần đầu
+  useEffect(() => {
+    setIsLoading(true);
+  }, []);
+
+  useEffect(() => {
+    setIsLoading(firstFetching);
+  }, [firstFetching, setIsLoading]);
+
+  useEffect(() => {
+    if (firstData) setIsLoading(false);
+  }, [firstData, setIsLoading]);
+
 
   // Load trang đầu tiên
   useEffect(() => {
@@ -138,19 +154,24 @@ export default function HomePage() {
       setPages((prev) => {
         const pageIndex = prev.findIndex((p) => p.page === payload.page);
         if (pageIndex === -1) {
-          return [...prev, payload].sort(
-            (a, b) => parseInt(a.page ?? 0, 10) - parseInt(b.page ?? 0, 10)
+          // loại bỏ trùng trong payload.items vs prev.flatItems
+          const existingIds = new Set(prev.flatMap(p => p.items.map(i => i.id)));
+          const uniqueItems = payload.items.filter(i => !existingIds.has(i.id));
+          return [...prev, { ...payload, items: uniqueItems }].sort(
+            (a, b) => (a.page ?? 0) - (b.page ?? 0)
           );
         } else {
           const oldItems = prev[pageIndex].items ?? [];
-          const mergedPage = { ...payload, items: [...oldItems, ...payload.items] };
+          // lọc trùng giữa oldItems + payload.items
+          const oldIds = new Set(oldItems.map(i => i.id));
+          const newItems = payload.items.filter(i => !oldIds.has(i.id));
+          const mergedPage = { ...payload, items: [...oldItems, ...newItems] };
           const newPages = [...prev];
           newPages[pageIndex] = mergedPage;
-          return newPages.sort(
-            (a, b) => parseInt(a.page ?? 0, 10) - parseInt(b.page ?? 0, 10)
-          );
+          return newPages.sort((a, b) => (a.page ?? 0) - (b.page ?? 0));
         }
       });
+
     } catch (e) {
       console.error("loadPage error", e);
       nextPageRef.current = Math.max(0, nextPageRef.current - 1);
@@ -256,17 +277,23 @@ export default function HomePage() {
   };
 
   // TTL stale check
+  const toastRef = useRef(false);
+
   const tryRefreshIfStale = useCallback(async () => {
     if (Date.now() - lastFetchTimeRef.current > STALE_TIME_MS) {
       try {
         await refetchPage0();
         lastFetchTimeRef.current = Date.now();
-        toast.success("Bảng tin đã được làm mới (tự động sau 30 phút)");
+        if (!toastRef.current) {
+          toast.success("Bảng tin đã được làm mới");
+          toastRef.current = true;
+        }
       } catch (e) {
         toast.error("Làm mới bảng tin thất bại");
       }
     }
-  }, [refetchPage0]);
+  }, [refetchPage0, lastFetchTimeRef]);
+
 
   useEffect(() => {
     tryRefreshIfStale(); // check khi mount

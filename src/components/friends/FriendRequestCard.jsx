@@ -174,8 +174,10 @@ const FriendRequestCard = ({ friend, type = null }) => {
 
       {/* Bạn chung */}
       {!isMutualLoading && (
-        <p className="text-sm text-gray-500 dark:text-gray-400 min-h-[20px]">
-          {countMutualFriend > 0 ? `${countMutualFriend} bạn chung` : ""}
+        <p className="text-sm text-gray-500 dark:text-gray-400 min-h-[20px] cursor-pointer hover:underline">
+          <Link href={`/profile/${userData?.username}/profile-friends?tab=mutual`}>
+            {countMutualFriend > 0 ? `${countMutualFriend} bạn chung` : ""}
+          </Link>
         </p>
       )}
 
