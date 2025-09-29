@@ -22,7 +22,7 @@ export const userApi = createApi({
             providesTags: (r, e, username) => [{ type: "User", id: username }],
         }),
         getUserById: builder.query({
-            query: (userId) => `/${userId}`,
+            query: (userId) => `/id/${userId}`,
             transformResponse: transform,
             providesTags: (r, e, userId) => [{ type: "User", id: userId }],
         }),

@@ -4,6 +4,7 @@ import {
   useAcceptRequestMutation,
   useDeleteFriendMutation,
   useDeleteRequestMutation,
+  useGetCountMutualFriendQuery,
   useGetSentPendingQuery,
   useIsFriendQuery,
   useRejectRequestMutation,
@@ -13,6 +14,7 @@ import { useGetUserByUsernameQuery } from "@/features/userApi";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { skipToken } from "@reduxjs/toolkit/query";
+import ConfirmModal from "../common/confirmModal";
 
 const FriendRequestCard = ({ friend, type = null }) => {
   const [acceptRequest, { isLoading: isAccepting }] = useAcceptRequestMutation();
@@ -35,6 +37,8 @@ const FriendRequestCard = ({ friend, type = null }) => {
     undefined,
     { skip: type !== "SUGGESTION" }
   );
+  const { data: countMutualFriend, isLoading: isMutualLoading } =
+    useGetCountMutualFriendQuery(userData?.id, { skip: !userData?.id });
 
   // kiểm tra đã gửi lời mời chưa (trường hợp SUGGESTION)
   const isSentPending = useMemo(() => {
@@ -57,6 +61,8 @@ const FriendRequestCard = ({ friend, type = null }) => {
       setLocalRelation(type);
     }
   }, [type, isSentPending]);
+  const [showConfirm, setShowConfirm] = useState(false);
+
 
 
 
@@ -103,11 +109,12 @@ const FriendRequestCard = ({ friend, type = null }) => {
   const handleRemoveFriend = async () => {
     try {
       await deleteFriend(checkIsFriend.friendshipId).unwrap();
-      toast.success(`Đã hủy kết bạn với ${userData?.firstName} ${userData?.lastName}`);
+      toast.success(`Đã hủy kết bạn với ${friend?.user?.firstName || friend?.friend?.firstName}`);
       setLocalRelation("SUGGESTION");
     } catch (err) {
       toast.error(err?.data?.message || "Hủy kết bạn thất bại");
     }
+    setShowConfirm(false);
   };
 
 
@@ -135,7 +142,7 @@ const FriendRequestCard = ({ friend, type = null }) => {
   );
 
   // ================== UI ==================
-  if (isUserLoading) {
+  if (isUserLoading || isMutualLoading) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 flex flex-col items-center text-center animate-pulse">
         <div className="w-24 h-24 bg-gray-300 dark:bg-gray-700 rounded-full mb-3"></div>
@@ -159,18 +166,21 @@ const FriendRequestCard = ({ friend, type = null }) => {
       </div>
 
       {/* Tên */}
-      <h3 className="font-semibold text-lg dark:text-white">
+      <h3 className="font-semibold text-lg dark:text-white cursor-pointer hover:underline">
         <Link href={`/profile/${userData?.username}`}>
           {userData?.firstName} {userData?.lastName}
         </Link>
       </h3>
 
       {/* Bạn chung */}
-      {friend?.user?.mutualFriendsCount && (
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          {`${friend?.user?.mutualFriendsCount} bạn chung`}
+      {!isMutualLoading && (
+        <p className="text-sm text-gray-500 dark:text-gray-400 min-h-[20px] cursor-pointer hover:underline">
+          <Link href={`/profile/${userData?.username}/profile-friends?tab=mutual`}>
+            {countMutualFriend > 0 ? `${countMutualFriend} bạn chung` : ""}
+          </Link>
         </p>
       )}
+
 
       {/* Nút */}
       <div className="mt-4 w-full space-y-2">
@@ -193,7 +203,7 @@ const FriendRequestCard = ({ friend, type = null }) => {
           </>
         )}
 
-        {(localRelation === "SENT") && (
+        {localRelation === "SENT" && (
           <button
             onClick={handleDeleteRequest}
             disabled={isDeletingRequest}
@@ -205,7 +215,7 @@ const FriendRequestCard = ({ friend, type = null }) => {
 
         {localRelation === "DELETE" && (
           <button
-            onClick={handleRemoveFriend}
+            onClick={() => setShowConfirm(true)}
             disabled={isDeletingFriend}
             className="w-full bg-red-500 hover:bg-red-600 text-white text-sm px-5 py-2 rounded-full transition-colors"
           >
@@ -223,6 +233,15 @@ const FriendRequestCard = ({ friend, type = null }) => {
           </button>
         )}
       </div>
+
+      {/* Confirm Modal */}
+      <ConfirmModal
+        isOpen={showConfirm}
+        title={`Hủy kết bạn với ${friend.user?.firstName} ${friend.user?.lastName}?`}
+        content="Bạn có chắc chắn muốn hủy kết bạn không?"
+        onCancel={() => setShowConfirm(false)}
+        onConfirm={handleRemoveFriend}
+      />
     </div>
   );
 };

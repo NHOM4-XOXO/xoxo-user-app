@@ -161,7 +161,9 @@ const MainPost = ({ data, reactionStats, currentUserId, localCommentCount = null
 
       {/* Caption */}
       <div className="px-2 text-gray-700 dark:text-gray-300 text-sm">
-        <p className={showFullCaption ? "" : "line-clamp-2"}>
+        <p
+          className={`${showFullCaption ? "" : "line-clamp-2"} break-words whitespace-pre-wrap`}
+        >
           {post?.content || ""}
         </p>
         {post?.content && post.content.length > 100 && (
@@ -173,6 +175,7 @@ const MainPost = ({ data, reactionStats, currentUserId, localCommentCount = null
           </button>
         )}
       </div>
+
 
       {/* Media */}
       {media.length > 0 && <PostMediaGrid media={media} postId={post?.id} />}

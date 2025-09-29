@@ -1,19 +1,73 @@
 "use client";
 import React, { forwardRef } from "react";
 import Image from "next/image";
+import {
+  useGetUserByIdQuery,
+  useMarkNotificationReadMutation,
+  useDeleteNotificationMutation,
+  useMarkAllReadMutation,
+} from "@/features/userApi";
 
-const NotificationDropdown = forwardRef((props, ref) => {
-  const { notifications = [], isLoading = false, onClose } = props;
-  const {
-    useMarkNotificationReadMutation,
-    useDeleteNotificationMutation,
-    useMarkAllReadMutation,
-    useGetUnreadCountQuery,
-  } = require("@/features/userApi");
+// Component con cho từng notification
+const NotificationItem = ({ item, formatTimeAgo }) => {
+  const { data: profile } = useGetUserByIdQuery(item.senderId);
 
   const [markRead] = useMarkNotificationReadMutation();
   const [deleteNoti] = useDeleteNotificationMutation();
+  console.log(profile);
+
+
+  return (
+    <li
+      className={`flex items-start gap-3 p-2 rounded-lg ${item.isRead ? "bg-transparent" : "bg-blue-50 dark:bg-blue-900"
+        } hover:bg-gray-100 dark:hover:bg-gray-700`}
+    >
+      <Image
+        src={profile?.avatarUrl || "/default-avatar.jpg"}
+        alt="avatar"
+        width={40}
+        height={40}
+        className="rounded-full w-10 h-10"
+      />
+      <div className="flex-1">
+        <p className="text-sm text-gray-800 dark:text-white">{item.message}</p>
+        <span className="text-xs text-gray-500">{formatTimeAgo(item.createdAt)}</span>
+      </div>
+      <div className="flex flex-col items-end gap-1">
+        {!item.isRead && (
+          <button
+            onClick={async (e) => {
+              e.stopPropagation();
+              try {
+                await markRead(item.id).unwrap();
+              } catch { }
+            }}
+            className="text-xs text-blue-600 hover:underline"
+          >
+            Đánh dấu đã đọc
+          </button>
+        )}
+        <button
+          onClick={async (e) => {
+            e.stopPropagation();
+            try {
+              await deleteNoti(item.id).unwrap();
+            } catch { }
+          }}
+          className="text-xs text-gray-500 hover:underline"
+        >
+          Xóa
+        </button>
+      </div>
+    </li>
+  );
+};
+
+const NotificationDropdown = forwardRef((props, ref) => {
+  const { notifications = [], isLoading = false, onClose } = props;
   const [markAllRead] = useMarkAllReadMutation();
+  console.log(props);
+
 
   const formatTimeAgo = (isoString) => {
     if (!isoString) return "";
@@ -47,7 +101,7 @@ const NotificationDropdown = forwardRef((props, ref) => {
         <div className="flex items-center gap-3">
           <button
             onClick={async () => {
-              try { await markAllRead().unwrap(); } catch {}
+              try { await markAllRead().unwrap(); } catch { }
             }}
             className="text-sm text-blue-600 hover:underline"
           >
@@ -70,42 +124,11 @@ const NotificationDropdown = forwardRef((props, ref) => {
       ) : (
         <ul className="space-y-2">
           {notifications.map((item) => (
-            <li
+            <NotificationItem
               key={item.id}
-              className={`flex items-start gap-3 p-2 rounded-lg ${
-                item.isRead ? "bg-transparent" : "bg-blue-50 dark:bg-blue-900"
-              } hover:bg-gray-100 dark:hover:bg-gray-700`}
-            >
-              <Image
-                src={"/default-avatar.jpg"}
-                alt="avatar"
-                width={40}
-                height={40}
-                className="rounded-full w-10 h-10"
-              />
-              <div className="flex-1">
-                <p className="text-sm text-gray-800 dark:text-white">
-                  {item.message}
-                </p>
-                <span className="text-xs text-gray-500 ">{formatTimeAgo(item.createdAt)}</span>
-              </div>
-              <div className="flex flex-col items-end gap-1">
-                {!item.isRead && (
-                  <button
-                    onClick={async (e) => { e.stopPropagation(); try { await markRead(item.id).unwrap(); } catch {} }}
-                    className="text-xs text-blue-600 hover:underline"
-                  >
-                    Đánh dấu đã đọc
-                  </button>
-                )}
-                <button
-                  onClick={async (e) => { e.stopPropagation(); try { await deleteNoti(item.id).unwrap(); } catch {} }}
-                  className="text-xs text-gray-500 hover:underline"
-                >
-                  Xóa
-                </button>
-              </div>
-            </li>
+              item={item}
+              formatTimeAgo={formatTimeAgo}
+            />
           ))}
         </ul>
       )}

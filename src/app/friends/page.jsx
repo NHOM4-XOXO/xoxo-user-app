@@ -17,12 +17,12 @@ export default function FriendsPage() {
     <main className="flex-1 p-6 space-y-8">
       {/* -------------------- Lời mời nhận -------------------- */}
       <div>
-        <div className="flex justify-between items-center mb-4">
+        {received.length > 0 && (<div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-bold dark:text-white">Lời mời kết bạn</h1>
           {/* <a href="#" className="text-blue-500 hover:underline">
             Xem tất cả
           </a> */}
-        </div>
+        </div>)}
 
         {isLoadingReceived ? (
           ""
@@ -37,12 +37,14 @@ export default function FriendsPage() {
 
       {/* -------------------- Lời mời đã gửi -------------------- */}
       <div>
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold dark:text-white">Lời mời đã gửi</h1>
-          {/* <a href="#" className="text-blue-500 hover:underline">
+        {sent.length > 0 && (
+          <div className="flex justify-between items-center mb-4">
+            <h1 className="text-2xl font-bold dark:text-white">Lời mời đã gửi</h1>
+            {/* <a href="#" className="text-blue-500 hover:underline">
             Xem tất cả
           </a> */}
-        </div>
+          </div>
+        )}
 
         {isLoadingSent ? (
           ""

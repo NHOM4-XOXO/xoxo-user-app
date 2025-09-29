@@ -47,7 +47,7 @@ const ProfilePost = () => {
     <div className="flex flex-col-reverse md:flex-row gap-4">
 
       <div className="w-full md:w-[60%] space-y-3">
-        <PostCreation />
+        {isMe && (<PostCreation />)}
 
         {posts.map((item) => (
           <Post key={item?.post.id} data={item} />

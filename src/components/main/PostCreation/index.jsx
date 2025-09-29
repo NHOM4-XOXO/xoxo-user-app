@@ -4,7 +4,7 @@ import { Video, ImageIcon, Smile } from "lucide-react";
 import PostCreationModal from "./PostCreationModal";
 import { useSelector } from "react-redux";
 
-const PostCreation = () => {
+const PostCreation = ({ onPosted }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [postContent, setPostContent] = useState("");
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -130,6 +130,7 @@ const PostCreation = () => {
           handleFileSelect={handleFileSelect}
           removeFile={removeFile}
           fileInputRef={fileInputRef}
+          onPosted={onPosted}
         />
       </>
     );

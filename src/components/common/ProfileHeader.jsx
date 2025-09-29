@@ -1,7 +1,6 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
-import { Modal } from "antd";
-import { Camera } from "lucide-react";
+import { useState, useEffect, } from "react";
+import { Edit } from "lucide-react";
 import toast from "react-hot-toast";
 import ProfileTabs from "@/components/common/ProfileTabs";
 import {
@@ -20,7 +19,6 @@ import {
     useRejectRequestMutation,
     useSendRequestMutation,
 } from "@/features/friendshipApi";
-import Link from "next/link";
 
 const tabs = [
     { label: "Bài viết", path: "/" },
@@ -201,10 +199,8 @@ function ProfileHeader({ userName, setIsLoading }) {
         }
     };
 
-    const avatar =
-        profile?.avatarUrl || "https://placehold.co/150x150?text=No+Avatar";
-    const cover =
-        profile?.coverUrl || "https://placehold.co/1000x300?text=No+Cover";
+    const avatar = profile?.avatarUrl || "/default-avatar.jpg"
+    const cover = profile?.coverUrl || "/default-cover.png";
     const displayName =
         `${profile?.firstName || ""} ${profile?.lastName || ""}`.trim() ||
         profile?.username ||
@@ -217,7 +213,7 @@ function ProfileHeader({ userName, setIsLoading }) {
             {/* Cover */}
             <div className="relative group">
                 <img
-                    className="w-full rounded-t-lg object-cover h-[20rem]"
+                    className="w-full  rounded-t-lg object-cover h-[20rem]"
                     src={cover}
                     alt="cover"
                 />
@@ -225,9 +221,10 @@ function ProfileHeader({ userName, setIsLoading }) {
                     <>
                         <label
                             htmlFor="coverUpload"
-                            className="absolute bottom-2 right-2 bg-black/50 text-white p-2 rounded-full cursor-pointer hover:bg-black/70 transition"
+                            className="absolute bottom-2 right-2 bg-black/50 text-white p-2 rounded-full cursor-pointer 
+                   hover:bg-black/70 transition opacity-0 group-hover:opacity-100"
                         >
-                            <Camera className="w-4 h-4" />
+                            <Edit className="w-4 h-4" />
                         </label>
                         <input
                             type="file"
@@ -242,7 +239,7 @@ function ProfileHeader({ userName, setIsLoading }) {
 
             {/* Avatar + Info */}
             <div className="flex flex-col justify-start items-start sm:flex-row px-3 h-auto pb-6 relative border-b border-gray-200 dark:border-fb-dark-quaternary">
-                <div className="w-[10rem] sm:-mt-12 -mt-16 sm:mb-0 relative">
+                <div className="w-[10rem] sm:-mt-12 -mt-16 sm:mb-0 relative group">
                     <img
                         className="w-[9rem] h-[9rem] mx-auto rounded-full border-4 border-fb-light-primary dark:border-fb-dark-secondary object-cover"
                         src={avatar}
@@ -252,9 +249,10 @@ function ProfileHeader({ userName, setIsLoading }) {
                         <>
                             <label
                                 htmlFor="avatarUpload"
-                                className="absolute bottom-2 right-2 bg-black/50 text-white p-2 rounded-full cursor-pointer hover:bg-black/70 transition"
+                                className="absolute bottom-2 right-2 bg-black/50 text-white p-2 rounded-full cursor-pointer 
+                   hover:bg-black/70 transition opacity-0 group-hover:opacity-100"
                             >
-                                <Camera className="w-4 h-4" />
+                                <Edit className="w-4 h-4" />
                             </label>
                             <input
                                 type="file"

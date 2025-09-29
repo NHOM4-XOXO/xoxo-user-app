@@ -48,7 +48,7 @@ export default function LoginForm() {
     e.preventDefault();
     try {
       const res = await login(formData).unwrap();
-      const { email, token } = res.data; 
+      const { email, token } = res.data;
       dispatch(setCredentials({ email, token }));
       scheduleTokenRefresh(token);
 
@@ -151,11 +151,10 @@ export default function LoginForm() {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className={`w-full py-3 px-4 rounded-md font-semibold text-lg transition duration-200 cursor-pointer ${
-                      isLoading
+                    className={`w-full py-3 px-4 rounded-md font-semibold text-lg transition duration-200 cursor-pointer ${isLoading
                         ? "bg-gray-400 text-gray-200 cursor-not-allowed"
                         : "bg-blue-600 text-white hover:bg-blue-700"
-                    }`}
+                      }`}
                   >
                     {isLoading ? (
                       <span className="flex items-center justify-center">

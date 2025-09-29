@@ -47,7 +47,8 @@ function updateLocalReactionStats(prev, oldType, newType) {
   };
 }
 
-const Post = ({ data }) => {
+const Post = ({ data, onLike }) => {
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { id, commentCount } = data?.post || {};
   const [showPopup, setShowPopup] = useState(false);
@@ -167,6 +168,7 @@ const Post = ({ data }) => {
     try {
       if (newType) {
         await addReactToPost({ postId: id, reactionType: "LIKE" }).unwrap();
+        onLike();
       } else {
         await deleteReactionPost(id).unwrap();
       }
@@ -217,7 +219,7 @@ const Post = ({ data }) => {
       <div className="flex justify-between text-sm text-gray-600 dark:text-gray-300">
         {/* Like */}
         <div
-          className="w-1/3 relative flex justify-center"
+          className="w-full relative flex justify-center"
           onMouseEnter={() => setShowPopup(true)}
           onMouseLeave={() => setShowPopup(false)}
         >
@@ -253,6 +255,7 @@ const Post = ({ data }) => {
 
                 try {
                   await addReactToPost({ postId: id, reactionType: newType }).unwrap();
+                  onLike();
                 } catch (err) {
                   console.error("Reaction failed:", err);
                   // rollback
@@ -270,18 +273,18 @@ const Post = ({ data }) => {
         {/* Comment */}
         <button
           onClick={() => setIsModalOpen(true)}
-          className="w-1/3 hover:bg-gray-100 dark:hover:bg-fb-dark-tertiary flex items-center justify-center gap-2 py-2 rounded-md cursor-pointer"
+          className="w-full hover:bg-gray-100 dark:hover:bg-fb-dark-tertiary flex items-center justify-center gap-2 py-2 rounded-md cursor-pointer"
         >
           <MessageCircle size={18} /> Bình luận ({commentCount})
         </button>
 
         {/* Share */}
-        <button
+        {currentUserId !== data?.post?.authorId && (<button
           onClick={() => setIsShareOpen(true)}
-          className="w-1/3 hover:bg-gray-100 dark:hover:bg-fb-dark-tertiary flex items-center justify-center gap-2 py-2 rounded-md cursor-pointer"
+          className="w-full hover:bg-gray-100 dark:hover:bg-fb-dark-tertiary flex items-center justify-center gap-2 py-2 rounded-md cursor-pointer"
         >
           <Share2 size={18} /> Chia sẻ
-        </button>
+        </button>)}
       </div>
 
       {/* Comment Modal */}

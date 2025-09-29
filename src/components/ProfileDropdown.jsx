@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { getProfileMenuItems } from "@/data/profileMenuItems";
 import Link from "next/link";
+import { useGetMyProfileQuery } from "@/features/userApi";
 
 export default function ProfileDropdown() {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,38 +12,21 @@ export default function ProfileDropdown() {
   const [userAvatar, setUserAvatar] = useState("/default-avatar.jpg");
   const menuRef = useRef(null);
   const items = getProfileMenuItems();
-
-  // const storedProfile = localStorage.getItem("auth");
-
-  // let avatarUrl = null;
-  // if (storedProfile) {
-  //   const profileObj = JSON.parse(storedProfile);
-  //   avatarUrl = profileObj?.profile.avatarUrl; // Lấy ra link avatar
-  // }
+  const { data: profile } = useGetMyProfileQuery();
 
   const handleClickOutside = (e) => {
     if (menuRef.current && !menuRef.current.contains(e.target)) {
       setIsOpen(false);
     }
   };
-  useEffect(() => {
-    try {
-      const profile = localStorage.getItem("profile");
-      if (profile) {
-        const parsedUser = JSON.parse(profile);
-        setUser(parsedUser);
 
-        if (parsedUser) {
-          setUserName(parsedUser.firstName + " " + parsedUser.lastName);
-          setUserAvatar(parsedUser.avatarUrl || "/default-avatar.jpg");
-        }
-      }
-    } catch (error) {
-      console.error("Error loading user data:", error);
-      setUserName("User");
-      setUserAvatar("/default-avatar.jpg");
+  useEffect(() => {
+    if (profile) {
+      setUserName(profile.firstName + " " + profile.lastName);
+      setUserAvatar(profile.avatarUrl || "/default-avatar.jpg");
     }
-  }, []);
+  }, [profile])
+
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);

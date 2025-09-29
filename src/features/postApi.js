@@ -8,7 +8,7 @@ const transform = (response) => response.data;
 export const postApi = createApi({
     reducerPath: "postApi",
     baseQuery: createBaseQueryWithReauth(`${process.env.NEXT_PUBLIC_API_URL}/api/posts`),
-    tagTypes: ["Post", "Comment", "Like", "Share", "Media"],
+    tagTypes: ["Post", "Comment", "Like", "Share", "Media", "CommentList"],
 
     endpoints: (builder) => ({
         /* -------------------- GET -------------------- */
@@ -202,7 +202,10 @@ export const postApi = createApi({
                 url: `/${postId}`,
                 method: "DELETE",
             }),
-            invalidatesTags: (r, e, postId) => [{ type: "Post", id: postId }],
+            invalidatesTags: (r, e, { postId }) => [
+                { type: "Post", id: postId },
+                { type: "Post", id: "LIST" },
+            ],
         }),
 
         deletePostMedia: builder.mutation({

@@ -118,7 +118,7 @@ export default function Sidebar() {
         <div className="mb-4">
           <div className="flex items-center space-x-3 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg cursor-pointer">
             <Image
-              src={userAvatar}
+              src={userAvatar || "/default-avatar.jpg"}
               alt="User Avatar"
               width={40}
               height={40}
