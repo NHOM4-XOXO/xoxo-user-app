@@ -1,5 +1,5 @@
 "use client";
-import React, { forwardRef } from "react";
+import React, { forwardRef, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import {
   useGetUserByIdQuery,
@@ -7,6 +7,7 @@ import {
   useDeleteNotificationMutation,
   useMarkAllReadMutation,
 } from "@/features/userApi";
+import websocketService from "@/services/websocketService";
 
 // Component con cho từng notification
 const NotificationItem = ({ item, formatTimeAgo }) => {
@@ -68,7 +69,39 @@ const NotificationDropdown = forwardRef((props, ref) => {
   const [markAllRead] = useMarkAllReadMutation();
   console.log(props);
 
+  const [items, setItems] = useState(() => notifications);
 
+  useEffect(() => {
+    setItems(notifications);
+  }, [notifications]);
+
+  useEffect(() => {
+    let sub;
+    const run = async () => {
+      try {
+        await websocketService.connect();
+        sub = await websocketService.subscribeToNotifications((realtime) => {
+          const mapped = {
+            id: realtime.id || `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+            message: realtime.message,
+            isRead: realtime.read ?? false,
+            createdAt: realtime.createdAt,
+            senderId: realtime.senderId,
+            type: realtime.type,
+            targetId: realtime.targetId,
+            targetType: realtime.targetType,
+            actionType: realtime.actionType,
+            payload: realtime.payload,
+          };
+          setItems((prev) => [mapped, ...prev]);
+        });
+      } catch (e) {
+        console.error("Failed to subscribe notifications:", e);
+      }
+    };
+    run();
+    return () => sub?.unsubscribe?.();
+  }, []);
   const formatTimeAgo = (isoString) => {
     if (!isoString) return "";
     const then = new Date(isoString).getTime();
@@ -119,11 +152,11 @@ const NotificationDropdown = forwardRef((props, ref) => {
         <div className="flex justify-center items-center py-6">
           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
         </div>
-      ) : notifications.length === 0 ? (
+      ) : items.length === 0 ? (
         <div className="py-4 text-center text-sm text-gray-500 dark:text-gray-300">Không có thông báo</div>
       ) : (
         <ul className="space-y-2">
-          {notifications.map((item) => (
+          {items.map((item) => (
             <NotificationItem
               key={item.id}
               item={item}

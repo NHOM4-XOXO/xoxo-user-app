@@ -11,6 +11,10 @@ import LoadingOverlay from "@/components/LoadingOverlay";
 import { usePathname } from "next/navigation";
 import Cookies from "js-cookie";
 import { scheduleTokenRefresh } from "@/features/auth/authManager";
+import { useDispatch } from "react-redux";
+import websocketService from "@/services/websocketService";
+import { userApi } from "@/features/userApi";
+import { useGetMyProfileQuery } from "@/features/userApi";
 
 
 // Fonts
@@ -29,6 +33,26 @@ export default function ClientProviders({ children }) {
     }
   }, []);
 
+  // Place Redux-bound effects inside Provider scope
+  const ReduxEffects = () => {
+    const dispatch = useDispatch();
+    const { data: me } = useGetMyProfileQuery();
+    useEffect(() => {
+      let sub;
+      const run = async () => {
+        try {
+          await websocketService.connect();
+          sub = await websocketService.subscribeToNotifications(() => {
+            dispatch(userApi.util.invalidateTags(["Notification"]));
+          }, { userId: me?.id });
+        } catch {}
+      };
+      run();
+      return () => sub?.unsubscribe?.();
+    }, [dispatch, me?.id]);
+    return null;
+  };
+
   const pathname = usePathname();
 
   // useEffect(() => {
@@ -45,6 +69,7 @@ export default function ClientProviders({ children }) {
       <RootContext.Provider value={{ setIsLoading }}>
         <ThemeProvider>
           <ClientLayout className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+            <ReduxEffects />
             {children}
           </ClientLayout>
           <Toaster position="top-right" reverseOrder={false} />

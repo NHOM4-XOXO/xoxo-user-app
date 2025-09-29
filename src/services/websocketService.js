@@ -174,6 +174,45 @@ class WebSocketService {
         return subscription;
     }
 
+    async subscribeToNotifications(onMessage, options = {}) {
+        if (!this.isConnected) {
+            await this.connect();
+        }
+
+        const userQueue = this.client.subscribe(`/user/queue/notifications`, (message) => {
+            try {
+                const parsed = JSON.parse(message.body);
+                onMessage(parsed);
+            } catch (error) {
+                console.error('Error parsing notification message:', error);
+            }
+        });
+
+        // Optional: also subscribe to public topic /topic/notifications/{userId}
+        let publicTopic;
+        if (options.userId) {
+            try {
+                publicTopic = this.client.subscribe(`/topic/notifications/${options.userId}`, (message) => {
+                    try {
+                        const parsed = JSON.parse(message.body);
+                        onMessage(parsed);
+                    } catch (error) {
+                        console.error('Error parsing notification message (public):', error);
+                    }
+                });
+            } catch (e) {
+                console.warn('Subscribe public notifications failed:', e);
+            }
+        }
+
+        return {
+            unsubscribe: () => {
+                try { userQueue.unsubscribe(); } catch {}
+                try { publicTopic?.unsubscribe?.(); } catch {}
+            }
+        };
+    }
+
     unsubscribeFromRoom(chatRoomId) {
         const subscription = this.messageHandlers.get(chatRoomId);
         if (subscription) {
