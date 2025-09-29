@@ -258,7 +258,6 @@ export default function HomePage() {
         }))
       );
       await interact({ itemId }).unwrap();
-      await updatepriorities();
     } catch (e) {
       toast.error("Tương tác thất bại, đã hoàn tác");
       refetchPage0();
